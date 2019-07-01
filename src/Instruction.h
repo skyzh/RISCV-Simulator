@@ -17,6 +17,8 @@ char InstructionType[] = "UUJIBBBBBBIIIIISSIIIIIISSSSSSSSSSSSS";
 
 using Instruction = unsigned int;
 
+using Immediate = unsigned int;
+
 struct InstructionBase {
 };
 
