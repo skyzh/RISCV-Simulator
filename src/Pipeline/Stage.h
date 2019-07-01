@@ -5,9 +5,12 @@
 #ifndef RISCV_SIMULATOR_STAGE_H
 #define RISCV_SIMULATOR_STAGE_H
 
+#include "../Tickable.h"
+#include <map>
 
-class Stage {
-
+class Stage : public Tickable {
+public:
+    void tick() override {}
 };
 
 

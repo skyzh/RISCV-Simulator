@@ -7,6 +7,9 @@
 
 #include "../Instruction.h"
 
+const unsigned OP_IMM = 0b0010011;
+const unsigned OP = 0b0110011;
+
 class ALU {
 public:
     class InvalidOperation {
@@ -18,6 +21,5 @@ public:
 
     Immediate get_r(unsigned opcode, unsigned funct3, Immediate op1, Immediate op2, unsigned funct7);
 };
-
 
 #endif //RISCV_SIMULATOR_ALU_H

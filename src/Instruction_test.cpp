@@ -7,7 +7,6 @@
 
 TEST(Instruction, CorrectSize) {
     EXPECT_EQ(sizeof(Instruction), 4);
-    EXPECT_EQ(AND, sizeof(InstructionType) - 1);
 }
 
 TEST(Instruction, InstructionR) {

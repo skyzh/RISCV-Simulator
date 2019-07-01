@@ -17,16 +17,29 @@ Immediate ALU::get_i(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
         }
     }
 
-    if (opcode == 0b10011) {
+    if (opcode == OP_IMM) {
         switch (funct3) {
             case 0b000: // ADDI
+                return imm + op1;
             case 0b010: // SLTI
+                if ((SImmediate) op1 < (SImmediate) imm) return 1;
+                else return 0;
             case 0b011: // SLTIU
+                if (op1 < imm) return 1;
+                else return 0;
             case 0b100: // XORI
+                return op1 ^ imm;
             case 0b110: // ORI
+                return op1 | imm;
             case 0b111: // ANDI
-            default:
-                throw InvalidOperation();
+                return op1 & imm;
+            case 0b001: // SLLI
+                return op1 << (imm & (unsigned) 0x1f);
+            case 0b101:
+                if (imm & (1 << 9)) // SRAI
+                    return ((SImmediate) op1) >> (imm & (unsigned) 0x1f);
+                else // SRLI
+                    return op1 >> (imm & (unsigned) 0x1f);
         }
     }
 
@@ -48,33 +61,30 @@ Immediate ALU::get_s(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
 }
 
 Immediate ALU::get_r(unsigned opcode, unsigned funct3, Immediate op1, Immediate op2, unsigned funct7) {
-    if (opcode == 0b0010011) {
-        switch (funct3) {
-            case 0b001: // SLLI
-            case 0b101:
-                if (funct7 == 0b0000000); // SRLI
-                if (funct7 == 0b0100000); // SRAI
-            default:
-                throw InvalidOperation();
-        }
-    }
-
-    if (opcode == 0b0110011) {
+    if (opcode == OP) {
         switch (funct3) {
             case 0b000:
-                if (funct7 == 0b0000000); // ADD
-                if (funct7 == 0b0100000); // SUB
+                if (funct7 == 0b0000000) return op1 + op2; // ADD
+                if (funct7 == 0b0100000) return op1 - op2; // SUB
             case 0b001: // SLL
+                return op1 << (op2 & (unsigned) 0x1f);
             case 0b010: // SLT
+                if ((SImmediate) op1 < (SImmediate) op2) return 1;
+                else return 0;
             case 0b011: // SLTU
+                if (op1 < op2) return 1;
+                else return 0;
             case 0b100: // XOR
+                return op1 ^ op2;
             case 0b101:
-                if (funct7 == 0b0000000); // SRL
-                if (funct7 == 0b0100000); // SRA
+                if (funct7 == 0b0000000) // SRL
+                    return op1 >> (op2 & (unsigned) 0x1f);
+                if (funct7 == 0b0100000) // SRA
+                    return (SImmediate) op1 >> (op2 & (unsigned) 0x1f);
             case 0b110: // OR
+                return op1 | op2;
             case 0b111: // AND
-            default:
-                throw InvalidOperation();
+                return op1 & op2;
         }
     }
 
