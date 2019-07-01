@@ -3,8 +3,8 @@ project(RISCV_Simulator)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_library(RISCV_Simulator src/simulator.cpp src/simulator.cpp)
-add_executable(RISCV_Simulator_Test src/main_test.cpp)
+add_library(RISCV_Simulator src/simulator.cpp src/simulator.cpp src/Parser.cpp src/Parser.h src/Instruction.cpp src/Instruction.h)
+add_executable(RISCV_Simulator_Test src/main_test.cpp src/Parser_test.cpp src/Instruction_test.cpp)
 add_executable(RISCV_Simulator_Main src/main.cpp)
 
 enable_testing()
