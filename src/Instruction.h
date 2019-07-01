@@ -7,6 +7,14 @@
 
 #include <utility>
 
+enum InstructionList {
+    LUI = 0, AUIPC, JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU, LB, LH, LW, LBU, LHU, SB,
+    SH, SW, ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI, ADD, SUB, SLL, SLT, SLTU,
+    XOR, SRL, SRA, OR, AND
+};
+
+char InstructionType[] = "UUJIBBBBBBIIIIISSIIIIIISSSSSSSSSSSSS";
+
 using Instruction = unsigned int;
 
 struct InstructionBase {
@@ -57,7 +65,7 @@ struct InstructionS : InstructionBase {
         funct3 = get_digits(inst, 14, 12);
         rs1 = get_digits(inst, 19, 15);
         rs2 = get_digits(inst, 24, 20);
-        imm = (get_digits(inst, 11, 7)) |
+        imm = get_digits(inst, 11, 7) |
               (get_digits(inst, 30, 25) << 5) |
               expand_digit(get_digits(inst, 31, 31), 11);
     }
