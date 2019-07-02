@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "Instruction.h"
+#include "Instruction.hpp"
 
 TEST(Instruction, CorrectSize) {
     EXPECT_EQ(sizeof(Instruction), 4);

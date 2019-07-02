@@ -6,10 +6,17 @@
 #define RISCV_SIMULATOR_EXECUTE_H
 
 #include "Stage.h"
+#include "../Module/ALU.h"
 
 class Execute : public Stage {
+private:
+    ALU alu;
 public:
-    Execute(Session* session);
+
+    class InvalidAccess {
+    };
+
+    Execute(Session *session);
 
     Immediate dispatch(const std::string &key) override;
 };

@@ -1,6 +1,8 @@
 #include <iostream>
+#include "Session.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    Session session;
+    session.tick();
     return 0;
 }

@@ -14,5 +14,4 @@ public:
     Immediate dispatch(const std::string &key) override;
 };
 
-
 #endif //RISCV_SIMULATOR_WRITEBACK_H

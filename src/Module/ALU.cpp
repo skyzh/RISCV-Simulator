@@ -6,6 +6,8 @@
 
 Immediate ALU::get_i(unsigned opcode, unsigned funct3, Immediate op1, Immediate imm) {
     if (opcode == 0b11) {
+        // Load and Store
+        /*
         switch (funct3) {
             case 0b000: // LB
             case 0b001: // LH
@@ -15,8 +17,12 @@ Immediate ALU::get_i(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
             default:
                 throw InvalidOperation();
         }
+         */
+        return op1 + imm;
     }
-
+    if (opcode == 0b1100111) {
+        return op1 + imm;
+    }
     if (opcode == OP_IMM) {
         switch (funct3) {
             case 0b000: // ADDI
@@ -40,6 +46,8 @@ Immediate ALU::get_i(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
                     return ((SImmediate) op1) >> (imm & (unsigned) 0x1f);
                 else // SRLI
                     return op1 >> (imm & (unsigned) 0x1f);
+            default:
+                throw InvalidOperation();
         }
     }
 
@@ -57,6 +65,36 @@ Immediate ALU::get_s(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
         }
     }
 
+    throw InvalidOperation();
+}
+
+Immediate ALU::get_b(unsigned opcode, unsigned funct3, Immediate op1, Immediate op2, Immediate imm, unsigned pc) {
+    if (opcode == 0b1100011) {
+        Immediate branch_inst = pc + imm;
+        Immediate next_inst = pc + 4;
+        switch (funct3) {
+            case 0b000: // BEQ
+                if (op1 == op2) return branch_inst;
+                else return next_inst;
+            case 0b001: // BNE
+                if (op1 != op2) return branch_inst;
+                else return next_inst;
+            case 0b100: // BLT
+                if ((SImmediate) op1 < (SImmediate) op2) return branch_inst;
+                else return next_inst;
+            case 0b101: // BGE
+                if ((SImmediate) op1 >= (SImmediate) op2) return branch_inst;
+                else return next_inst;
+            case 0b110: // BLTU
+                if (op1 < op2) return branch_inst;
+                else return next_inst;
+            case 0b111: // BGEU
+                if (op1 >= op2) return branch_inst;
+                else return next_inst;
+            default:
+                throw InvalidOperation();
+        }
+    }
     throw InvalidOperation();
 }
 
@@ -85,6 +123,8 @@ Immediate ALU::get_r(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
                 return op1 | op2;
             case 0b111: // AND
                 return op1 & op2;
+            default:
+                throw InvalidOperation();
         }
     }
 

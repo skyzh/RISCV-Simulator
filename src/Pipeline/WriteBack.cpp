@@ -7,5 +7,6 @@
 WriteBack::WriteBack(Session* session) : Stage(session) {}
 
 Immediate WriteBack::dispatch(const std::string &key) {
+    throw InvalidKey();
     return 0;
 }

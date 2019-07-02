@@ -7,5 +7,5 @@
 MemoryAccess::MemoryAccess(Session* session) : Stage(session) {}
 
 Immediate MemoryAccess::dispatch(const std::string &key) {
-    return 0;
+    throw InvalidKey();
 }
