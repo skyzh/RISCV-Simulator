@@ -40,17 +40,6 @@ int run_all_tests() {
 }
 
 int main() {
-    Session session;
-    session.load_memory("../data/pi.data");
-    int cnt = 0;
-    while (true) {
-        session.tick();
-        if (session.PC.read() == 0x1004) std::cout << cnt++;
-        if (session.memory[0x30004]) {
-            break;
-        }
-    }
-    std::cout << (session.rf[10].read() & 0xff) << std::endl;
-
+    run_all_tests();
     return 0;
 }
