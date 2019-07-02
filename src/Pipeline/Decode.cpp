@@ -35,7 +35,7 @@ Immediate Decode::dispatch(const std::string &key) {
         cached_inst.verify("rs1");
         return cached_inst.rs1;
     }
-    if (key == "rval1") {
+    if (key == "op1") {
         cached_inst.verify("rs1");
         return session->rf[cached_inst.rs1].read();
     }
@@ -43,7 +43,7 @@ Immediate Decode::dispatch(const std::string &key) {
         cached_inst.verify("rs2");
         return cached_inst.rs2;
     }
-    if (key == "rval2") {
+    if (key == "op2") {
         cached_inst.verify("rs2");
         return session->rf[cached_inst.rs2].read();
     }

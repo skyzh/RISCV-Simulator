@@ -6,12 +6,15 @@
 #define RISCV_SIMULATOR_MEMORY_HPP
 
 #include "Common.h"
+#include <cstring>
 
 const int MEMORY_SIZE = 0x400000;
 
 class Memory {
 public:
     char mem[MEMORY_SIZE];
+
+    Memory() { memset(mem, 0, sizeof(mem)); }
 
     Immediate read_word(unsigned int addr) {
         return *(Immediate *) (mem + addr);
