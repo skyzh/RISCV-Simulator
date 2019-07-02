@@ -46,3 +46,11 @@ The process described above resembles lazy evaluation of a function
 in Haskell. It can be easily expressed in a functional way. In this
 project, `Stage` object saves all such functions, hence an intermediate
 value won't be evaluated twice in a single cycle.
+
+## Tips
+
+* Register x0 is always zero.
+* Be careful with branch jump. Make sure you know next instruction is relative to PC or the next.
+* You should write return address to rd when executing jal.
+* When I was debugging, I printed out PC at every moment to check branching functionality.
+* And I made a trap at 0x1000 then print register a0 to know what printInt was exactly printing.
