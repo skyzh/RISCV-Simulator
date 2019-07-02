@@ -2,7 +2,7 @@
 // Created by Alex Chi on 2019-07-01.
 //
 
-#ifndef RISCV_SIMULATOR_MEMORY_H
+#ifndef RISCV_SIMULATOR_MEMORY_HPP
 #define RISCV_SIMULATOR_MEMORY_H
 
 #include "Stage.h"
@@ -13,4 +13,4 @@ public:
 };
 
 
-#endif //RISCV_SIMULATOR_MEMORY_H
+#endif //RISCV_SIMULATOR_MEMORY_HPP

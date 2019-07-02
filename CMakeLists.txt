@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.12)
 project(RISCV_Simulator)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_library(RISCV_Simulator STATIC src/simulator.cpp src/simulator.cpp src/Parser.cpp src/Parser.h src/Instruction.cpp src/Instruction.h src/Pipeline/Stage.h src/Pipeline/Fetch.cpp src/Pipeline/Fetch.h src/Pipeline/Decode.cpp src/Pipeline/Decode.h src/Pipeline/Execute.cpp src/Pipeline/Execute.h src/Pipeline/Memory.cpp src/Pipeline/Memory.h src/Pipeline/WriteBack.cpp src/Pipeline/WriteBack.h src/Module/ALU.cpp src/Module/ALU.h src/Register.hpp src/Tickable.h src/Session.cpp src/Session.h)
-add_executable(RISCV_Simulator_Test src/main_test.cpp src/Parser_test.cpp src/Instruction_test.cpp src/Register_test.cpp src/Module/ALU_test.cpp src/Pipeline/Stage_test.cpp src/Session_test.cpp)
+add_library(RISCV_Simulator STATIC src/simulator.cpp src/simulator.cpp src/Parser.cpp src/Parser.h src/Instruction.cpp src/Instruction.h src/Pipeline/Stage.h src/Pipeline/Fetch.cpp src/Pipeline/Fetch.h src/Pipeline/Decode.cpp src/Pipeline/Decode.h src/Pipeline/Execute.cpp src/Pipeline/Execute.h src/Pipeline/Memory.cpp src/Pipeline/Memory.h src/Pipeline/WriteBack.cpp src/Pipeline/WriteBack.h src/Module/ALU.cpp src/Module/ALU.h src/Register.hpp src/Tickable.h src/Session.cpp src/Session.h src/Memory.hpp src/RegisterFile.hpp src/Common.h)
+add_executable(RISCV_Simulator_Test src/main_test.cpp src/Parser_test.cpp src/Instruction_test.cpp src/Register_test.cpp src/Module/ALU_test.cpp src/Pipeline/Stage_test.cpp src/Session_test.cpp src/Memory_test.cpp)
 add_executable(RISCV_Simulator_Main src/main.cpp)
 
 enable_testing()

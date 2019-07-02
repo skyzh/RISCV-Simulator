@@ -6,11 +6,9 @@
 #define RISCV_SIMULATOR_INSTRUCTION_H
 
 #include <utility>
+#include "Common.h"
 
 using Instruction = unsigned int;
-
-using Immediate = unsigned int;
-using SImmediate = int;
 
 struct InstructionBase {
     unsigned opcode, rs1, rs2, rd, funct3, funct7;
