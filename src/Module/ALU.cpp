@@ -71,7 +71,7 @@ Immediate ALU::get_s(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
 Immediate ALU::get_b(unsigned opcode, unsigned funct3, Immediate op1, Immediate op2, Immediate imm, unsigned pc) {
     if (opcode == 0b1100011) {
         Immediate branch_inst = pc + imm;
-        Immediate next_inst = pc + 4;
+        Immediate next_inst = pc;
         switch (funct3) {
             case 0b000: // BEQ
                 if (op1 == op2) return branch_inst;

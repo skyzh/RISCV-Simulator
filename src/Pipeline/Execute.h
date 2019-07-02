@@ -16,6 +16,10 @@ public:
     class InvalidAccess {
     };
 
+    class InvalidOp {
+
+    };
+
     Execute(Session *session);
 
     Immediate dispatch(const std::string &key) override;

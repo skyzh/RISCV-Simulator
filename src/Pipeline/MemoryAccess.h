@@ -8,10 +8,17 @@
 #include "Stage.h"
 
 class MemoryAccess : public Stage {
+private:
+    bool write_processed;
 public:
-    MemoryAccess(Session* session);
+    class InvalidTarget {
+    };
+
+    MemoryAccess(Session *session);
 
     Immediate dispatch(const std::string &key) override;
+
+    void tick() override;
 };
 
 

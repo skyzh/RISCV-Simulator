@@ -4,6 +4,7 @@
 
 #include "Execute.h"
 #include "Decode.h"
+#include "Fetch.h"
 #include "../Session.h"
 
 Execute::Execute(Session *session) : Stage(session) {}
@@ -41,10 +42,20 @@ Immediate Execute::dispatch(const std::string &key) {
                     session->d->get("op1"),
                     session->d->get("op2"),
                     session->d->get("imm"),
-                    session->PC.read()
+                    session->f->get("f_pc")
             );
         if (type == InstructionBase::Type::J)
             return session->d->get("imm");
+        if (type== InstructionBase::Type::U) {
+            switch(session->d->get("opcode")) {
+                case 0b0110111:
+                    return session->d->get("imm");
+                case 0b0010111:
+                    return session->f->get("f_pc") + session->d->get("imm");
+                default:
+                    throw InvalidOp();
+            }
+        }
         throw InvalidAccess();
     }
 

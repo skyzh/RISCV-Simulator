@@ -12,7 +12,7 @@ const int MEMORY_SIZE = 0x400000;
 
 class Memory {
 public:
-    char mem[MEMORY_SIZE];
+    unsigned char mem[MEMORY_SIZE];
 
     Memory() { memset(mem, 0, sizeof(mem)); }
 
@@ -24,7 +24,15 @@ public:
         *(Immediate *) (mem + addr) = imm;
     }
 
-    char &operator[](unsigned int addr) { return mem[addr]; }
+    unsigned short read_ushort(unsigned int addr) {
+        return *(short *) (mem + addr);
+    }
+
+    void write_ushort(unsigned int addr, unsigned short imm) {
+        *(short *) (mem + addr) = imm;
+    }
+
+    unsigned char &operator[](unsigned int addr) { return mem[addr]; }
 };
 
 
