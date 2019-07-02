@@ -50,14 +50,15 @@ Immediate Execute::dispatch(const std::string &key) {
             );
 
         if (type == InstructionBase::Type::J)
-            return session->f->get("f_pc") + session->d->get("imm");
+            // JAL
+            return session->f->get("f_pc") + session->d->get("imm") - 4;
 
         if (type == InstructionBase::Type::U) {
             switch (session->d->get("opcode")) {
-                case 0b0110111:
+                case 0b0110111: // LUI
                     return session->d->get("imm");
-                case 0b0010111:
-                    return session->f->get("f_pc") + session->d->get("imm");
+                case 0b0010111: // AUIPC
+                    return session->f->get("f_pc") + session->d->get("imm") - 4;
                 default:
                     throw InvalidOp();
             }

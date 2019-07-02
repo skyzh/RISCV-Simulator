@@ -16,7 +16,9 @@ class RegisterFile : Tickable {
 public:
     using Reg_T = Register<Immediate>;
 
-    RegisterFile() : Tickable() {}
+    RegisterFile() : Tickable() {
+        reg[0].always_zero = true;
+    }
 
     Reg_T reg[REG_NUM];
 

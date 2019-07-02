@@ -19,6 +19,8 @@ public:
     Immediate dispatch(const std::string &key) override;
 
     void tick() override;
+
+    void hook();
 };
 
 #endif //RISCV_SIMULATOR_WRITEBACK_H

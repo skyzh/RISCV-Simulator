@@ -6,28 +6,11 @@
 #include "Decode.h"
 #include "Execute.h"
 #include "../Session.h"
+#include <iostream>
 
 MemoryAccess::MemoryAccess(Session *session) : Stage(session), write_processed(false) {}
 
 Immediate MemoryAccess::dispatch(const std::string &key) {
-    if (!write_processed) {
-        write_processed = true;
-        if (session->d->get("opcode") == 0b0100011) {
-            unsigned int addr = session->e->get("e_val");
-            switch (session->d->get("funct3")) {
-                case 0b000: // SB
-                    session->memory[addr] = session->d->get("op2");
-                    break;
-                case 0b001: // SH
-                    session->memory.write_ushort(addr, session->d->get("op2"));
-                    break;
-                case 0b010: // SW
-                    session->memory.write_word(addr, session->d->get("op2"));
-                    break;
-            }
-        }
-    }
-
     if (key == "m_val") {
         unsigned int addr = session->e->get("e_val");
         switch (session->d->get("funct3")) {
@@ -51,4 +34,24 @@ Immediate MemoryAccess::dispatch(const std::string &key) {
 void MemoryAccess::tick() {
     Stage::tick();
     write_processed = false;
+}
+
+void MemoryAccess::hook() {
+    if (!write_processed) {
+        write_processed = true;
+        if (session->d->get("opcode") == 0b0100011) {
+            unsigned int addr = session->e->get("e_val");
+            switch (session->d->get("funct3")) {
+                case 0b000: // SB
+                    session->memory[addr] = session->d->get("op2");
+                    break;
+                case 0b001: // SH
+                    session->memory.write_ushort(addr, session->d->get("op2"));
+                    break;
+                case 0b010: // SW
+                    session->memory.write_word(addr, session->d->get("op2"));
+                    break;
+            }
+        }
+    }
 }

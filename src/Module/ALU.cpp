@@ -21,7 +21,8 @@ Immediate ALU::get_i(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
         return op1 + imm;
     }
     if (opcode == 0b1100111) {
-        return op1 + imm;
+        // JALR
+        return (op1 + imm) & (~0x1);
     }
     if (opcode == OP_IMM) {
         switch (funct3) {
@@ -60,6 +61,7 @@ Immediate ALU::get_s(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
             case 0b000: // SB
             case 0b001: // SH
             case 0b010: // SW
+                return op1 + imm;
             default:
                 throw InvalidOperation();
         }
@@ -70,7 +72,7 @@ Immediate ALU::get_s(unsigned opcode, unsigned funct3, Immediate op1, Immediate 
 
 Immediate ALU::get_b(unsigned opcode, unsigned funct3, Immediate op1, Immediate op2, Immediate imm, unsigned pc) {
     if (opcode == 0b1100011) {
-        Immediate branch_inst = pc + imm;
+        Immediate branch_inst = pc + imm - 4;
         Immediate next_inst = pc;
         switch (funct3) {
             case 0b000: // BEQ

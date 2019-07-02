@@ -7,6 +7,7 @@
 
 #include "Common.h"
 #include <cstring>
+#include <iostream>
 
 const int MEMORY_SIZE = 0x400000;
 
@@ -32,7 +33,16 @@ public:
         *(short *) (mem + addr) = imm;
     }
 
-    unsigned char &operator[](unsigned int addr) { return mem[addr]; }
+    unsigned char &operator[](unsigned int addr) {
+        return mem[addr];
+    }
+
+    void debug() {
+        for (int i = 0x20000 - 0x10; i <= 0x20000; i++) {
+            std::cout << std::hex << (unsigned) mem[i] << " ";
+        }
+        std::cout << std::endl;
+    }
 };
 
 

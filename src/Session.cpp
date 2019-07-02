@@ -30,6 +30,8 @@ Session::~Session() {
 
 void Session::tick() {
     PC.write(w->get("w_pc"));
+    m->hook();
+    w->hook();
 
     PC.tick();
     rf.tick();

@@ -11,12 +11,12 @@ template<typename T>
 class Register : public Tickable {
 public:
     T prev, next;
-
-    Register() { prev = next = 0; }
+    bool always_zero;
+    Register() : always_zero(false) { prev = next = 0; }
 
     Register(const T &t) : prev(t), next(t) {}
 
-    const T &read() { return prev; }
+    const T &read() { if (always_zero) return 0; else return prev; }
 
     void write(const T &t) { next = t; }
 

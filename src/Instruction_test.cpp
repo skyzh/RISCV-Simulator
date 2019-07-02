@@ -64,6 +64,7 @@ TEST(Instruction, InstructionU) {
 
 TEST(Instruction, InstructionJ) {
     //                  10987654321098765432109876543210
+                                   100000000010100010011
     InstructionJ inst(0b10101010101010101010101010101010);
     //                    10987654321098765432109876543210
     EXPECT_EQ(inst.imm, 0b11111111111110101010001010101010);
