@@ -3,3 +3,6 @@
 //
 
 #include "Decode.h"
+#include "../Session.h"
+
+Decode::Decode(Session* session) : Stage(session) {}

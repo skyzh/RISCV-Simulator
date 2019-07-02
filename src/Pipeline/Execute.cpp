@@ -3,3 +3,5 @@
 //
 
 #include "Execute.h"
+
+Execute::Execute(Session* session) : Stage(session) {}

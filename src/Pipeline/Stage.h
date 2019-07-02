@@ -8,8 +8,14 @@
 #include "../Tickable.h"
 #include <map>
 
+class Session;
+
 class Stage : public Tickable {
+private:
+    Session *session;
 public:
+    Stage(Session *session) : session(session) {}
+
     void tick() override {}
 };
 

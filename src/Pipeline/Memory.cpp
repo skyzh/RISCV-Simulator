@@ -3,3 +3,5 @@
 //
 
 #include "Memory.h"
+
+Memory::Memory(Session* session) : Stage(session) {}

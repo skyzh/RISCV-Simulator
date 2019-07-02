@@ -8,7 +8,8 @@
 #include "Stage.h"
 
 class Decode : public Stage {
-
+public:
+    Decode(Session* session);
 };
 
 

@@ -3,3 +3,5 @@
 //
 
 #include "WriteBack.h"
+
+WriteBack::WriteBack(Session* session) : Stage(session) {}

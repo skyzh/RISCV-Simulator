@@ -8,7 +8,8 @@
 #include "Stage.h"
 
 class WriteBack : public Stage {
-
+public:
+    WriteBack(Session *session);
 };
 
 

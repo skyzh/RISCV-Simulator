@@ -8,7 +8,8 @@
 #include "Stage.h"
 
 class Fetch : public Stage {
-
+public:
+    Fetch(Session* session);
 };
 
 

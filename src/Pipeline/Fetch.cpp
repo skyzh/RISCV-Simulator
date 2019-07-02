@@ -3,3 +3,5 @@
 //
 
 #include "Fetch.h"
+
+Fetch::Fetch(Session* session) : Stage(session) {}

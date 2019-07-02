@@ -8,7 +8,8 @@
 #include "Stage.h"
 
 class Execute : public Stage {
-
+public:
+    Execute(Session* session);
 };
 
 

@@ -8,7 +8,8 @@
 #include "Stage.h"
 
 class Memory : public Stage {
-
+public:
+    Memory(Session* session);
 };
 
 
