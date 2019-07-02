@@ -21,7 +21,7 @@ int dstE = [
 ];
 ```
 
-### There is no feed forward of data.
+### There is no feed forward of data
 
 Contrary to CSAPP HCL, where we cannot read back data, there's no 
 feed forward of data in my implementation.
@@ -46,6 +46,11 @@ The process described above resembles lazy evaluation of a function
 in Haskell. It can be easily expressed in a functional way. In this
 project, `Stage` object saves all such functions, hence an intermediate
 value won't be evaluated twice in a single cycle.
+
+### Equivalent Circuit
+
+[PDF](https://github.com/skyzh/RISCV-Simulator/files/3350303/Note.Jul.2.2019.9_14_07.PM.pdf)
+
 
 ## Tips
 
