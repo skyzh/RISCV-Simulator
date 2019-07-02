@@ -27,7 +27,6 @@ public:
     }
 
     Immediate get(const std::string &key) {
-        return this->dispatch(key);
         if (cache.find(key) == cache.end()) {
             cache[key] = this->dispatch(key);
         }

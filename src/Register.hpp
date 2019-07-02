@@ -16,7 +16,9 @@ public:
 
     Register(const T &t) : prev(t), next(t) {}
 
-    const T &read() { if (always_zero) return 0; else return prev; }
+    T read() {
+        if (always_zero) return 0; else return prev;
+    }
 
     void write(const T &t) { next = t; }
 

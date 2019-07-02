@@ -18,6 +18,7 @@ public:
 
     RegisterFile() : Tickable() {
         reg[0].always_zero = true;
+        for (int i = 0; i < REG_NUM; i++) reg[i].prev = reg[i].next = 0;
     }
 
     Reg_T reg[REG_NUM];
