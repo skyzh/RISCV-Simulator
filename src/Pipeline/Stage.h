@@ -13,24 +13,27 @@
 class Session;
 
 class Stage : public Tickable {
-private:
+protected:
     Session *session;
-    std::map <std::string, Immediate> cache;
+    std::map<std::string, Immediate> cache;
 public:
+    class InvalidKey {
+    };
+
     Stage(Session *session) : session(session) {}
 
-    void tick() override {
+    virtual void tick() override {
         cache.clear();
     }
 
-    Immediate get(const std::string& key) {
+    Immediate get(const std::string &key) {
         if (cache.find(key) == cache.end()) {
             cache[key] = this->dispatch(key);
         }
         return cache[key];
     }
 
-    virtual Immediate dispatch(const std::string& key) = 0;
+    virtual Immediate dispatch(const std::string &key) = 0;
 };
 
 

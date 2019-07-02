@@ -29,6 +29,7 @@ void Session::tick() {
     PC.write(w->get("val_pc"));
 
     PC.tick();
+    rf.tick();
 
     f->tick();
     d->tick();
@@ -36,4 +37,3 @@ void Session::tick() {
     m->tick();
     w->tick();
 }
-

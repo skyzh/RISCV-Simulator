@@ -13,12 +13,15 @@ class Memory {
 public:
     char mem[MEMORY_SIZE];
 
-    Immediate read(unsigned int addr) {
+    Immediate read_word(unsigned int addr) {
         return *(Immediate *) (mem + addr);
     }
-    void write(unsigned int addr, Immediate imm) {
+
+    void write_word(unsigned int addr, Immediate imm) {
         *(Immediate *) (mem + addr) = imm;
     }
+
+    char &operator[](unsigned int addr) { return mem[addr]; }
 };
 
 

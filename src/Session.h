@@ -9,6 +9,7 @@
 #include "Register.hpp"
 #include "Tickable.h"
 #include "Memory.hpp"
+#include "RegisterFile.hpp"
 
 class Fetch;
 
@@ -29,6 +30,7 @@ public:
     WriteBack *w;
 
     Register<Immediate> PC;
+    RegisterFile rf;
     Memory memory;
 
     Session();

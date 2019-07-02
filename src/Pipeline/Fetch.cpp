@@ -3,9 +3,13 @@
 //
 
 #include "Fetch.h"
+#include "../Session.h"
 
 Fetch::Fetch(Session* session) : Stage(session) {}
 
 Immediate Fetch::dispatch(const std::string &key) {
-    return 0;
+    if (key == "inst") {
+        return session->memory.read_word(session->PC.read());
+    }
+    throw InvalidKey();
 }

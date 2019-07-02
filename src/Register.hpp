@@ -7,16 +7,20 @@
 
 #include "Tickable.h"
 
-template <typename T>
+template<typename T>
 class Register : public Tickable {
 public:
     T prev, next;
-    Register(const T& t) : prev(t), next(t) {}
 
-    const T& read() { return prev; }
-    void write(const T& t) { next = t; }
+    Register() { prev = next = 0; }
+
+    Register(const T &t) : prev(t), next(t) {}
+
+    const T &read() { return prev; }
+
+    void write(const T &t) { next = t; }
+
     void tick() { prev = next; }
 };
-
 
 #endif //RISCV_SIMULATOR_REGISTER_HPP

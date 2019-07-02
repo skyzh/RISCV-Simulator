@@ -5,11 +5,24 @@
 #ifndef RISCV_SIMULATOR_REGISTERFILE_HPP
 #define RISCV_SIMULATOR_REGISTERFILE_HPP
 
-#inlcude "Register.hpp"
+#include "Common.h"
+#include "Tickable.h"
+#include "Register.hpp"
 
-class RegisterFile {
+class RegisterFile : Tickable {
+    static const int REG_NUM = 32;
 public:
-    Register <Immediate> reg[32];
+    using Reg_T = Register<Immediate>;
+
+    RegisterFile() : Tickable() {}
+
+    Reg_T reg[REG_NUM];
+
+    Reg_T &operator[](unsigned id) { return reg[id]; }
+
+    void tick() override {
+        for (int i = 0; i < REG_NUM; i++) reg[i].tick();
+    }
 };
 
 
