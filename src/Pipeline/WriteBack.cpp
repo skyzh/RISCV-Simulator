@@ -13,22 +13,21 @@ WriteBack::WriteBack(Session *session) : Stage(session), write_processed(false) 
 Immediate WriteBack::dispatch(const std::string &key) {
     if (!write_processed) {
         write_processed = true;
-        auto rd = session->d->get("rd");
         switch (session->d->get("opcode")) {
             case 0b0110111: // LUI
-                session->rf[rd].write(session->d->get("imm"));
-                break;
             case 0b0010111: // AUIPC
             case 0b0000011: // L*
             case 0b0010011: // ***I
             case 0b0110011: // ***
-                session->rf[rd].write(session->e->get("e_val"));
+                session->rf[session->d->get("rd")].write(session->e->get("e_val"));
                 break;
         }
     }
 
     if (key == "w_pc") {
-        if (session->d->get("opcode") == 0b1100011) {
+        auto opcode = session->d->get("opcode");
+        // TODO: JAL WRITE
+        if (opcode == 0b1100011 || opcode == 0b1101111) { // JALR | JAL
             return session->e->get("e_val");
         } else {
             return session->f->get("f_pc");

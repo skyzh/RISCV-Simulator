@@ -38,12 +38,12 @@ struct InstructionBase {
         if (t == I) { if (key == "rs2" || key == "funct7") return false; }
         if (t == S) { if (key == "rd" || key == "funct7") return false; }
         if (t == B) { if (key == "rd" || key == "funct7") return false; }
-        if (t == U) { if (key == "rs1" || key == "rs2" || key == "funct3" || key == "funct7") return false; }
+        if (t == U || t == J) { if (key == "rs1" || key == "rs2" || key == "funct3" || key == "funct7") return false; }
         return true;
     }
 
     void verify(const std::string &key) {
-        if (is_valid(key)) throw InvalidAccess();
+        if (!is_valid(key)) throw InvalidAccess();
     };
 };
 

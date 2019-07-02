@@ -20,7 +20,7 @@ TEST(Parser, Hex) {
 
 TEST(Parser, Parse) {
     Memory mem;
-    std::string test_data = "@100\n00 01 02 03 04 05\n@0\n06 07 08 09 0A";
+    std::string test_data = "@100\n00 01 02 03    \n    04 05\n@0\n06 07 08 09 0A";
     std::stringstream ss(test_data);
     Parser::parse(ss, mem);
     EXPECT_EQ(mem[0x100], 0);

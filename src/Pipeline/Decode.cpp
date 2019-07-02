@@ -16,17 +16,17 @@ InstructionBase Decode::parse_opcode(unsigned opcode, Immediate imm) {
     if (opcode == 0b1100011) { return InstructionB(imm); } // B**
     if (opcode == 0b1100111) { return InstructionI(imm); } // JALR
     if (opcode == 0b1101111) { return InstructionJ(imm); } // JAL
-    if (opcode == 0b0010111) { return InstructionJ(imm); } // AUIPC
-    if (opcode == 0b0110111) { return InstructionJ(imm); } // LUI
+    if (opcode == 0b0010111) { return InstructionU(imm); } // AUIPC
+    if (opcode == 0b0110111) { return InstructionU(imm); } // LUI
     throw InvalidInstruction();
 }
 
 Immediate Decode::dispatch(const std::string &key) {
     if (!cache_valid) {
         cache_valid = true;
-        auto imm = session->f->get("inst");
-        auto opcode = imm & 0x7f;
-        cached_inst = parse_opcode(opcode, imm);
+        auto inst = session->f->get("inst");
+        auto opcode = inst & 0x7f;
+        cached_inst = parse_opcode(opcode, inst);
     }
     if (key == "opcode") { return cached_inst.opcode; }
     if (key == "type") return cached_inst.t;
@@ -58,6 +58,10 @@ Immediate Decode::dispatch(const std::string &key) {
     if (key == "funct7") {
         cached_inst.verify("funct7");
         return cached_inst.funct7;
+    }
+    if (key == "imm") {
+        cached_inst.verify("imm");
+        return cached_inst.imm;
     }
     throw InvalidKey();
 }

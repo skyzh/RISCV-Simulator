@@ -29,6 +29,8 @@ public:
                 std::string hex;
                 while (ss) {
                     ss >> hex;
+                    if (!ss) break;
+                    if (hex.length() == 0) break;
                     char data = parse_hex(hex);
                     mem[base_addr++] = data;
                 }

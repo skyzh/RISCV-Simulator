@@ -37,6 +37,8 @@ public:
 
     void tick() override;
 
+    void load_memory(const char* path);
+
     virtual ~Session();
 };
 

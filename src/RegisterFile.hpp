@@ -9,6 +9,8 @@
 #include "Tickable.h"
 #include "Register.hpp"
 
+#include <iostream>
+
 class RegisterFile : Tickable {
     static const int REG_NUM = 32;
 public:
@@ -22,6 +24,13 @@ public:
 
     void tick() override {
         for (int i = 0; i < REG_NUM; i++) reg[i].tick();
+    }
+
+    void debug() {
+        for (int i = 0; i < 32; i++) {
+            std::cout << std::hex << reg[i].read() << " ";
+            if ((i + 1) % 8 == 0) std::cout << std::endl;
+        }
     }
 };
 

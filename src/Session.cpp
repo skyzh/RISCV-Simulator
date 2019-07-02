@@ -8,6 +8,9 @@
 #include "Pipeline/Execute.h"
 #include "Pipeline/MemoryAccess.h"
 #include "Pipeline/WriteBack.h"
+#include "Parser.hpp"
+
+#include <fstream>
 
 Session::Session() : PC(0) {
     f = new Fetch(this);
@@ -26,7 +29,7 @@ Session::~Session() {
 }
 
 void Session::tick() {
-    PC.write(w->get("val_pc"));
+    PC.write(w->get("w_pc"));
 
     PC.tick();
     rf.tick();
@@ -36,4 +39,9 @@ void Session::tick() {
     e->tick();
     m->tick();
     w->tick();
+}
+
+void Session::load_memory(const char *path) {
+    std::fstream in(path);
+    Parser::parse(in, memory);
 }
