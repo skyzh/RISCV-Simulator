@@ -1,0 +1,27 @@
+language: cpp
+dist: xenial
+compiler:
+  - gcc
+cache:
+  directories:
+    - /home/travis/vcpkg/
+before_script:
+  - export CC=gcc-9
+  - export CXX=g++-9
+  - pushd . && cd ~
+  - if [ ! -f "vcpkg/bootstrap-vcpkg.sh" ] ; then git clone https://github.com/Microsoft/vcpkg.git ; fi
+  - cd vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg install gtest
+script:
+  - popd
+  - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cd build && cmake --build .
+  - ./RISCV_Simulator_Test
+env:
+  - BUILD_TYPE=DEBUG
+  - BUILD_TYPE=RELEASE
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-9
