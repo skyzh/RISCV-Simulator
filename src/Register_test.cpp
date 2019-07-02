@@ -7,8 +7,7 @@
 
 
 TEST(Register, ReadWrite) {
-    Register <unsigned> r(0);
-    EXPECT_EQ(r.read(), 0);
+    Register <unsigned> r;
     r.write(1);
     EXPECT_EQ(r.read(), 0);
     r.tick();
