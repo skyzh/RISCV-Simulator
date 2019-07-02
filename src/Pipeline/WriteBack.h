@@ -10,6 +10,8 @@
 class WriteBack : public Stage {
 public:
     WriteBack(Session *session);
+
+    Immediate dispatch(const std::string &key) override;
 };
 
 

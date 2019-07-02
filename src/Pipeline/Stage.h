@@ -5,18 +5,32 @@
 #ifndef RISCV_SIMULATOR_STAGE_H
 #define RISCV_SIMULATOR_STAGE_H
 
+#include "../Common.h"
 #include "../Tickable.h"
 #include <map>
+#include <string>
 
 class Session;
 
 class Stage : public Tickable {
 private:
     Session *session;
+    std::map <std::string, Immediate> cache;
 public:
     Stage(Session *session) : session(session) {}
 
-    void tick() override {}
+    void tick() override {
+        cache.clear();
+    }
+
+    Immediate get(const std::string& key) {
+        if (cache.find(key) == cache.end()) {
+            cache[key] = this->dispatch(key);
+        }
+        return cache[key];
+    }
+
+    virtual Immediate dispatch(const std::string& key) = 0;
 };
 
 

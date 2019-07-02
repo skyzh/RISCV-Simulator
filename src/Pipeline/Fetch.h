@@ -10,6 +10,8 @@
 class Fetch : public Stage {
 public:
     Fetch(Session* session);
+
+    Immediate dispatch(const std::string &key) override;
 };
 
 

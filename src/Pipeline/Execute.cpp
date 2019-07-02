@@ -5,3 +5,7 @@
 #include "Execute.h"
 
 Execute::Execute(Session* session) : Stage(session) {}
+
+Immediate Execute::dispatch(const std::string &key) {
+    return 0;
+}

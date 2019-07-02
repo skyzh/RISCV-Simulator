@@ -10,6 +10,8 @@
 class Decode : public Stage {
 public:
     Decode(Session* session);
+
+    Immediate dispatch(const std::string &key) override;
 };
 
 

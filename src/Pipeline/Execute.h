@@ -10,6 +10,8 @@
 class Execute : public Stage {
 public:
     Execute(Session* session);
+
+    Immediate dispatch(const std::string &key) override;
 };
 
 

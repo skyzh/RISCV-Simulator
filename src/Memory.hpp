@@ -7,7 +7,7 @@
 
 #include "Common.h"
 
-const int MEMORY_SIZE = 65536;
+const int MEMORY_SIZE = 0x400000;
 
 class Memory {
 public:
