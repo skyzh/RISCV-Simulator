@@ -25,3 +25,5 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-9
+      - ninja-build
+      
