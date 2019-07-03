@@ -8,20 +8,23 @@ void run_session(const char *path, unsigned ret_value) {
     std::cerr << "Running: " << path << " ... ";
     Session *session = new Session;
     session->load_memory(path);
+    int pc_cnt = 0;
     while (true) {
+        ++pc_cnt;
         session->tick();
         if (session->memory[0x30004]) {
             break;
         }
     }
-    auto ret_val = session->rf[10].read() & 0xff;
+    auto ret_val = session->rf.read(10) & 0xff;
     assert(ret_val == ret_value);
     std::cerr << ret_val << " == " << ret_value << "  ";
-    std::cerr << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms" << std::endl;
+    std::cerr << pc_cnt << " inst in " << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms" << std::endl;
     delete session;
 }
 
 int run_all_tests() {
+    /*
     run_session("../data/array_test1.data", 123);
     run_session("../data/array_test2.data", 43);
     run_session("../data/basicopt1.data", 88);
@@ -39,6 +42,7 @@ int run_all_tests() {
     run_session("../data/statement_test.data", 50);
     run_session("../data/superloop.data", 134);
     run_session("../data/tak.data", 186);
+     */
     run_session("../data/pi.data", 137);
     return 0;
 }

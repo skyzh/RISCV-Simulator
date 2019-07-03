@@ -8,8 +8,11 @@
 
 TEST(RegisterFile, ReadWrite) {
     RegisterFile r;
-    r[1].write(1);
-    EXPECT_EQ(r[1].read(), 0);
+    r.write(0, 2333);
+    EXPECT_EQ(r.read(0), 0);
+    r.write(1, 1);
+    EXPECT_EQ(r.read(1), 0);
     r.tick();
-    EXPECT_EQ(r[1].read(), 1);
+    EXPECT_EQ(r.read(1), 1);
+    EXPECT_EQ(r.read(0), 0);
 }

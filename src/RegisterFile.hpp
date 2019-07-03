@@ -11,26 +11,26 @@
 
 #include <iostream>
 
-class RegisterFile : Tickable {
+
+class RegisterFile { // : public Tickable {
     static const int REG_NUM = 32;
 public:
-    using Reg_T = Register<Immediate>;
+    Immediate prev[REG_NUM];
+    Immediate next[REG_NUM];
 
-    RegisterFile() : Tickable() {
-        reg[0].always_zero = true;
+    RegisterFile() {
+        memset(prev, 0, sizeof(prev));
+        memset(next, 0, sizeof(next));
     }
 
-    Reg_T reg[REG_NUM];
+    void tick() { memcpy(prev, next, sizeof(prev)); }
 
-    Reg_T &operator[](unsigned id) { return reg[id]; }
-
-    void tick() override {
-        for (int i = 0; i < REG_NUM; i++) reg[i].tick();
-    }
+    Immediate read(int id) { return id == 0 ? 0 : prev[id]; }
+    void write(int id, Immediate val) { next[id] = val; }
 
     void debug() {
         for (int i = 0; i < 32; i++) {
-            std::cout << std::hex << reg[i].read() << " ";
+            std::cout << std::hex << prev[i] << " ";
             if ((i + 1) % 8 == 0) std::cout << std::endl;
         }
     }

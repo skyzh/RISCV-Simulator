@@ -22,7 +22,7 @@ public:
 
     Immediate dispatch(Wire wire) override;
 
-    void tick() override;
+    void tick();
 
     void hook();
 };

@@ -22,7 +22,7 @@ public:
 
     Decode(Session *session);
 
-    void tick() override;
+    void tick();
 
     Immediate dispatch(Wire wire) override;
 

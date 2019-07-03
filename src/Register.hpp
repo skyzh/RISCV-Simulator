@@ -8,17 +8,14 @@
 #include "Tickable.h"
 
 template<typename T>
-class Register : public Tickable {
+class Register { // : public Tickable {
 public:
     T prev, next;
-    bool always_zero;
-    Register() : always_zero(false) { prev = next = 0; }
+    Register() { prev = next = 0; }
 
     Register(const T &t) : prev(t), next(t) {}
 
-    T read() {
-        if (always_zero) return 0; else return prev;
-    }
+    T read() { return prev; }
 
     void write(const T &t) { next = t; }
 

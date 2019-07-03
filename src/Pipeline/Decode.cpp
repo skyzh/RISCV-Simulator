@@ -43,7 +43,7 @@ Immediate Decode::dispatch(Wire wire) {
 #ifndef NO_VERIFY
         cached_inst.verify("rs1");
 #endif
-        return session->rf[cached_inst.rs1].read();
+        return session->rf.read(cached_inst.rs1);
     }
     if (wire == rs2) {
 #ifndef NO_VERIFY
@@ -55,7 +55,7 @@ Immediate Decode::dispatch(Wire wire) {
 #ifndef NO_VERIFY
         cached_inst.verify("rs2");
 #endif
-        return session->rf[cached_inst.rs2].read();
+        return session->rf.read(cached_inst.rs2);
     }
     if (wire == rd) {
 #ifndef NO_VERIFY

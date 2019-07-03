@@ -40,14 +40,14 @@ void WriteBack::hook() {
             case 0b0010111: // AUIPC
             case 0b0010011: // ***I
             case 0b0110011: // ***
-                session->rf[session->d->get(Decode::rd)].write(session->e->get(Execute::e_val));
+                session->rf.write(session->d->get(Decode::rd), session->e->get(Execute::e_val));
                 break;
             case 0b1101111: // JAL
             case 0b1100111: // JALR
-                session->rf[session->d->get(Decode::rd)].write(session->f->get(Fetch::f_pc));
+                session->rf.write(session->d->get(Decode::rd), session->f->get(Fetch::f_pc));
                 break;
             case 0b0000011: // L*
-                session->rf[session->d->get(Decode::rd)].write(session->m->get(MemoryAccess::m_val));
+                session->rf.write(session->d->get(Decode::rd), session->m->get(MemoryAccess::m_val));
         }
     }
 }

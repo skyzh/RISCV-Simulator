@@ -14,7 +14,7 @@ class Session;
 
 using Wire = unsigned int;
 
-class Stage : public Tickable {
+class Stage { // : public Tickable {
     static const int MAX_WIRE = 16;
 protected:
     Session *session;
@@ -33,7 +33,7 @@ public:
         memset(cache, 0, sizeof(cache));
     }
 
-    virtual void tick() override { reset(); }
+    void tick() { reset(); }
 
     Immediate get(Wire wire) {
         if (!cache_valid[wire]) {
