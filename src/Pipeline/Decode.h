@@ -15,16 +15,14 @@ public:
     class InvalidInstruction {
     };
 
-    enum D {
-        d_inst = 0, opcode, type, rs1, op1, rs2,
-        op2, rd, funct3, funct7, imm
-    };
+    Immediate opcode, type, rs1, op1, rs2,
+        op2, rd, funct3, funct7, imm;
 
     Decode(Session *session);
 
     void tick();
 
-    Immediate dispatch(Wire wire) override;
+    Immediate dispatch(Wire wire) override { throw InvalidKey(); };
 
     InstructionBase parse_opcode(unsigned opcode, Immediate imm);
 };

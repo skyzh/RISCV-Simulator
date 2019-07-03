@@ -14,13 +14,11 @@ public:
     class InvalidTarget {
     };
 
-    enum W {
-        w_pc = 0
-    };
+    Immediate w_pc;
 
     WriteBack(Session *session);
 
-    Immediate dispatch(Wire wire) override;
+    Immediate dispatch(Wire wire) override { throw InvalidKey(); };
 
     void tick();
 

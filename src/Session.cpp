@@ -29,18 +29,15 @@ Session::~Session() {
 }
 
 void Session::tick() {
-    PC.write(w->get(WriteBack::w_pc));
-    m->hook();
-    w->hook();
-
-    PC.tick();
-    rf.tick();
-
     f->tick();
     d->tick();
     e->tick();
     m->tick();
     w->tick();
+
+    PC.write(w->w_pc);
+    PC.tick();
+    rf.tick();
 }
 
 void Session::load_memory(const char *path) {

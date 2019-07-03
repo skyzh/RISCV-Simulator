@@ -21,69 +21,19 @@ InstructionBase Decode::parse_opcode(unsigned opcode, Immediate imm) {
     throw InvalidInstruction();
 }
 
-#define NO_VERIFY
-
-Immediate Decode::dispatch(Wire wire) {
-    if (!cache_valid[d_inst]) {
-        cache_valid[d_inst] = true;
-        auto inst = session->f->get(Fetch::inst);
-        auto opcode = inst & 0x7f;
-        cached_inst = parse_opcode(opcode, inst);
-    }
-    if (wire == opcode) { return cached_inst.opcode; }
-    if (wire == type) return cached_inst.t;
-
-    if (wire == rs1) {
-#ifndef NO_VERIFY
-        cached_inst.verify("rs1");
-#endif
-        return cached_inst.rs1;
-    }
-    if (wire == op1) {
-#ifndef NO_VERIFY
-        cached_inst.verify("rs1");
-#endif
-        return session->rf.read(cached_inst.rs1);
-    }
-    if (wire == rs2) {
-#ifndef NO_VERIFY
-        cached_inst.verify("rs2");
-#endif
-        return cached_inst.rs2;
-    }
-    if (wire == op2) {
-#ifndef NO_VERIFY
-        cached_inst.verify("rs2");
-#endif
-        return session->rf.read(cached_inst.rs2);
-    }
-    if (wire == rd) {
-#ifndef NO_VERIFY
-        cached_inst.verify("rd");
-#endif
-        return cached_inst.rd;
-    }
-    if (wire == funct3) {
-#ifndef NO_VERIFY
-        cached_inst.verify("funct3");
-#endif
-        return cached_inst.funct3;
-    }
-    if (wire == funct7) {
-#ifndef NO_VERIFY
-        cached_inst.verify("funct7");
-#endif
-        return cached_inst.funct7;
-    }
-    if (wire == imm) {
-#ifndef NO_VERIFY
-        cached_inst.verify("imm");
-#endif
-        return cached_inst.imm;
-    }
-    throw InvalidKey();
-}
-
 void Decode::tick() {
-    Stage::tick();
+    auto _inst = session->f->inst;
+    auto _opcode = _inst & 0x7f;
+    auto inst = parse_opcode(_opcode, _inst);
+    opcode = inst.opcode;
+    type = inst.t;
+    rs1 = inst.rs1;
+    rs2 = inst.rs2;
+    if (type != InstructionBase::U && type != InstructionBase::J)
+        op1 = session->rf.read(rs1);
+    if (type == InstructionBase::R || type == InstructionBase::S || type == InstructionBase::B) op2 = session->rf.read(rs2);
+    rd = inst.rd;
+    funct3 = inst.funct3;
+    funct7 = inst.funct7;
+    imm = inst.imm;
 }

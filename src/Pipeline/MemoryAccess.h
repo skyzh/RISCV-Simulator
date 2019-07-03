@@ -14,17 +14,13 @@ public:
     class InvalidTarget {
     };
 
-    enum M {
-        m_val = 0
-    };
+    Immediate m_val;
 
     MemoryAccess(Session *session);
 
-    Immediate dispatch(Wire wire) override;
+    Immediate dispatch(Wire wire) override { throw InvalidKey(); };
 
     void tick();
-
-    void hook();
 };
 
 

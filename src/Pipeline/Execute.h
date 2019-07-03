@@ -12,9 +12,7 @@ class Execute : public Stage {
 private:
     ALU alu;
 public:
-    enum E {
-        e_val = 0
-    };
+    Immediate e_val;
 
     class InvalidAccess {
     };
@@ -25,7 +23,9 @@ public:
 
     Execute(Session *session);
 
-    Immediate dispatch(Wire wire) override;
+    void tick();
+
+    Immediate dispatch(Wire wire) override { throw InvalidKey(); };
 };
 
 

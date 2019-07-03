@@ -9,13 +9,13 @@
 
 class Fetch : public Stage {
 public:
-    enum F {
-        inst = 0, f_pc
-    };
+    Immediate inst, f_pc;
 
-    Fetch(Session* session);
+    Fetch(Session *session);
 
-    Immediate dispatch(Wire wire) override;
+    Immediate dispatch(Wire wire) override { throw InvalidKey(); };
+
+    void tick();
 };
 
 
