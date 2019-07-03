@@ -1,6 +1,6 @@
 # RISCV-Simulator
 
-[![Build Status](https://travis-ci.com/skyzh/RISCV-Simulator.svg?branch=seq)](https://travis-ci.com/skyzh/RISCV-Simulator)
+[![Build Status](https://travis-ci.com/skyzh/RISCV-Simulator.svg?branch=pipeline)](https://travis-ci.com/skyzh/RISCV-Simulator)
 
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
