@@ -7,11 +7,11 @@
 
 Fetch::Fetch(Session* session) : Stage(session) {}
 
-Immediate Fetch::dispatch(const std::string &key) {
-    if (key == "inst") {
+Immediate Fetch::dispatch(Wire wire) {
+    if (wire == inst) {
         return session->memory.read_word(session->PC.read());
     }
-    if (key == "f_pc") {
+    if (wire == f_pc) {
         return session->PC.read() + 4;
     }
     throw InvalidKey();

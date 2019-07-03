@@ -9,56 +9,56 @@
 
 Execute::Execute(Session *session) : Stage(session) {}
 
-Immediate Execute::dispatch(const std::string &key) {
-    if (key == "e_val") {
-        auto type = session->d->get("type");
+Immediate Execute::dispatch(Wire wire) {
+    if (wire == e_val) {
+        auto type = session->d->get(Decode::type);
 
         if (type == InstructionBase::Type::R)
             return alu.get_r(
-                    session->d->get("opcode"),
-                    session->d->get("funct3"),
-                    session->d->get("op1"),
-                    session->d->get("op2"),
-                    session->d->get("funct7")
+                    session->d->get(Decode::opcode),
+                    session->d->get(Decode::funct3),
+                    session->d->get(Decode::op1),
+                    session->d->get(Decode::op2),
+                    session->d->get(Decode::funct7)
             );
 
         if (type == InstructionBase::Type::I)
             return alu.get_i(
-                    session->d->get("opcode"),
-                    session->d->get("funct3"),
-                    session->d->get("op1"),
-                    session->d->get("imm")
+                    session->d->get(Decode::opcode),
+                    session->d->get(Decode::funct3),
+                    session->d->get(Decode::op1),
+                    session->d->get(Decode::imm)
             );
 
         if (type == InstructionBase::Type::S)
             return alu.get_s(
-                    session->d->get("opcode"),
-                    session->d->get("funct3"),
-                    session->d->get("op1"),
-                    session->d->get("op2"),
-                    session->d->get("imm")
+                    session->d->get(Decode::opcode),
+                    session->d->get(Decode::funct3),
+                    session->d->get(Decode::op1),
+                    session->d->get(Decode::op2),
+                    session->d->get(Decode::imm)
             );
 
         if (type == InstructionBase::Type::B)
             return alu.get_b(
-                    session->d->get("opcode"),
-                    session->d->get("funct3"),
-                    session->d->get("op1"),
-                    session->d->get("op2"),
-                    session->d->get("imm"),
-                    session->f->get("f_pc")
+                    session->d->get(Decode::opcode),
+                    session->d->get(Decode::funct3),
+                    session->d->get(Decode::op1),
+                    session->d->get(Decode::op2),
+                    session->d->get(Decode::imm),
+                    session->f->get(Fetch::f_pc)
             );
 
         if (type == InstructionBase::Type::J)
             // JAL
-            return session->f->get("f_pc") + session->d->get("imm") - 4;
+            return session->f->get(Fetch::f_pc) + session->d->get(Decode::imm) - 4;
 
         if (type == InstructionBase::Type::U) {
-            switch (session->d->get("opcode")) {
+            switch (session->d->get(Decode::opcode)) {
                 case 0b0110111: // LUI
-                    return session->d->get("imm");
+                    return session->d->get(Decode::imm);
                 case 0b0010111: // AUIPC
-                    return session->f->get("f_pc") + session->d->get("imm") - 4;
+                    return session->f->get(Fetch::f_pc) + session->d->get(Decode::imm) - 4;
                 default:
                     throw InvalidOp();
             }

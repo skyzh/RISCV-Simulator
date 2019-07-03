@@ -5,7 +5,7 @@
 #ifndef RISCV_SIMULATOR_MEMORYACCESS_HPP
 #define RISCV_SIMULATOR_MEMORYACCESS_HPP
 
-#include "Stage.h"
+#include "Stage.hpp"
 
 class MemoryAccess : public Stage {
 private:
@@ -14,9 +14,13 @@ public:
     class InvalidTarget {
     };
 
+    enum M {
+        m_val = 0
+    };
+
     MemoryAccess(Session *session);
 
-    Immediate dispatch(const std::string &key) override;
+    Immediate dispatch(Wire wire) override;
 
     void tick() override;
 

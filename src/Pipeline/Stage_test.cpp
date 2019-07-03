@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "Stage.h"
+#include "Stage.hpp"
 
 class MockStage : public Stage {
 public:
@@ -13,21 +13,21 @@ public:
 
     void mock_update() { flag = true; }
 
-    Immediate dispatch(const std::string &key) override {
-        return flag ? key[1] : key[0];
+    Immediate dispatch(Wire wire) override {
+        return flag ? wire / 10 : wire % 10;
     }
 };
 
 TEST(Stage, ValueCache) {
     MockStage st;
-    EXPECT_EQ(st.get("ab"), 'a');
-    EXPECT_EQ(st.get("ab"), 'a');
-    EXPECT_EQ(st.get("bc"), 'b');
-    EXPECT_EQ(st.get("cd"), 'c');
+    EXPECT_EQ(st.get(2), 2);
+    EXPECT_EQ(st.get(3), 3);
+    EXPECT_EQ(st.get(4), 4);
+    EXPECT_EQ(st.get(5), 5);
     st.tick();
     st.mock_update();
-    EXPECT_EQ(st.get("ab"), 'b');
-    EXPECT_EQ(st.get("ab"), 'b');
-    EXPECT_EQ(st.get("bc"), 'c');
-    EXPECT_EQ(st.get("cd"), 'd');
+    EXPECT_EQ(st.get(2), 0);
+    EXPECT_EQ(st.get(3), 0);
+    EXPECT_EQ(st.get(4), 0);
+    EXPECT_EQ(st.get(5), 0);
 }

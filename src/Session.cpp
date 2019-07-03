@@ -12,7 +12,7 @@
 
 #include <fstream>
 
-Session::Session() : PC(0) {
+Session::Session() {
     f = new Fetch(this);
     d = new Decode(this);
     e = new Execute(this);
@@ -29,7 +29,7 @@ Session::~Session() {
 }
 
 void Session::tick() {
-    PC.write(w->get("w_pc"));
+    PC.write(w->get(WriteBack::w_pc));
     m->hook();
     w->hook();
 

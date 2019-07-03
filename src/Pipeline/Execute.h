@@ -5,13 +5,16 @@
 #ifndef RISCV_SIMULATOR_EXECUTE_H
 #define RISCV_SIMULATOR_EXECUTE_H
 
-#include "Stage.h"
+#include "Stage.hpp"
 #include "../Module/ALU.h"
 
 class Execute : public Stage {
 private:
     ALU alu;
 public:
+    enum E {
+        e_val = 0
+    };
 
     class InvalidAccess {
     };
@@ -22,7 +25,7 @@ public:
 
     Execute(Session *session);
 
-    Immediate dispatch(const std::string &key) override;
+    Immediate dispatch(Wire wire) override;
 };
 
 

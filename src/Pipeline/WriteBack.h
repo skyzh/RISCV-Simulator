@@ -5,7 +5,7 @@
 #ifndef RISCV_SIMULATOR_WRITEBACK_H
 #define RISCV_SIMULATOR_WRITEBACK_H
 
-#include "Stage.h"
+#include "Stage.hpp"
 
 class WriteBack : public Stage {
 private:
@@ -14,9 +14,13 @@ public:
     class InvalidTarget {
     };
 
+    enum W {
+        w_pc = 0
+    };
+
     WriteBack(Session *session);
 
-    Immediate dispatch(const std::string &key) override;
+    Immediate dispatch(Wire wire) override;
 
     void tick() override;
 

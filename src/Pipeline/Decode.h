@@ -5,22 +5,26 @@
 #ifndef RISCV_SIMULATOR_DECODE_H
 #define RISCV_SIMULATOR_DECODE_H
 
-#include "Stage.h"
+#include "Stage.hpp"
 #include "../Instruction.hpp"
 
 class Decode : public Stage {
 private:
-    bool cache_valid;
     InstructionBase cached_inst;
 public:
     class InvalidInstruction {
+    };
+
+    enum D {
+        d_inst = 0, opcode, type, rs1, op1, rs2,
+        op2, rd, funct3, funct7, imm
     };
 
     Decode(Session *session);
 
     void tick() override;
 
-    Immediate dispatch(const std::string &key) override;
+    Immediate dispatch(Wire wire) override;
 
     InstructionBase parse_opcode(unsigned opcode, Immediate imm);
 };

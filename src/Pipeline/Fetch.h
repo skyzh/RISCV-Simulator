@@ -5,13 +5,17 @@
 #ifndef RISCV_SIMULATOR_FETCH_H
 #define RISCV_SIMULATOR_FETCH_H
 
-#include "Stage.h"
+#include "Stage.hpp"
 
 class Fetch : public Stage {
 public:
+    enum F {
+        inst = 0, f_pc
+    };
+
     Fetch(Session* session);
 
-    Immediate dispatch(const std::string &key) override;
+    Immediate dispatch(Wire wire) override;
 };
 
 

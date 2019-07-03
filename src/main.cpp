@@ -3,9 +3,10 @@
 #include "Session.h"
 #include <cassert>
 
-void run_session(const char* path, unsigned ret_value) {
-    std::cout << "Running: " << path << std::endl;
-    Session* session = new Session;
+void run_session(const char *path, unsigned ret_value) {
+    std::clock_t c_start = std::clock();
+    std::cerr << "Running: " << path << " ... ";
+    Session *session = new Session;
     session->load_memory(path);
     while (true) {
         session->tick();
@@ -13,7 +14,10 @@ void run_session(const char* path, unsigned ret_value) {
             break;
         }
     }
-    assert((session->rf[10].read() & 0xff) == ret_value);
+    auto ret_val = session->rf[10].read() & 0xff;
+    assert(ret_val == ret_value);
+    std::cerr << ret_val << " == " << ret_value << "  ";
+    std::cerr << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms" << std::endl;
     delete session;
 }
 
