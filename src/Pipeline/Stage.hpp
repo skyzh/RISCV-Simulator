@@ -15,7 +15,7 @@ class Session;
 using Wire = unsigned int;
 
 class Stage { // : public Tickable {
-    static const int MAX_WIRE = 16;
+    static const int MAX_WIRE = 12;
 protected:
     Session *session;
     bool cache_valid[MAX_WIRE];
@@ -37,6 +37,7 @@ public:
 
     Immediate get(Wire wire) {
         if (!cache_valid[wire]) {
+            cache_valid[wire] = true;
             cache[wire] = this->dispatch(wire);
         }
         return cache[wire];

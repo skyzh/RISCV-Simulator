@@ -21,7 +21,7 @@ class MemoryAccess;
 
 class WriteBack;
 
-class Session : public Tickable {
+class Session { // : public Tickable {
 public:
     Fetch *f;
     Decode *d;
@@ -35,7 +35,7 @@ public:
 
     Session();
 
-    void tick() override;
+    void tick();
 
     void load_memory(const char* path);
 
