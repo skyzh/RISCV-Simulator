@@ -24,10 +24,14 @@ struct InstructionBase {
         t = I;
         imm = 0;
         funct3 = funct7 = 0;
+        this->inst = -1;
     }
+
+    static InstructionBase nop() { return InstructionBase(0); }
 
     unsigned opcode, rs1, rs2, rd, funct3, funct7;
     Immediate imm;
+    Instruction inst;
     enum Type {
         R, I, S, B, U, J
     } t;
@@ -58,22 +62,34 @@ struct InstructionBase {
     };
 
     void debug() {
-        if (opcode == 0b0110111) std::cout << "lui ";
-        if (opcode == 0b0010111) std::cout << "auipc ";
-        if (opcode == 0b1101111) std::cout << "jal ";
-        if (opcode == 0b1100111) std::cout << "jalr ";
-        if (opcode == 0b1100011) std::cout << "branch";
-        if (opcode == 0b0000011) std::cout << "load";
-        if (opcode == 0b0100011) std::cout << "store";
-        if (opcode == 0b0010011) {
+        std::cout << std::hex << inst << " ";
+        if (inst == 0x00000013) std::cout << "nop";
+        else if (opcode == 0b0110111) std::cout << "lui ";
+        else if (opcode == 0b0010111) std::cout << "auipc ";
+        else if (opcode == 0b1101111) std::cout << "jal ";
+        else if (opcode == 0b1100111) std::cout << "jalr ";
+        else if (opcode == 0b1100011) std::cout << "branch";
+        else if (opcode == 0b0000011) std::cout << "load";
+        else if (opcode == 0b0100011) std::cout << "store";
+        else if (opcode == 0b0010011) {
             static std::string opi[] = {
                     "addi", "slli", "slti", "sltiu", "xori", "srli / srai",
                     "ori", "andi"
             };
             std::cout << opi[funct3];
         }
-        if (opcode == 0b0110011) std::cout << "op";
+        else if (opcode == 0b0110011) std::cout << "op";
+        else std::cout << "unknown";
         std::cout << std::endl;
+    }
+
+    bool has_op1() {
+        return t != InstructionBase::U && t != InstructionBase::J;
+    }
+
+    bool has_op2() {
+        return t == InstructionBase::R || t == InstructionBase::S
+               || t == InstructionBase::B;
     }
 };
 
@@ -86,6 +102,7 @@ struct InstructionR : InstructionBase {
         rs2 = get_digits(inst, 24, 20);
         funct7 = get_digits(inst, 31, 25);
         t = R;
+        this->inst = inst;
     }
 };
 
@@ -97,6 +114,7 @@ struct InstructionI : InstructionBase {
         rs1 = get_digits(inst, 19, 15);
         imm = get_digits(inst, 30, 20) | expand_digit(get_digits(inst, 31, 31), 11);
         t = I;
+        this->inst = inst;
     }
 };
 
@@ -110,6 +128,7 @@ struct InstructionS : InstructionBase {
               (get_digits(inst, 30, 25) << 5) |
               expand_digit(get_digits(inst, 31, 31), 11);
         t = S;
+        this->inst = inst;
     }
 };
 
@@ -124,6 +143,7 @@ struct InstructionB : InstructionBase {
               (get_digits(inst, 7, 7) << 11) |
               expand_digit(get_digits(inst, 31, 31), 12);
         t = B;
+        this->inst = inst;
     }
 };
 
@@ -135,6 +155,7 @@ struct InstructionU : InstructionBase {
               (get_digits(inst, 30, 20) << 20) |
               (get_digits(inst, 31, 31) << 31);
         t = U;
+        this->inst = inst;
     }
 };
 
@@ -147,6 +168,7 @@ struct InstructionJ : InstructionBase {
               (get_digits(inst, 19, 12) << 12) |
               expand_digit(get_digits(inst, 31, 31), 20);
         t = J;
+        this->inst = inst;
     }
 };
 

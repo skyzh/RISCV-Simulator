@@ -6,9 +6,13 @@
 #define RISCV_SIMULATOR_WRITEBACK_H
 
 #include "Stage.hpp"
+#include "../Instruction.hpp"
+#include "../Register.hpp"
 
 class WriteBack : public Stage {
 public:
+
+    Register<InstructionBase> w_inst;
 
     WriteBack(Session *session);
 

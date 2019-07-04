@@ -13,7 +13,7 @@
 
 class Parser {
 public:
-    static char parse_hex(const std::string &hex) {
+    static unsigned parse_hex(const std::string &hex) {
         return strtol(hex.c_str(), NULL, 16);
     }
 
@@ -27,14 +27,21 @@ public:
             } else {
                 std::stringstream ss(line);
                 std::string hex;
-                while (ss) {
-                    ss >> hex;
-                    if (!ss) break;
+                while (ss >> hex) {
                     if (hex.length() == 0) break;
                     char data = parse_hex(hex);
                     mem[base_addr++] = data;
                 }
             }
+        }
+    }
+
+    static void parse_hex(std::istream &in, Memory &mem) {
+        unsigned base_addr = 0;
+        std::string hex;
+        while(in >> hex) {
+            mem.write_word(base_addr, parse_hex(hex));
+            base_addr += 4;
         }
     }
 };

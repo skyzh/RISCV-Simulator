@@ -29,12 +29,13 @@ Session::~Session() {
 }
 
 void Session::tick() {
-
-    e->hook();
-    f->hook();
-    d->hook();
-    m->hook();
     w->hook();
+    m->hook();
+    e->hook();
+    d->hook();
+    f->hook();
+
+    this->debug();
 
     f->tick();
     d->tick();
@@ -47,5 +48,20 @@ void Session::tick() {
 
 void Session::load_memory(const char *path) {
     std::fstream in(path);
-    Parser::parse(in, memory);
+    Parser::parse_hex(in, memory);
+}
+
+void Session::debug() {
+    std::cout << "Fetch" << std::endl;
+    f->debug();
+    std::cout << "Decode" << std::endl;
+    d->debug();
+    std::cout << "Execute" << std::endl;
+    e->debug();
+    std::cout << "Memory" << std::endl;
+    m->debug();
+    std::cout << "Write back" << std::endl;
+    w->debug();
+    std::cout << "Registers" << std::endl;
+    rf.debug();
 }

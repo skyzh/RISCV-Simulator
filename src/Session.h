@@ -39,6 +39,8 @@ public:
     void load_memory(const char* path);
 
     virtual ~Session();
+
+    void debug();
 };
 
 

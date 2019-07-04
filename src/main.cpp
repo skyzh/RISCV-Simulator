@@ -11,24 +11,16 @@
 
 void run_session(const char *path, unsigned ret_value) {
     std::clock_t c_start = std::clock();
-    std::cerr << "Running: " << path << " ... ";
+    // std::cerr << "Running: " << path << " ... ";
     Session *session = new Session;
     session->load_memory(path);
     int pc_cnt = 0;
     while (true) {
-        std::cout << "Fetch" << std::endl;
-        session->f->debug();
-        std::cout << "Decode" << std::endl;
-        session->d->debug();
-        std::cout << "Execute" << std::endl;
-        session->e->debug();
-        std::cout << "Memory" << std::endl;
-        session->m->debug();
-        std::cout << "Registers" << std::endl;
-        session->rf.debug();
+        std::cout << std::endl << std::endl << "Cycle " << pc_cnt << std::endl;
+        session->tick();
 
         ++pc_cnt;
-        session->tick();
+
         if (session->memory[0x30004]) {
             break;
         }
@@ -41,7 +33,8 @@ void run_session(const char *path, unsigned ret_value) {
 }
 
 int run_all_tests() {
-    run_session("../data/naive.data", 94);
+    run_session("../tests/data-hazard-1.hex", 0x1f);
+    run_session("../tests/data-hazard-2.hex", 0x1f);
     /*
     run_session("../data/array_test1.data", 123);
     run_session("../data/array_test2.data", 43);

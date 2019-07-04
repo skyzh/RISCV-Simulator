@@ -73,7 +73,7 @@ void MemoryAccess::hook() {
 
 void MemoryAccess::debug() {
     std::cout << "    ";
-    m_inst.read().debug();
-    std::cout << "    " << "m_pc m_val e_val" << std::endl;
-    std::cout << "    " << m_pc.read() << " " << m_val.read() << " " << e_val.read() << std::endl;
+    m_inst.current().debug();
+    std::cout << "    " << "m_pc\tm_val\te_val" << std::endl;
+    std::cout << "    " << m_pc.current() << "\t" << m_val.current() << "\t" << e_val.current() << std::endl;
 }

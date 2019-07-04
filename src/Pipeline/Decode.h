@@ -17,6 +17,8 @@ public:
     Register<Immediate> op1, op2;
     Register<Immediate> d_pc, pred_pc;
 
+    bool _bubble, hazard_detected, _stall;
+
     Decode(Session *session);
 
     void hook();
@@ -24,6 +26,12 @@ public:
     void tick();
 
     void debug();
+
+    void bubble(bool _bubble);
+
+    void stall(bool _stall);
+
+    bool detect_hazard(unsigned reg_id);
 };
 
 

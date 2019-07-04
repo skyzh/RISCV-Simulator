@@ -18,6 +18,8 @@ public:
 
     T read() { return prev; }
 
+    T current() { return next; }
+
     void write(const T &t) { next = t; }
 
     void tick() { if (!_stall) prev = next; }

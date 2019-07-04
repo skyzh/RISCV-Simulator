@@ -78,17 +78,21 @@ void Execute::hook() {
         case 0b1101111: // JAL
         case 0b1100011: // B**
             next_pc = val;
+            if (session->d->pred_pc.read() != next_pc) mis_pred = true;
             break;
         default:
             next_pc = pc + 4;
+            mis_pred = false;
     }
 
     auto pred_pc = session->d->pred_pc.read();
 
-    if (pred_pc != next_pc) {
-        mis_pred = true;
+    if (mis_pred) {
+        session->d->bubble(true);
+        session->f->notify_jump(true, next_pc);
     } else {
-        mis_pred = false;
+        session->d->bubble(false);
+        session->f->notify_jump(false, 0);
     }
 
     e_val.write(val);
@@ -107,7 +111,10 @@ void Execute::tick() {
 
 void Execute::debug() {
     std::cout << "    ";
-    e_inst.read().debug();
-    std::cout << "    " << "e_pc e_val op2 mispred" << std::endl;
-    std::cout << "    " << e_pc.read() << " " << e_val.read() << " " << op2.read() << " " << (mis_pred ? "True" : "False") << std::endl;
+    e_inst.current().debug();
+    std::cout << "    " << "e_pc\te_val\top2" << std::endl;
+    std::cout << "    " << e_pc.current() << "\t" << e_val.current() << "\t" << op2.current() << std::endl;
+    std::cout << "    " << "op1\timm" << std::endl;
+    std::cout << "    " << session->d->op1.read() << "\t" << e_inst.current().imm << std::endl;
+    if (mis_pred) std::cout << "(mis prediction)" << std::endl;
 }

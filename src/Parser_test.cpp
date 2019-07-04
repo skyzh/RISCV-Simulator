@@ -14,7 +14,7 @@ TEST(Parser, Hex) {
         else str[1] = i % 16 + 'A' - 10;
         if (i / 16 < 10) str[0] = i / 16 + '0';
         else str[0] = i / 16 + 'A' - 10;
-        EXPECT_EQ(Parser::parse_hex(str), (char) i);
+        EXPECT_EQ(Parser::parse_hex(str), i);
     }
 }
 
@@ -34,4 +34,16 @@ TEST(Parser, Parse) {
     EXPECT_EQ(mem[2], 8);
     EXPECT_EQ(mem[3], 9);
     EXPECT_EQ(mem[4], 10);
+}
+
+
+TEST(Parser, ParseHex) {
+    Memory mem;
+    std::string test_data = "00010203";
+    std::stringstream ss(test_data);
+    Parser::parse_hex(ss, mem);
+    EXPECT_EQ(mem[0], (char) 0x03);
+    EXPECT_EQ(mem[1], (char) 0x02);
+    EXPECT_EQ(mem[2], (char) 0x01);
+    EXPECT_EQ(mem[3], (char) 0x00);
 }

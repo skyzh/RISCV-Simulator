@@ -14,6 +14,8 @@ public:
     Register<Immediate> pred_pc;
     Register<Immediate> f_pc;
     Register<InstructionBase> f_inst;
+    bool _jump, _stall;
+    Immediate pc;
 
     InstructionBase parse_opcode(unsigned opcode, Immediate imm);
 
@@ -26,6 +28,8 @@ public:
     void stall(bool _stall);
 
     void debug();
+
+    void notify_jump(bool _jump, Immediate pc);
 };
 
 

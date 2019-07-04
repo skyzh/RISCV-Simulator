@@ -13,6 +13,7 @@
 WriteBack::WriteBack(Session *session) : Stage(session) {}
 
 void WriteBack::tick() {
+    w_inst.write(session->m->m_inst.read());
 }
 
 void WriteBack::hook() {
@@ -37,5 +38,6 @@ void WriteBack::hook() {
 }
 
 void WriteBack::debug() {
-
+    std::cout << "    ";
+    w_inst.current().debug();
 }

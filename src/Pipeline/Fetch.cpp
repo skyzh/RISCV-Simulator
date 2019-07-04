@@ -6,7 +6,7 @@
 #include "../Session.h"
 #include "WriteBack.h"
 
-Fetch::Fetch(Session *session) : Stage(session) {}
+Fetch::Fetch(Session *session) : Stage(session), _jump(false), _stall(false) {}
 
 InstructionBase Fetch::parse_opcode(unsigned opcode, Immediate imm) {
     if (opcode == 0b0110011) { return InstructionR(imm); } // ***
@@ -24,6 +24,9 @@ InstructionBase Fetch::parse_opcode(unsigned opcode, Immediate imm) {
 
 void Fetch::hook() {
     auto pc = pred_pc.read();
+
+    if (_jump) pc = this->pc; // branch mispredicted
+
     f_pc.write(pc);
     // Always take
     pred_pc.write(pc + 4);
@@ -43,11 +46,18 @@ void Fetch::stall(bool _stall) {
     pred_pc.stall(_stall);
     f_inst.stall(_stall);
     f_pc.stall(_stall);
+    this->_stall = _stall;
 }
 
 void Fetch::debug() {
     std::cout << "    ";
-    f_inst.read().debug();
-    std::cout << "    " << "f_pc pred_pc" << std::endl;
-    std::cout << "    " << f_pc.read() << " " << pred_pc.read() << std::endl;
+    f_inst.current().debug();
+    std::cout << "    " << "f_pc\tpred_pc" << std::endl;
+    std::cout << "    " << f_pc.current() << "\t" << pred_pc.current() << std::endl;
+    if (_stall) std::cout << "(stall)" << std::endl;
+}
+
+void Fetch::notify_jump(bool _jump, Immediate pc) {
+    this->pc = pc;
+    this->_jump = _jump;
 }
