@@ -47,10 +47,24 @@ in Haskell. It can be easily expressed in a functional way. In this
 project, `Stage` object saves all such functions, hence an intermediate
 value won't be evaluated twice in a single cycle.
 
-### Equivalent Circuit
+### But, it's slow
 
-[PDF](https://github.com/skyzh/RISCV-Simulator/files/3350303/Note.Jul.2.2019.9_14_07.PM.pdf)
+It's slow to resolve dependency in functional programming style. Therefore,
+I manually resolve dependency and use feed-forward flavor in this branch.
+For example, in `Session.cpp`
 
+```cpp
+    w->hook(); // Write back
+    m->hook(); // Memory access
+    e->hook(); // Execute
+    d->hook(); // Decode
+    f->hook(); // Fetch
+```
+
+In decode stage, we should check if any source register will be written in the
+following stages. Therefore, we must obtain circuit parameters of write back
+and memory access stage before obtaining decode information. In this way,
+we can make the simulator run faster.
 
 ## Tips
 
