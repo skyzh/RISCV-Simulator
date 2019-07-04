@@ -12,6 +12,7 @@
 #include "Tickable.h"
 #include "Memory.hpp"
 #include "RegisterFile.hpp"
+#include "Module/Branch.h"
 
 class Fetch;
 
@@ -34,6 +35,13 @@ public:
 
     RegisterFile rf;
     Memory memory;
+
+    Branch branch;
+
+    struct Stat {
+        unsigned long long mis_pred, branches;
+        Stat() : mis_pred(0), branches(0) {}
+    } s;
 
     Session(bool debug = false);
 
