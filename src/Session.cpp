@@ -29,11 +29,28 @@ Session::~Session() {
 }
 
 void Session::tick() {
+
     w->hook();
     m->hook();
     e->hook();
     d->hook();
     f->hook();
+
+    /*
+     * If you want to verify this implementation
+     * is really "pipelined", remove the comments,
+     * shuffle the hooks in the loop and comment
+     * the previous 5 hooks.
+
+    for (int i = 0; i < 10; i++) {
+        m->hook();
+        e->hook();
+        f->hook();
+        d->hook();
+        w->hook();
+    }
+
+     */
 
     if (_debug) this->debug();
 
@@ -71,6 +88,6 @@ void Session::load_hex(const char *path) {
     Parser::parse_hex(in, memory);
 }
 
-void Session::load_memory(std::istream& in) {
+void Session::load_memory(std::istream &in) {
     Parser::parse(in, memory);
 }

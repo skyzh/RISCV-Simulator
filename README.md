@@ -34,7 +34,7 @@ and contents in the memory determine the outcome. Therefore pipeline status
 can be updated by obtaining the next PC.
 
 ```cpp
-    PC.write(w->get("w_pc"));
+    PC.write(w->get(WriteBack::w_pc));
 ```
 
 There are only two exceptions. In write back stage, registers
@@ -68,6 +68,17 @@ In decode stage, we should check if any source register will be written in the
 following stages. Therefore, we must obtain circuit parameters of write back
 and memory access stage before obtaining decode information. In this way,
 we can make the simulator run faster.
+
+### Verify feed-forward evaluation is really 'pipelined'
+
+It's obvious that given a initial state (registers and memory), every terminal
+in the circuit can be determined by recursively evaluating other components in
+the circuit until reaching a register.
+
+In `Session.cpp`, you may replace the sequence of evaluation with a loop.
+For a random sequence of updating circuit status, 10 times is enough to obtain
+steady state of the circuit. The result would stay the same, but runs much slower.
+In this way we can verify this implementation is really 'pipelined'.
 
 ## Tips
 
