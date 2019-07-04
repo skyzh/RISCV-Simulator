@@ -4,7 +4,7 @@
 
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
-This branch simulates a sequential RISC-V CPU.
+This branch simulates a pipelined RISC-V CPU.
 
 ## Why Functional?
 
@@ -73,3 +73,8 @@ we can make the simulator run faster.
 * You should write return address to rd when executing jal.
 * When I was debugging, I printed out PC at every moment to check branching functionality.
 * And I made a trap at 0x1000 then print register a0 to know what printInt was exactly printing.
+* When debugging pipeline, I print out PC in every stage.
+* If you don't want to disassemble the binary, you may just print necessary information to identify the instruction.
+  For example, just identify an instruction as "r-r operation" instead of "add", "sub", etc.
+* You may write your own test case in assembly with [RARS](https://github.com/TheThirdOne/rars).
+  Then dump memory in hex format, load it into simulator and test it. Some examples in tests/ folder.
