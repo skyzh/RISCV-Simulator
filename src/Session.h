@@ -5,6 +5,8 @@
 #ifndef RISCV_SIMULATOR_SESSION_H
 #define RISCV_SIMULATOR_SESSION_H
 
+#include <iostream>
+
 #include "Common.h"
 #include "Register.hpp"
 #include "Tickable.h"
@@ -38,6 +40,8 @@ public:
     void tick();
 
     void load_memory(const char* path);
+
+    void load_memory(std::istream& in);
 
     void load_hex(const char* path);
 

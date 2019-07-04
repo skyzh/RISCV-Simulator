@@ -48,7 +48,7 @@ void Session::tick() {
 
 void Session::load_memory(const char *path) {
     std::fstream in(path);
-    Parser::parse(in, memory);
+    load_memory(in);
 }
 
 void Session::debug() {
@@ -69,4 +69,8 @@ void Session::debug() {
 void Session::load_hex(const char *path) {
     std::fstream in(path);
     Parser::parse_hex(in, memory);
+}
+
+void Session::load_memory(std::istream& in) {
+    Parser::parse(in, memory);
 }
