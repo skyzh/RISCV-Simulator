@@ -76,8 +76,8 @@ in the circuit can be determined by recursively evaluating other components in
 the circuit until reaching a register.
 
 In `Session.cpp`, you may replace the sequence of evaluation with a loop.
-For a random sequence of updating circuit status, 10 times is enough to obtain
-steady state of the circuit. The result would stay the same, but runs much slower.
+For a random sequence of updating circuit status, loop of 10 times is enough to obtain
+steady state of the circuit. The result would stay the same, but simulation runs much slower.
 In this way we can verify this implementation is really 'pipelined'.
 
 ## Tips

@@ -11,6 +11,7 @@
 #include "Parser.hpp"
 
 #include <fstream>
+#include <random>
 
 Session::Session(bool debug) : _debug(debug) {
     f = new Fetch(this);
@@ -29,7 +30,6 @@ Session::~Session() {
 }
 
 void Session::tick() {
-
     w->hook();
     m->hook();
     e->hook();
@@ -40,16 +40,33 @@ void Session::tick() {
      * If you want to verify this implementation
      * is really "pipelined", remove the comments,
      * shuffle the hooks in the loop and comment
-     * the previous 5 hooks.
+     * the previous 5 hooks. */
 
+    /*
     for (int i = 0; i < 10; i++) {
-        m->hook();
-        e->hook();
-        f->hook();
-        d->hook();
-        w->hook();
+        int seq[5] = { 0 };
+        for (int j = 0; j < 5; j++) seq[j] = j;
+        std::random_shuffle(seq, seq + 5);
+        for (int j = 0; j < 5; j++) {
+            switch(seq[j]) {
+                case 0:
+                    f->hook();
+                    break;
+                case 1:
+                    d->hook();
+                    break;
+                case 2:
+                    e->hook();
+                    break;
+                case 3:
+                    m->hook();
+                    break;
+                case 4:
+                    w->hook();
+                    break;
+            }
+        }
     }
-
      */
 
     if (_debug) this->debug();
