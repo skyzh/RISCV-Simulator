@@ -1,6 +1,12 @@
 #include <iostream>
 #include <iomanip>
 #include "Session.h"
+#include "Pipeline/Fetch.h"
+#include "Pipeline/Decode.h"
+#include "Pipeline/Execute.h"
+#include "Pipeline/MemoryAccess.h"
+#include "Pipeline/WriteBack.h"
+
 #include <cassert>
 
 void run_session(const char *path, unsigned ret_value) {
@@ -10,6 +16,17 @@ void run_session(const char *path, unsigned ret_value) {
     session->load_memory(path);
     int pc_cnt = 0;
     while (true) {
+        std::cout << "Fetch" << std::endl;
+        session->f->debug();
+        std::cout << "Decode" << std::endl;
+        session->d->debug();
+        std::cout << "Execute" << std::endl;
+        session->e->debug();
+        std::cout << "Memory" << std::endl;
+        session->m->debug();
+        std::cout << "Registers" << std::endl;
+        session->rf.debug();
+
         ++pc_cnt;
         session->tick();
         if (session->memory[0x30004]) {
@@ -24,6 +41,7 @@ void run_session(const char *path, unsigned ret_value) {
 }
 
 int run_all_tests() {
+    run_session("../data/naive.data", 94);
     /*
     run_session("../data/array_test1.data", 123);
     run_session("../data/array_test2.data", 43);
@@ -36,14 +54,13 @@ int run_all_tests() {
     run_session("../data/magic.data", 106);
     run_session("../data/manyarguments.data", 40);
     run_session("../data/multiarray.data", 115);
-    run_session("../data/naive.data", 94);
     run_session("../data/qsort.data", 105);
     run_session("../data/queens.data", 171);
     run_session("../data/statement_test.data", 50);
     run_session("../data/superloop.data", 134);
     run_session("../data/tak.data", 186);
-     */
     run_session("../data/pi.data", 137);
+     */
     return 0;
 }
 

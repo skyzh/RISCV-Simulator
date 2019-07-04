@@ -8,12 +8,23 @@
 #include <utility>
 #include "Common.h"
 #include <string>
+#include <iostream>
 
 using Instruction = unsigned int;
 
 struct InstructionBase {
     class InvalidAccess {
     };
+
+    InstructionBase() {}
+
+    InstructionBase(unsigned) {
+        rs1 = rs2 = rd = 0;
+        opcode = 0b0010011;
+        t = I;
+        imm = 0;
+        funct3 = funct7 = 0;
+    }
 
     unsigned opcode, rs1, rs2, rd, funct3, funct7;
     Immediate imm;
@@ -45,6 +56,25 @@ struct InstructionBase {
     void verify(const std::string &key) {
         if (!is_valid(key)) throw InvalidAccess();
     };
+
+    void debug() {
+        if (opcode == 0b0110111) std::cout << "lui ";
+        if (opcode == 0b0010111) std::cout << "auipc ";
+        if (opcode == 0b1101111) std::cout << "jal ";
+        if (opcode == 0b1100111) std::cout << "jalr ";
+        if (opcode == 0b1100011) std::cout << "branch";
+        if (opcode == 0b0000011) std::cout << "load";
+        if (opcode == 0b0100011) std::cout << "store";
+        if (opcode == 0b0010011) {
+            static std::string opi[] = {
+                    "addi", "slli", "slti", "sltiu", "xori", "srli / srai",
+                    "ori", "andi"
+            };
+            std::cout << opi[funct3];
+        }
+        if (opcode == 0b0110011) std::cout << "op";
+        std::cout << std::endl;
+    }
 };
 
 struct InstructionR : InstructionBase {

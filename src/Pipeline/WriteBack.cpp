@@ -10,44 +10,32 @@
 #include "MemoryAccess.h"
 
 
-WriteBack::WriteBack(Session *session) : Stage(session), write_processed(false) {}
-
-Immediate WriteBack::dispatch(Wire wire) {
-    if (wire == w_pc) {
-        auto opcode = session->d->get(Decode::opcode);
-        switch(opcode) {
-            case 0b1100111: // JALR
-            case 0b1101111: // JAL
-            case 0b1100011:
-                return session->e->get(Execute::e_val);
-            default:
-                return session->f->get(Fetch::f_pc);
-        }
-    }
-    throw InvalidKey();
-}
+WriteBack::WriteBack(Session *session) : Stage(session) {}
 
 void WriteBack::tick() {
-    Stage::tick();
-    write_processed = false;
 }
 
 void WriteBack::hook() {
-    if (!write_processed) {
-        write_processed = true;
-        switch (session->d->get(Decode::opcode)) {
-            case 0b0110111: // LUI
-            case 0b0010111: // AUIPC
-            case 0b0010011: // ***I
-            case 0b0110011: // ***
-                session->rf.write(session->d->get(Decode::rd), session->e->get(Execute::e_val));
-                break;
-            case 0b1101111: // JAL
-            case 0b1100111: // JALR
-                session->rf.write(session->d->get(Decode::rd), session->f->get(Fetch::f_pc));
-                break;
-            case 0b0000011: // L*
-                session->rf.write(session->d->get(Decode::rd), session->m->get(MemoryAccess::m_val));
-        }
+    auto inst = session->m->m_inst.read();
+
+    // Write
+
+    switch (inst.opcode) {
+        case 0b0110111: // LUI
+        case 0b0010111: // AUIPC
+        case 0b0010011: // ***I
+        case 0b0110011: // ***
+            session->rf.write(inst.rd, session->m->e_val.read());
+            break;
+        case 0b1101111: // JAL
+        case 0b1100111: // JALR
+            session->rf.write(inst.rd, session->m->m_pc.read() + 4);
+            break;
+        case 0b0000011: // L*
+            session->rf.write(inst.rd, session->m->m_val.read());
     }
+}
+
+void WriteBack::debug() {
+
 }

@@ -6,25 +6,22 @@
 #define RISCV_SIMULATOR_MEMORYACCESS_HPP
 
 #include "Stage.hpp"
+#include "../Instruction.hpp"
+#include "../Register.hpp"
 
 class MemoryAccess : public Stage {
-private:
-    bool write_processed;
 public:
-    class InvalidTarget {
-    };
-
-    enum M {
-        m_val = 0
-    };
+    class InvalidTarget {};
+    Register<InstructionBase> m_inst;
+    Register<Immediate> m_val, e_val, m_pc;
 
     MemoryAccess(Session *session);
-
-    Immediate dispatch(Wire wire) override;
 
     void tick();
 
     void hook();
+
+    void debug();
 };
 
 

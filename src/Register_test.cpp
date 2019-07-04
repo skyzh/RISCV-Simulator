@@ -12,4 +12,11 @@ TEST(Register, ReadWrite) {
     EXPECT_EQ(r.read(), 0);
     r.tick();
     EXPECT_EQ(r.read(), 1);
+    r.write(2);
+    r.stall(true);
+    r.tick();
+    EXPECT_EQ(r.read(), 1);
+    r.stall(false);
+    r.tick();
+    EXPECT_EQ(r.read(), 2);
 }

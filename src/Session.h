@@ -29,7 +29,6 @@ public:
     MemoryAccess *m;
     WriteBack *w;
 
-    Register<Immediate> PC;
     RegisterFile rf;
     Memory memory;
 

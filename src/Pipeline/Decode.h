@@ -7,26 +7,23 @@
 
 #include "Stage.hpp"
 #include "../Instruction.hpp"
+#include "../Register.hpp"
 
 class Decode : public Stage {
 private:
     InstructionBase cached_inst;
 public:
-    class InvalidInstruction {
-    };
-
-    enum D {
-        d_inst = 0, opcode, type, rs1, op1, rs2,
-        op2, rd, funct3, funct7, imm
-    };
+    Register<InstructionBase> d_inst;
+    Register<Immediate> op1, op2;
+    Register<Immediate> d_pc, pred_pc;
 
     Decode(Session *session);
 
+    void hook();
+
     void tick();
 
-    Immediate dispatch(Wire wire) override;
-
-    InstructionBase parse_opcode(unsigned opcode, Immediate imm);
+    void debug();
 };
 
 

@@ -9,63 +9,105 @@
 
 Execute::Execute(Session *session) : Stage(session) {}
 
-Immediate Execute::dispatch(Wire wire) {
-    if (wire == e_val) {
-        auto type = session->d->get(Decode::type);
+void Execute::hook() {
+    auto inst = session->d->d_inst.read();
+    auto op1 = session->d->op1.read();
+    auto op2 = session->d->op2.read();
+    auto pc = session->d->d_pc.read();
 
-        if (type == InstructionBase::Type::R)
-            return alu.get_r(
-                    session->d->get(Decode::opcode),
-                    session->d->get(Decode::funct3),
-                    session->d->get(Decode::op1),
-                    session->d->get(Decode::op2),
-                    session->d->get(Decode::funct7)
-            );
+    e_inst.write(inst);
 
-        if (type == InstructionBase::Type::I)
-            return alu.get_i(
-                    session->d->get(Decode::opcode),
-                    session->d->get(Decode::funct3),
-                    session->d->get(Decode::op1),
-                    session->d->get(Decode::imm)
-            );
+    Immediate val;
+    if (inst.t == InstructionBase::Type::R)
+        val = alu.get_r(
+                inst.opcode,
+                inst.funct3,
+                op1,
+                op2,
+                inst.funct7
+        );
 
-        if (type == InstructionBase::Type::S)
-            return alu.get_s(
-                    session->d->get(Decode::opcode),
-                    session->d->get(Decode::funct3),
-                    session->d->get(Decode::op1),
-                    session->d->get(Decode::op2),
-                    session->d->get(Decode::imm)
-            );
+    if (inst.t == InstructionBase::Type::I)
+        val = alu.get_i(
+                inst.opcode,
+                inst.funct3,
+                op1,
+                inst.imm
+        );
 
-        if (type == InstructionBase::Type::B)
-            return alu.get_b(
-                    session->d->get(Decode::opcode),
-                    session->d->get(Decode::funct3),
-                    session->d->get(Decode::op1),
-                    session->d->get(Decode::op2),
-                    session->d->get(Decode::imm),
-                    session->f->get(Fetch::f_pc)
-            );
+    if (inst.t == InstructionBase::Type::S)
+        val = alu.get_s(
+                inst.opcode,
+                inst.funct3,
+                op1,
+                op2,
+                inst.imm
+        );
 
-        if (type == InstructionBase::Type::J)
-            // JAL
-            return session->f->get(Fetch::f_pc) + session->d->get(Decode::imm) - 4;
+    if (inst.t == InstructionBase::Type::B)
+        val = alu.get_b(
+                inst.opcode,
+                inst.funct3,
+                op1,
+                op2,
+                inst.imm,
+                pc
+        );
 
-        if (type == InstructionBase::Type::U) {
-            switch (session->d->get(Decode::opcode)) {
-                case 0b0110111: // LUI
-                    return session->d->get(Decode::imm);
-                case 0b0010111: // AUIPC
-                    return session->f->get(Fetch::f_pc) + session->d->get(Decode::imm) - 4;
-                default:
-                    throw InvalidOp();
-            }
+    if (inst.t == InstructionBase::Type::J)
+        // JAL
+        val = pc + inst.imm;
+
+    if (inst.t == InstructionBase::Type::U) {
+        switch (inst.opcode) {
+            case 0b0110111: // LUI
+                val = inst.imm;
+                break;
+            case 0b0010111: // AUIPC
+                val = pc + inst.imm;
+                break;
+            default:
+                throw InvalidOp();
         }
-
-        throw InvalidAccess();
     }
 
-    throw InvalidKey();
+    // Handle mis-prediction
+    Immediate next_pc;
+    switch(inst.opcode) {
+        case 0b1100111: // JALR
+        case 0b1101111: // JAL
+        case 0b1100011: // B**
+            next_pc = val;
+            break;
+        default:
+            next_pc = pc + 4;
+    }
+
+    auto pred_pc = session->d->pred_pc.read();
+
+    if (pred_pc != next_pc) {
+        mis_pred = true;
+    } else {
+        mis_pred = false;
+    }
+
+    e_val.write(val);
+
+    e_pc.write(pc);
+
+    this->op2.write(op2);
+}
+
+void Execute::tick() {
+    e_inst.tick();
+    e_val.tick();
+    e_pc.tick();
+    op2.tick();
+}
+
+void Execute::debug() {
+    std::cout << "    ";
+    e_inst.read().debug();
+    std::cout << "    " << "e_pc e_val op2 mispred" << std::endl;
+    std::cout << "    " << e_pc.read() << " " << e_val.read() << " " << op2.read() << " " << (mis_pred ? "True" : "False") << std::endl;
 }

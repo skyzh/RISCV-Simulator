@@ -8,23 +8,15 @@
 #include "Stage.hpp"
 
 class WriteBack : public Stage {
-private:
-    bool write_processed;
 public:
-    class InvalidTarget {
-    };
-
-    enum W {
-        w_pc = 0
-    };
 
     WriteBack(Session *session);
-
-    Immediate dispatch(Wire wire) override;
 
     void tick();
 
     void hook();
+
+    void debug();
 };
 
 #endif //RISCV_SIMULATOR_WRITEBACK_H

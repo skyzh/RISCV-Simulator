@@ -6,16 +6,26 @@
 #define RISCV_SIMULATOR_FETCH_H
 
 #include "Stage.hpp"
+#include "../Register.hpp"
+#include "../Instruction.hpp"
 
 class Fetch : public Stage {
 public:
-    enum F {
-        inst = 0, f_pc
-    };
+    Register<Immediate> pred_pc;
+    Register<Immediate> f_pc;
+    Register<InstructionBase> f_inst;
 
-    Fetch(Session* session);
+    InstructionBase parse_opcode(unsigned opcode, Immediate imm);
 
-    Immediate dispatch(Wire wire) override;
+    Fetch(Session *session);
+
+    void hook();
+
+    void tick();
+
+    void stall(bool _stall);
+
+    void debug();
 };
 
 

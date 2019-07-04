@@ -11,15 +11,18 @@ template<typename T>
 class Register { // : public Tickable {
 public:
     T prev, next;
-    Register() { prev = next = 0; }
 
-    Register(const T &t) : prev(t), next(t) {}
+    bool _stall;
+
+    Register() : prev(0), next(0), _stall(false) {}
 
     T read() { return prev; }
 
     void write(const T &t) { next = t; }
 
-    void tick() { prev = next; }
+    void tick() { if (!_stall) prev = next; }
+
+    void stall(bool stall) { _stall = stall; }
 };
 
 #endif //RISCV_SIMULATOR_REGISTER_HPP

@@ -4,15 +4,50 @@
 
 #include "Fetch.h"
 #include "../Session.h"
+#include "WriteBack.h"
 
-Fetch::Fetch(Session* session) : Stage(session) {}
+Fetch::Fetch(Session *session) : Stage(session) {}
 
-Immediate Fetch::dispatch(Wire wire) {
-    if (wire == inst) {
-        return session->memory.read_word(session->PC.read());
-    }
-    if (wire == f_pc) {
-        return session->PC.read() + 4;
-    }
-    throw InvalidKey();
+InstructionBase Fetch::parse_opcode(unsigned opcode, Immediate imm) {
+    if (opcode == 0b0110011) { return InstructionR(imm); } // ***
+    if (opcode == 0b0010011) { return InstructionI(imm); } // ***I
+    if (opcode == 0b0100011) { return InstructionS(imm); } // S*
+    if (opcode == 0b0000011) { return InstructionI(imm); } // L*
+    if (opcode == 0b1100011) { return InstructionB(imm); } // B**
+    if (opcode == 0b1100111) { return InstructionI(imm); } // JALR
+    if (opcode == 0b1101111) { return InstructionJ(imm); } // JAL
+    if (opcode == 0b0010111) { return InstructionU(imm); } // AUIPC
+    if (opcode == 0b0110111) { return InstructionU(imm); } // LUI
+    assert(false);
+    return 0;
+}
+
+void Fetch::hook() {
+    auto pc = pred_pc.read();
+    f_pc.write(pc);
+    // Always take
+    pred_pc.write(pc + 4);
+
+    auto _inst = session->memory.read_word(pc);
+    auto inst = parse_opcode(_inst & 0x7f, _inst);
+    f_inst.write(inst);
+}
+
+void Fetch::tick() {
+    pred_pc.tick();
+    f_inst.tick();
+    f_pc.tick();
+}
+
+void Fetch::stall(bool _stall) {
+    pred_pc.stall(_stall);
+    f_inst.stall(_stall);
+    f_pc.stall(_stall);
+}
+
+void Fetch::debug() {
+    std::cout << "    ";
+    f_inst.read().debug();
+    std::cout << "    " << "f_pc pred_pc" << std::endl;
+    std::cout << "    " << f_pc.read() << " " << pred_pc.read() << std::endl;
 }
