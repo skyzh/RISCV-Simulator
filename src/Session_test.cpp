@@ -7,5 +7,6 @@
 
 
 TEST(Session, Construct) {
-    Session session;
+    Session *session = new Session;
+    delete session;
 }
