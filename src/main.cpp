@@ -60,7 +60,7 @@ int run_all_tests() {
     run_session("../data/statement_test.data", 50);
     run_session("../data/superloop.data", 134);
     run_session("../data/tak.data", 186);
-    // run_session("../data/pi.data", 137);
+    run_session("../data/pi.data", 137);
     return 0;
 }
 
