@@ -11,7 +11,7 @@
 
 void run_session(const char *path, unsigned ret_value, bool use_hex_parser = false) {
     std::clock_t c_start = std::clock();
-    std::cerr << "Running: " << path << " ... ";
+    std::clog << " | " << path << " | ";
     Session *session = new Session(false);
     if (use_hex_parser) session->load_hex(path); else session->load_memory(path);
     int pc_cnt = 0;
@@ -28,8 +28,12 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
         }
     }
     auto ret_val = session->rf.read(10) & 0xff;
-    std::cerr << ret_val << " == " << ret_value << "  ";
-    std::cerr << pc_cnt << " inst in " << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms" << std::endl;
+    // std::clog << "\t" << ret_val << " == " << ret_value << std::endl;
+    std::clog << pc_cnt << " | " << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms | ";
+    /* std::clog << "\t" << pc_cnt << " inst in " << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms"
+              << std::endl; */
+    std::clog << (1 - 1.0 * session->s.mis_pred / session->s.branches) * 100.0 << "% | " << std::endl;
+    // std::clog << "\t" << session->s.mis_pred << "/" << session->s.branches << "("<< (1 - 1.0 * session->s.mis_pred / session->s.branches) * 100.0 <<"%)" << std::endl;
     assert(ret_val == ret_value);
     delete session;
 }
@@ -56,7 +60,7 @@ int run_all_tests() {
     run_session("../data/statement_test.data", 50);
     run_session("../data/superloop.data", 134);
     run_session("../data/tak.data", 186);
-    run_session("../data/pi.data", 137);
+    // run_session("../data/pi.data", 137);
     return 0;
 }
 

@@ -30,11 +30,17 @@ void Fetch::hook() {
     }
 
     f_pc.write(pc);
-    // Always take
+
     pred_pc.write(pc + 4);
 
     auto _inst = session->memory.read_word(pc);
     auto inst = parse_opcode(_inst & 0x7f, _inst);
+
+    if (inst.opcode == 0b1100011) {
+        if (session->branch.take(pc)) {
+            pred_pc.write(pc + inst.imm);
+        }
+    }
     f_inst.write(inst);
 }
 

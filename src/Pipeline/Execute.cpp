@@ -74,9 +74,10 @@ void Execute::hook() {
     // Handle mis-prediction
     Immediate next_pc;
     switch(inst.opcode) {
+        case 0b1100011: // B**
+            ++session->s.branches;
         case 0b1100111: // JALR
         case 0b1101111: // JAL
-        case 0b1100011: // B**
             next_pc = val;
             if (session->d->pred_pc.read() != next_pc) mis_pred = true;
             break;
@@ -88,12 +89,15 @@ void Execute::hook() {
     auto pred_pc = session->d->pred_pc.read();
 
     if (mis_pred) {
+        if (inst.opcode == 0b1100011) ++session->s.mis_pred;
         session->d->bubble(true);
         session->f->notify_jump(true, next_pc);
     } else {
         session->d->bubble(false);
         session->f->notify_jump(false, 0);
     }
+
+    if (inst.opcode == 0b1100011) session->branch.report(pc, next_pc != pc + 4);
 
     e_val.write(val);
 
