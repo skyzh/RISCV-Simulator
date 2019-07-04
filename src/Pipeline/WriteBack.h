@@ -13,6 +13,7 @@ class WriteBack : public Stage {
 public:
 
     Register<InstructionBase> w_inst;
+    Register<Immediate> w_val;
 
     WriteBack(Session *session);
 

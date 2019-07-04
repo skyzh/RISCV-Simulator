@@ -36,14 +36,31 @@ void Decode::hook() {
     hazard_detected = false;
 
     if (f_inst.has_op1()) {
-        if (detect_hazard(f_inst.rs1)) hazard_detected = true;
-        op1.write(session->rf.read(f_inst.rs1));
+        bool may_forward;
+        Immediate forward_val;
+        Immediate op = 0;
+        if (detect_hazard(f_inst.rs1, may_forward, forward_val)) {
+            if (may_forward)
+                op = forward_val;
+            else
+                hazard_detected = true;
+        } else op = session->rf.read(f_inst.rs1);
+        op1.write(op);
     }
 
     if (f_inst.has_op2()) {
-        if (detect_hazard(f_inst.rs2)) hazard_detected = true;
-        op2.write(session->rf.read(f_inst.rs2));
+        bool may_forward;
+        Immediate forward_val;
+        Immediate op = 0;
+        if (detect_hazard(f_inst.rs2, may_forward, forward_val)) {
+            if (may_forward)
+                op = forward_val;
+            else
+                hazard_detected = true;
+        } else op = session->rf.read(f_inst.rs2);
+        op2.write(op);
     }
+
 
     session->f->stall(hazard_detected);
     bubble(hazard_detected);
@@ -65,14 +82,35 @@ void Decode::bubble(bool _bubble) {
     if (_bubble) d_inst.write(InstructionBase::nop());
 }
 
-bool Decode::detect_hazard(unsigned reg_id) {
+bool Decode::detect_hazard(unsigned reg_id, bool &may_forward, Immediate &forward_val) {
     if (reg_id == 0) return false;
     auto m_inst = session->m->m_inst.current();
     auto e_inst = session->e->e_inst.current();
     auto w_inst = session->w->w_inst.current();
-    if (m_inst.rd == reg_id) return true;
-    if (e_inst.rd == reg_id) return true;
-    if (w_inst.rd == reg_id) return true;
+    may_forward = false;
+    if (e_inst.rd == reg_id) {
+        if (e_inst.opcode == 0b0010011 || e_inst.opcode == 0b0110011) {
+            may_forward = true;
+            forward_val = session->e->e_val.current();
+        }
+        return true;
+    }
+    if (m_inst.rd == reg_id) {
+        if (m_inst.opcode == 0b0000011) {
+            may_forward = true;
+            forward_val = session->m->m_val.current();
+        }
+        if (m_inst.opcode == 0b0010011 || m_inst.opcode == 0b0110011) {
+            may_forward = true;
+            forward_val = session->m->e_val.current();
+        }
+        return true;
+    }
+    if (w_inst.rd == reg_id) {
+        may_forward = true;
+        forward_val = session->w->w_val.current();
+        return true;
+    }
     return false;
 }
 

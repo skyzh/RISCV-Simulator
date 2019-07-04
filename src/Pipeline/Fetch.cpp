@@ -23,9 +23,11 @@ InstructionBase Fetch::parse_opcode(unsigned opcode, Immediate imm) {
 }
 
 void Fetch::hook() {
-    auto pc = pred_pc.read();
+    Immediate pc = pred_pc.read();
 
-    if (_jump) pc = this->pc; // branch mispredicted
+    if (_jump) {
+        pc = this->pc; // branch mispredicted
+    }
 
     f_pc.write(pc);
     // Always take

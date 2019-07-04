@@ -35,11 +35,11 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
 }
 
 int run_all_tests() {
+    run_session("../data/naive.data", 94);
     run_session("../tests/data-hazard-1.hex", 0x1f, true);
     run_session("../tests/data-hazard-2.hex", 0x1f, true);
     run_session("../tests/control-hazard-1.hex", 0x8, true);
     run_session("../tests/control-hazard-2.hex", 0x8, true);
-    run_session("../data/naive.data", 94);
     run_session("../data/array_test1.data", 123);
     run_session("../data/array_test2.data", 43);
     run_session("../data/basicopt1.data", 88);
@@ -57,7 +57,6 @@ int run_all_tests() {
     run_session("../data/superloop.data", 134);
     run_session("../data/tak.data", 186);
     run_session("../data/pi.data", 137);
-
     return 0;
 }
 

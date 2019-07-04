@@ -31,7 +31,7 @@ public:
 
     void stall(bool _stall);
 
-    bool detect_hazard(unsigned reg_id);
+    bool detect_hazard(unsigned reg_id, bool &may_forward, Immediate &forward_val);
 };
 
 

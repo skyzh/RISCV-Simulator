@@ -16,7 +16,13 @@ struct InstructionBase {
     class InvalidAccess {
     };
 
-    InstructionBase() {}
+    InstructionBase() {
+        rs1 = rs2 = rd = 0;
+        opcode = 0;
+        imm = 0;
+        funct3 = funct7 = 0;
+        this->inst = 0;
+    }
 
     InstructionBase(unsigned) {
         rs1 = rs2 = rd = 0;
