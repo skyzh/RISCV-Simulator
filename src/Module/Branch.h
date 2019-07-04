@@ -10,6 +10,7 @@
 class Branch {
 public:
     unsigned char two_bits[MEMORY_SIZE];
+    unsigned char mux[MEMORY_SIZE];
 
     Branch();
 

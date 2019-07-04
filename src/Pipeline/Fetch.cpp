@@ -41,6 +41,11 @@ void Fetch::hook() {
             pred_pc.write(pc + inst.imm);
         }
     }
+
+    if (inst.t == InstructionBase::J) {
+        pred_pc.write(pc + inst.imm);
+    }
+
     f_inst.write(inst);
 }
 

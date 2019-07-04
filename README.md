@@ -5,7 +5,7 @@
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
 This branch simulates a pipelined RISC-V CPU, which handles
-hazard with forwarding, and uses 2-bit saturating counter
+hazard with forwarding, and uses two-level adaptive predictor
 for branch prediction. Refer to [Branch.md](https://github.com/skyzh/RISCV-Simulator/blob/pipeline/Branch.md)
 for testing result.
 

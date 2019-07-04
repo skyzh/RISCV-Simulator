@@ -1,6 +1,6 @@
 # Before
 
- | data | inst | time(ms) | success rate |
+ | data | cycles | time(ms) | success rate |
  |---|---|---|---|
  | ../data/naive.data | 34 | 4.922ms | nan% | 
  | ../tests/data-hazard-1.hex | 11 | 0.479ms | nan% | 
@@ -25,27 +25,29 @@
  | ../data/tak.data | 1546200 | 90.022ms | 74.9996% | 
  | ../data/pi.data | 127443492 | 8041.23ms | 42.2702% | 
 
- | data | inst | time(ms) | success rate |
+# After
+
+ | data | cycles | time(ms) | success rate |
  |---|---|---|---|
- | ../data/naive.data | 34 | 5.452ms | nan% | 
- | ../tests/data-hazard-1.hex | 11 | 0.483ms | nan% | 
- | ../tests/data-hazard-2.hex | 12 | 0.48ms | nan% | 
- | ../tests/control-hazard-1.hex | 11 | 0.442ms | nan% | 
- | ../tests/control-hazard-2.hex | 13 | 0.447ms | 0% | 
- | ../data/array_test1.data | 219 | 0.548ms | 50% | 
- | ../data/array_test2.data | 248 | 0.553ms | 46.1538% | 
- | ../data/basicopt1.data | 596812 | 54.251ms | 82.3997% | 
- | ../data/bulgarian.data | 388655 | 34.315ms | 94.44% | 
- | ../data/expr.data | 582 | 0.697ms | 82.8829% | 
- | ../data/gcd.data | 540 | 0.891ms | 67.5% | 
- | ../data/hanoi.data | 199833 | 18.927ms | 61.093% | 
- | ../data/lvalue2.data | 61 | 0.642ms | 66.6667% | 
- | ../data/magic.data | 564871 | 46.439ms | 78.4025% | 
- | ../data/manyarguments.data | 71 | 0.474ms | 80% | 
- | ../data/multiarray.data | 1679 | 1.018ms | 79.0123% | 
- | ../data/qsort.data | 1476030 | 102.736ms | 87.4203% | 
- | ../data/queens.data | 599690 | 42.935ms | 73.3881% | 
- | ../data/statement_test.data | 1105 | 0.574ms | 64.3564% | 
- | ../data/superloop.data | 548862 | 33.466ms | 93.8222% | 
- | ../data/tak.data | 1546925 | 85.538ms | 73.804% | 
- | ../data/pi.data | 111407802 | 7178.12ms | 82.4032% | 
+ | ../data/naive.data | 33 | 5.337ms | nan% | 
+ | ../tests/data-hazard-1.hex | 11 | 0.729ms | nan% | 
+ | ../tests/data-hazard-2.hex | 12 | 0.571ms | nan% | 
+ | ../tests/control-hazard-1.hex | 10 | 0.582ms | nan% | 
+ | ../tests/control-hazard-2.hex | 13 | 0.582ms | 0% | 
+ | ../data/array_test1.data | 209 | 0.655ms | 54.5455% | 
+ | ../data/array_test2.data | 237 | 1.047ms | 50% | 
+ | ../data/basicopt1.data | 559226 | 52.074ms | 98.8887% | 
+ | ../data/bulgarian.data | 377506 | 35.758ms | 94.4862% | 
+ | ../data/expr.data | 586 | 3.846ms | 75.6757% | 
+ | ../data/gcd.data | 534 | 3.514ms | 61.6667% | 
+ | ../data/hanoi.data | 190794 | 18.921ms | 86.4868% | 
+ | ../data/lvalue2.data | 59 | 0.95ms | 66.6667% | 
+ | ../data/magic.data | 553419 | 46.586ms | 82.2054% | 
+ | ../data/manyarguments.data | 69 | 0.912ms | 80% | 
+ | ../data/multiarray.data | 1650 | 1.03ms | 66.0494% | 
+ | ../data/qsort.data | 1430582 | 98.468ms | 91.7384% | 
+ | ../data/queens.data | 582242 | 41.592ms | 81.0156% | 
+ | ../data/statement_test.data | 1067 | 2.527ms | 66.8317% | 
+ | ../data/superloop.data | 532844 | 42.246ms | 95.1932% | 
+ | ../data/tak.data | 1530613 | 101.747ms | 75.7038% | 
+ | ../data/pi.data | 109722503 | 8114.27ms | 84.5072% | 
