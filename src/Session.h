@@ -22,6 +22,7 @@ class MemoryAccess;
 class WriteBack;
 
 class Session { // : public Tickable {
+    bool _debug;
 public:
     Fetch *f;
     Decode *d;
@@ -32,11 +33,13 @@ public:
     RegisterFile rf;
     Memory memory;
 
-    Session();
+    Session(bool debug = false);
 
     void tick();
 
     void load_memory(const char* path);
+
+    void load_hex(const char* path);
 
     virtual ~Session();
 

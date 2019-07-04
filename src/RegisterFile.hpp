@@ -31,7 +31,7 @@ public:
     void debug() {
         for (int i = 0; i < 32; i++) {
             if (i % 8 == 0) std::cout << i << " - " << i + 8 << std::endl;
-            std::cout << std::hex << prev[i] << " ";
+            std::cout << std::dec << next[i] << std::hex << "(0x" << next[i] << ") ";
             if ((i + 1) % 8 == 0) std::cout << std::endl;
         }
     }

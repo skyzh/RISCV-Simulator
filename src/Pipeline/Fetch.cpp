@@ -2,6 +2,7 @@
 // Created by Alex Chi on 2019-07-01.
 //
 
+#include <cassert>
 #include "Fetch.h"
 #include "../Session.h"
 #include "WriteBack.h"
@@ -18,8 +19,7 @@ InstructionBase Fetch::parse_opcode(unsigned opcode, Immediate imm) {
     if (opcode == 0b1101111) { return InstructionJ(imm); } // JAL
     if (opcode == 0b0010111) { return InstructionU(imm); } // AUIPC
     if (opcode == 0b0110111) { return InstructionU(imm); } // LUI
-    assert(false);
-    return 0;
+    return InstructionBase::nop();
 }
 
 void Fetch::hook() {

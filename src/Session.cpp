@@ -12,7 +12,7 @@
 
 #include <fstream>
 
-Session::Session() {
+Session::Session(bool debug) : _debug(debug) {
     f = new Fetch(this);
     d = new Decode(this);
     e = new Execute(this);
@@ -35,7 +35,7 @@ void Session::tick() {
     d->hook();
     f->hook();
 
-    this->debug();
+    if (_debug) this->debug();
 
     f->tick();
     d->tick();
@@ -48,7 +48,7 @@ void Session::tick() {
 
 void Session::load_memory(const char *path) {
     std::fstream in(path);
-    Parser::parse_hex(in, memory);
+    Parser::parse(in, memory);
 }
 
 void Session::debug() {
@@ -64,4 +64,9 @@ void Session::debug() {
     w->debug();
     std::cout << "Registers" << std::endl;
     rf.debug();
+}
+
+void Session::load_hex(const char *path) {
+    std::fstream in(path);
+    Parser::parse_hex(in, memory);
 }
