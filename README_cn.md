@@ -82,4 +82,4 @@ CPU 的电路在程序运行之时就已经被确定了。因而，我可以手�
 
 ### 模拟器使用的 CPU 电路
 
-[RISCV Design.pdf](https://github.com/skyzh/RISCV-Simulator/files/3361184/RISCV.Design.pdf)
+[RISCV Design.pdf](https://github.com/skyzh/RISCV-Simulator/files/3362948/RISCV.Design.pdf)

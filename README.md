@@ -92,8 +92,7 @@ In this way we can verify this implementation is really 'pipelined'.
 
 ### Equivalent Circuit Design
 
-[RISCV Design.pdf](https://github.com/skyzh/RISCV-Simulator/files/3361184/RISCV.Design.pdf)
-
+[RISCV Design.pdf](https://github.com/skyzh/RISCV-Simulator/files/3362948/RISCV.Design.pdf)
 
 ## Tips
 
