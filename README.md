@@ -50,7 +50,7 @@ in Haskell. It can be easily expressed in a functional way. In this
 project, `Stage` object saves all such functions, hence an intermediate
 value won't be evaluated twice in a single cycle.
 
-### But, it's slow
+### But wait, it's slow
 
 It's slow to resolve dependency in functional programming style. Therefore,
 I manually resolve dependency and use feed-forward flavor in this branch.
@@ -79,6 +79,11 @@ In `Session.cpp`, you may replace the sequence of evaluation with a loop.
 For a random sequence of updating circuit status, loop of 10 times is enough to obtain
 steady state of the circuit. The result would stay the same, but simulation runs much slower.
 In this way we can verify this implementation is really 'pipelined'.
+
+### Equivalent Circuit Design
+
+[RISCV Design.pdf](https://github.com/skyzh/RISCV-Simulator/files/3361184/RISCV.Design.pdf)
+
 
 ## Tips
 
