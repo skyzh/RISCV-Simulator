@@ -1,8 +1,12 @@
 .globl main
 .text
 main:
-li a1, 0x4
-jalr a0, a1, 4
+li a1, 0x10
+nop
+nop
+nop
+jalr a0, a1, 8
+addi a0, a0, 8
 addi  a0, a0, 8
 test:
 li	a2,255
