@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.com/skyzh/RISCV-Simulator.svg?branch=pipeline)](https://travis-ci.com/skyzh/RISCV-Simulator)
 
+[中文文档](https://github.com/skyzh/RISCV-Simulator/blob/pipeline/README_cn.md)
+
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
 This branch simulates a pipelined RISC-V CPU, which handles
