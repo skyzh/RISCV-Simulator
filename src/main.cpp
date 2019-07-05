@@ -64,6 +64,7 @@ int run_all_tests() {
     run_session("../tests/data-hazard-2.hex", 0x1f, true);
     run_session("../tests/control-hazard-1.hex", 0x8, true);
     run_session("../tests/control-hazard-2.hex", 0x8, true);
+    run_session("../tests/control-hazard-3.hex", 16, true);
     run_session("../data/array_test1.data", 123);
     run_session("../data/array_test2.data", 43);
     run_session("../data/basicopt1.data", 88);
