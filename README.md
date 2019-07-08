@@ -106,3 +106,8 @@ In this way we can verify this implementation is really 'pipelined'.
   For example, just identify an instruction as "r-r operation" instead of "add", "sub", etc.
 * You may write your own test case in assembly with [RARS](https://github.com/TheThirdOne/rars).
   Then dump memory in hex format, load it into simulator and test it. Some examples in tests/ folder.
+
+## Todo
+
+- [ ] simplify circuit design
+- [ ] branch prediction should use hash map
