@@ -8,12 +8,14 @@
 #include "../Instruction.hpp"
 #include "../Register.hpp"
 #include "OoOCommon.h"
+#include "../ReservationStation.h"
 
 class Session;
 
 class Issue {
 public:
     Register<Immediate> pc;
+    Register<bool> branch_issued;
 
     InstructionBase _debug_dispatched_inst;
 
@@ -32,6 +34,20 @@ public:
     void debug();
 
     RSID find_available_op_unit();
+
+    Immediate issue_branch(const InstructionBase &inst);
+
+    Immediate resolve_branch(const InstructionBase &inst);
+
+    Immediate issue_immediate_op(const InstructionBase &inst);
+
+    Immediate issue_op(const InstructionBase &inst);
+
+    void issue_rs_to_Vj(unsigned reg_id, RS* rs, RSID unit_id);
+
+    void issue_rs_to_Vk(unsigned reg_id, RS* rs, RSID unit_id);
+
+    void issue_imm_to_Vk(Immediate imm, RS* rs, RSID unit_id);
 };
 
 

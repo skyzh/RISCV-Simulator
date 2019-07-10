@@ -2,17 +2,17 @@
 // Created by Alex Chi on 2019-07-04.
 //
 
-#ifndef RISCV_SIMULATOR_BRANCH_H
-#define RISCV_SIMULATOR_BRANCH_H
+#ifndef RISCV_SIMULATOR_BRANCHPREDICTION_H
+#define RISCV_SIMULATOR_BRANCHPREDICTION_H
 
 #include "../Memory.hpp"
 
-class Branch {
+class BranchPrediction {
 public:
     unsigned char two_bits[MEMORY_SIZE];
     unsigned char mux[MEMORY_SIZE];
 
-    Branch();
+    BranchPrediction();
 
     bool take(unsigned addr);
 
@@ -20,4 +20,4 @@ public:
 };
 
 
-#endif //RISCV_SIMULATOR_BRANCH_H
+#endif //RISCV_SIMULATOR_BRANCHPREDICTION_H

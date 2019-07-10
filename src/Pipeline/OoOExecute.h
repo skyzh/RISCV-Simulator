@@ -6,29 +6,36 @@
 #define RISCV_SIMULATOR_OOOEXECUTE_H
 
 #include "OoOCommon.h"
-#include "../ReservationStation.hpp"
+#include "../ReservationStation.h"
 #include "../Session.h"
 #include "../Register.hpp"
 #include <memory>
+#include <vector>
+#include <string>
 
 using std::unique_ptr;
 
 class Session;
+
 class ALUUnit;
+
 class LoadStoreUnit;
 
 class OoOExecute {
 public:
-    static const unsigned MAX_REG = 32;
-    RS Add1, Add2, Add3, Load1, Store1;
+    static const unsigned MAX_REG = 32 + 1;
+    RS Add1, Add2, Add3, Load1, Store1, Branch1;
+    // TODO: Here I added another register to indicate
+    //       branch status. It should be eliminated.
     Register<RSID> Qi[MAX_REG];
+    static const unsigned BRANCH_REG = MAX_REG - 1;
 
-    unique_ptr <ALUUnit> aluUnit;
-    unique_ptr <LoadStoreUnit> loadStoreUnit;
+    unique_ptr<ALUUnit> aluUnit;
+    unique_ptr<LoadStoreUnit> loadStoreUnit;
 
-    Session* session;
+    Session *session;
 
-    OoOExecute(Session* session);
+    OoOExecute(Session *session);
 
     void update();
 
@@ -48,6 +55,5 @@ public:
 
     void occupy_unit(RSID id);
 };
-
 
 #endif //RISCV_SIMULATOR_OOOEXECUTE_H

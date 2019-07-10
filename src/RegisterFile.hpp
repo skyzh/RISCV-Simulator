@@ -14,7 +14,7 @@
 #include "utils.h"
 
 class RegisterFile { // : public Tickable {
-    static const int REG_NUM = 32;
+    static const int REG_NUM = 33;
 public:
     Immediate prev[REG_NUM];
     Immediate next[REG_NUM];
@@ -44,6 +44,9 @@ public:
             }
             std::cout << std::endl;
         }
+        std::cout << "branch" << std::endl;
+        debug_immediate(prev[32]);
+        std::cout << std::endl;
     }
 };
 

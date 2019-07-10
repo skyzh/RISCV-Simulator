@@ -2,8 +2,8 @@
 // Created by Alex Chi on 2019-07-10.
 //
 
-#ifndef RISCV_SIMULATOR_RESERVATIONSTATION_HPP
-#define RISCV_SIMULATOR_RESERVATIONSTATION_HPP
+#ifndef RISCV_SIMULATOR_RESERVATIONSTATION_H
+#define RISCV_SIMULATOR_RESERVATIONSTATION_H
 
 #include "Register.hpp"
 #include "Instruction.hpp"
@@ -42,31 +42,15 @@ public:
                 return "STORE1";
             case LOAD1:
                 return "LOAD1";
+            case BRANCH1:
+                return "BRANCH1";
             case NONE:
                 return "NONE";
         }
         return "UNKNOWN";
     }
 
-    void debug() {
-        std::cout << "Busy\tOp\t\t\tQj\t\t\tQk\t\t\tVj\t\t\tVk\t\t\tA\t\t\tTag" << std::endl;
-        std::cout << std::boolalpha << Busy.current() << "\t";
-        debug_immediate(Op.current());
-        std::cout << "\t";
-        std::cout << resolve(Qj.current());
-        std::cout << "\t";
-        std::cout << resolve(Qk.current());
-        std::cout << "\t";
-        debug_immediate(Vj.current());
-        std::cout << "\t";
-        debug_immediate(Vk.current());
-        std::cout << "\t";
-        debug_immediate(A.current());
-        std::cout << "\t";
-        debug_immediate(Tag.current());
-        std::cout << std::endl;
-
-    }
+    void debug();
 };
 
-#endif //RISCV_SIMULATOR_RESERVATIONSTATION_HPP
+#endif //RISCV_SIMULATOR_RESERVATIONSTATION_H

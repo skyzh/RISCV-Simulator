@@ -5,12 +5,14 @@
 #ifndef RISCV_SIMULATOR_ALUUNIT_H
 #define RISCV_SIMULATOR_ALUUNIT_H
 
-#include "../ReservationStation.hpp"
+#include "../ReservationStation.h"
 #include "../Pipeline/OoOCommon.h"
 
 #include <vector>
+#include <string>
 
 using std::vector;
+using std::string;
 
 class OoOExecute;
 
@@ -19,7 +21,7 @@ public:
     OoOExecute *e;
     vector<RSID> rs;
     enum OP {
-        ADD = 233, SUB, SLT, SLTU, XOR, OR, AND, SLL, SRL, SRA, NONE_OP
+        NONE_OP = 0, ADD = 233, SUB, SLT, SLTU, XOR, OR, AND, SLL, SRL, SRA
     };
 
     ALUUnit(OoOExecute *e);
@@ -27,6 +29,8 @@ public:
     void update();
 
     Immediate get_result(Immediate op, Immediate op1, Immediate op2);
+
+    static string resolve(OP op);
 };
 
 

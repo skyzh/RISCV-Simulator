@@ -2,19 +2,19 @@
 // Created by Alex Chi on 2019-07-04.
 //
 
-#include "Branch.h"
+#include "BranchPrediction.h"
 #include <cstring>
 
-Branch::Branch() {
+BranchPrediction::BranchPrediction() {
     memset(two_bits, 0, sizeof(two_bits));
     memset(mux, 0, sizeof(mux));
 }
 
-bool Branch::take(unsigned addr) {
+bool BranchPrediction::take(unsigned addr) {
     return two_bits[addr + (mux[addr] & 0x3)] >= 2;
 }
 
-void Branch::report(unsigned addr, bool taken) {
+void BranchPrediction::report(unsigned addr, bool taken) {
     unsigned branch_addr = addr + (mux[addr] & 0x3);
     if (taken) {
         if (two_bits[branch_addr] < 3) two_bits[branch_addr]++;

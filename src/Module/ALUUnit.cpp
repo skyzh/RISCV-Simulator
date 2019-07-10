@@ -36,4 +36,21 @@ Immediate ALUUnit::get_result(Immediate op, Immediate op1, Immediate op2) {
 }
 
 ALUUnit::ALUUnit(OoOExecute *e)
-    : e(e), rs({ ADD1, ADD2, ADD3 }) {}
+    : e(e), rs({ ADD1, ADD2, ADD3, BRANCH1 }) {}
+
+std::string ALUUnit::resolve(ALUUnit::OP op) {
+    switch(op) {
+        case ADD: return "ADD";
+        case SUB: return "SUB";
+        case SLT: return "SLT";
+        case SLTU: return "SLTU";
+        case XOR: return "XOR";
+        case SRL: return "SRL";
+        case SLL: return "SLL";
+        case SRA: return "SRA";
+        case OR: return "OR";
+        case AND: return "AND";
+        case NONE_OP: return "NONE";
+    }
+    return "UNKNOWN";
+}

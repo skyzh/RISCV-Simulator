@@ -8,7 +8,7 @@
 enum RSID {
     NONE = 0,
     RS_BEGIN = 255,
-    ADD1, ADD2, ADD3, LOAD1, STORE1,
+    ADD1, ADD2, ADD3, LOAD1, STORE1, BRANCH1,
     RS_END
 };
 

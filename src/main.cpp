@@ -20,7 +20,8 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
             break;
         }
 
-        std::cin.get();
+        // std::cin.get();
+        if (pc_cnt >= 100) return;
     }
     auto ret_val = session->rf.read(10) & 0xff;
     std::clog << "\t" << ret_val << " == " << ret_value << std::endl;
@@ -56,7 +57,7 @@ int run_all_tests() {
     run_session("../data/tak.data", 186);
     run_session("../data/pi.data", 137);
      */
-    run_session("../tests/out-of-order-1.hex", 137, true);
+    run_session("../tests/out-of-order-2.hex", 137, true);
     return 0;
 }
 
