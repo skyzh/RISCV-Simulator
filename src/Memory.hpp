@@ -8,6 +8,7 @@
 #include "Common.h"
 #include <cstring>
 #include <iostream>
+#include <cassert>
 
 const int MEMORY_SIZE = 0x400000;
 

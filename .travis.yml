@@ -16,6 +16,7 @@ script:
   - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake
   - cd build && cmake --build .
   - ./RISCV_Simulator_Test
+  - ./RISCV_Simulator_Main
 env:
   - BUILD_TYPE=DEBUG
   - BUILD_TYPE=RELEASE
