@@ -16,12 +16,8 @@ OoOExecute::OoOExecute(Session *session) : session(session) {
 }
 
 void OoOExecute::update() {
-    aluUnit->update();
     loadStoreUnit->update();
     aluUnit->update();
-    loadStoreUnit->update();
-    aluUnit->update();
-    loadStoreUnit->update();
 }
 
 void OoOExecute::tick() {
@@ -45,7 +41,7 @@ RS *OoOExecute::get_rs(RSID id) {
 
 void OoOExecute::put_result(RSID id, Immediate result) {
     for (int i = 0; i < MAX_REG; i++) {
-        if (Qi[i] == id) {
+        if (Qi[i].current() == id) {
             Qi[i] = NONE;
             session->rf.write(i, result);
         }
@@ -107,4 +103,8 @@ RSID OoOExecute::rename_register(unsigned reg_id, RSID id) {
 RS *OoOExecute::occupy_unit(RSID id) {
     get_rs(id)->Busy = true;
     return get_rs(id);
+}
+
+RSID OoOExecute::get_renamed_register(unsigned reg_id) {
+    return Qi[reg_id];
 }

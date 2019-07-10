@@ -100,7 +100,7 @@ ALUUnit::OP get_op_branch(InstructionBase inst) {
 
 Immediate Issue::issue(const InstructionBase &inst) {
     _debug_dispatched_inst = inst;
-    issue_cnt = issue_cnt + 1;
+    issue_cnt.prev = issue_cnt.next = pc;
 
     if (inst.t == InstructionBase::J) { // JAL
         return issue_jal(inst);
@@ -306,7 +306,7 @@ Immediate Issue::resolve_branch(const InstructionBase &inst) {
 void Issue::issue_rs_to_Vj(unsigned reg_id, RS *rs, RSID unit_id) {
     if (reg_id != 0 && session->e->should_rename_register(reg_id)) {
         rs->Vj = 0;
-        rs->Qj = session->e->rename_register(reg_id, unit_id);
+        rs->Qj = session->e->get_renamed_register(reg_id);
     } else {
         rs->Vj = session->rf.read(reg_id);
         rs->Qj = NONE;
@@ -316,7 +316,7 @@ void Issue::issue_rs_to_Vj(unsigned reg_id, RS *rs, RSID unit_id) {
 void Issue::issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id) {
     if (reg_id != 0 && session->e->should_rename_register(reg_id)) {
         rs->Vk = 0;
-        rs->Qk = session->e->rename_register(reg_id, unit_id);
+        rs->Qk = session->e->get_renamed_register(reg_id);
     } else {
         rs->Vk = session->rf.read(reg_id);
         rs->Qk = NONE;
@@ -376,7 +376,7 @@ Immediate Issue::issue_lui(const InstructionBase &inst) {
     rs->Op = ALUUnit::OP::ADD;
     rs->Tag = issue_cnt;
 
-    issue_imm_to_Vk(0, rs, unit_id);
+    issue_imm_to_Vj(0, rs, unit_id);
     issue_imm_to_Vk(inst.imm, rs, unit_id);
 
     session->e->rename_register(inst.rd, unit_id);
@@ -393,7 +393,7 @@ Immediate Issue::issue_auipc(const InstructionBase &inst) {
     rs->Op = ALUUnit::OP::ADD;
     rs->Tag = issue_cnt;
 
-    issue_imm_to_Vk(pc, rs, unit_id);
+    issue_imm_to_Vj(pc, rs, unit_id);
     issue_imm_to_Vk(inst.imm, rs, unit_id);
 
     session->e->rename_register(inst.rd, unit_id);

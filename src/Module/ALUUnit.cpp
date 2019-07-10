@@ -23,7 +23,7 @@ void ALUUnit::update() {
 Immediate ALUUnit::get_result(Immediate op, Immediate op1, Immediate op2) {
     if (op == ADD) return op1 + op2;
     if (op == SUB) return op1 - op2;
-    if (op == SLT) if ((SImmediate) op1 < (SImmediate) op2) return 1;
+    if (op == SLT) { if ((SImmediate) op1 < (SImmediate) op2) return 1; else return 0; }
     if (op == SLTU) { if (op1 < op2) return 1; else return 0; }
     if (op == XOR) return op1 ^ op2;
     if (op == SRL) return op1 >> (op2 & (unsigned) 0x1f);

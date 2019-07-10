@@ -39,7 +39,7 @@ public:
             for (int j = i * 8; j < i * 8 + 8; j++) std::cout << rf_name[j] << "\t\t";
             std::cout << std::endl;
             for (int j = i * 8; j < i * 8 + 8; j++) {
-                debug_immediate(prev[j]);
+                debug_immediate(next[j]);
                 std::cout << "\t";
             }
             std::cout << std::endl;

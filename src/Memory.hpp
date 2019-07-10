@@ -20,6 +20,7 @@ public:
 
     bool check_addr(unsigned int addr) {
         if (0 <= addr && addr < MEMORY_SIZE) return true;
+        assert(false);
         return false;
     }
 

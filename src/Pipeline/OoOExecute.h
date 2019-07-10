@@ -54,6 +54,8 @@ public:
 
     RSID rename_register(unsigned reg_id, RSID id);
 
+    RSID get_renamed_register(unsigned reg_id);
+
     RS* occupy_unit(RSID id);
 };
 
