@@ -5,7 +5,7 @@
 #ifndef RISCV_SIMULATOR_ALUUNIT_H
 #define RISCV_SIMULATOR_ALUUNIT_H
 
-#include "../ReservationStation.h"
+#include "../Common/ReservationStation.h"
 #include "../Pipeline/OoOCommon.h"
 
 #include <vector>

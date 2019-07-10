@@ -6,6 +6,7 @@
 #include "Parser.hpp"
 #include "Memory.hpp"
 #include <sstream>
+#include <iostream>
 
 TEST(Parser, Hex) {
     char str[10] = { 0 };

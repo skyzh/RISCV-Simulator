@@ -5,10 +5,10 @@
 #ifndef RISCV_SIMULATOR_ISSUE_H
 #define RISCV_SIMULATOR_ISSUE_H
 
-#include "../Instruction.hpp"
-#include "../Register.hpp"
+#include "../Common/Instruction.hpp"
+#include "../Common/Register.hpp"
 #include "OoOCommon.h"
-#include "../ReservationStation.h"
+#include "../Common/ReservationStation.h"
 
 class Session;
 

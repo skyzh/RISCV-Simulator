@@ -3,7 +3,7 @@
 //
 
 #include "ReservationStation.h"
-#include "Module/ALUUnit.h"
+#include "../Module/ALUUnit.h"
 
 void RS::debug() {
     std::cout << "Op\t\t\tQj\t\t\tQk\t\t\tVj\t\t\tVk\t\t\tA\t\t\tTag" << std::endl;

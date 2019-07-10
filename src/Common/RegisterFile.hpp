@@ -6,7 +6,6 @@
 #define RISCV_SIMULATOR_REGISTERFILE_HPP
 
 #include "Common.h"
-#include "Tickable.h"
 #include "Register.hpp"
 
 #include <iostream>

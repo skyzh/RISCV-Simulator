@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include "ALUUnit.h"
-#include "../Instruction.hpp"
+#include "../Common/Instruction.hpp"
 #include "../Pipeline/OoOExecute.h"
 
 void ALUUnit::update() {

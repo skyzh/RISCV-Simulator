@@ -6,9 +6,9 @@
 #define RISCV_SIMULATOR_OOOEXECUTE_H
 
 #include "OoOCommon.h"
-#include "../ReservationStation.h"
-#include "../Session.h"
-#include "../Register.hpp"
+#include "../Common/ReservationStation.h"
+#include "../Common/Session.h"
+#include "../Common/Register.hpp"
 #include <memory>
 #include <vector>
 #include <string>

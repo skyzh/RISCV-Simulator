@@ -5,8 +5,6 @@
 #ifndef RISCV_SIMULATOR_REGISTER_HPP
 #define RISCV_SIMULATOR_REGISTER_HPP
 
-#include "Tickable.h"
-
 template<typename T>
 class Register { // : public Tickable {
 public:

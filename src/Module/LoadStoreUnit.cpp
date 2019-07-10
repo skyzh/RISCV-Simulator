@@ -3,7 +3,7 @@
 //
 
 #include "LoadStoreUnit.h"
-#include "../Instruction.hpp"
+#include "../Common/Instruction.hpp"
 #include "../Pipeline/OoOExecute.h"
 
 void LoadStoreUnit::update() {

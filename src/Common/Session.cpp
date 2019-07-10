@@ -3,8 +3,8 @@
 //
 
 #include "Session.h"
-#include "Pipeline/Issue.h"
-#include "Pipeline/OoOExecute.h"
+#include "../Pipeline/Issue.h"
+#include "../Pipeline/OoOExecute.h"
 #include "Parser.hpp"
 
 #include <thread>

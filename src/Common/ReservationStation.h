@@ -7,7 +7,7 @@
 
 #include "Register.hpp"
 #include "Instruction.hpp"
-#include "Pipeline/OoOCommon.h"
+#include "../Pipeline/OoOCommon.h"
 #include "utils.h"
 
 #include <iostream>

@@ -5,7 +5,7 @@
 #ifndef RISCV_SIMULATOR_BRANCHPREDICTION_H
 #define RISCV_SIMULATOR_BRANCHPREDICTION_H
 
-#include "../Memory.hpp"
+#include "../Common/Memory.hpp"
 
 class BranchPrediction {
 public:

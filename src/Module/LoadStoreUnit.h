@@ -6,8 +6,8 @@
 #define RISCV_SIMULATOR_LOADSTOREUNIT_H
 
 #include "../Pipeline/OoOCommon.h"
-#include "../Register.hpp"
-#include "../Instruction.hpp"
+#include "../Common/Register.hpp"
+#include "../Common/Instruction.hpp"
 
 #include <vector>
 
