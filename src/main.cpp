@@ -6,29 +6,8 @@
 #include "Pipeline/Execute.h"
 #include "Pipeline/MemoryAccess.h"
 #include "Pipeline/WriteBack.h"
-
 #include <cassert>
-
-
-void run_session_table_report(const char *path, unsigned ret_value, bool use_hex_parser = false) {
-    std::clock_t c_start = std::clock();
-    std::clog << " | " << path << " | ";
-    Session *session = new Session(false);
-    if (use_hex_parser) session->load_hex(path); else session->load_memory(path);
-    int pc_cnt = 0;
-    while (true) {
-        session->tick();
-        ++pc_cnt;
-        if (session->memory[0x30004]) {
-            break;
-        }
-    }
-    auto ret_val = session->rf.read(10) & 0xff;
-    std::clog << pc_cnt << " | " << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms | ";
-    std::clog << (1 - 1.0 * session->s.mis_pred / session->s.branches) * 100.0 << "% | " << std::endl;
-    if (ret_val != ret_value) std::clog << "(wrong answer)" << std::endl;
-    delete session;
-}
+#include <chrono>
 
 void run_session(const char *path, unsigned ret_value, bool use_hex_parser = false) {
     std::clock_t c_start = std::clock();
@@ -36,11 +15,11 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
     Session *session = new Session(false);
     if (use_hex_parser) session->load_hex(path); else session->load_memory(path);
     int pc_cnt = 0;
-    while (true) {
-        // std::cout << std::endl << std::endl << "Cycle " << pc_cnt << std::endl;
-        session->tick();
 
-        // std::cout << std::hex << session->e->e_pc.read() << std::endl;
+    session->bootstrap_thread();
+
+    while (true) {
+        session->tick();
 
         ++pc_cnt;
 

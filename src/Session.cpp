@@ -7,8 +7,10 @@
 #include "Pipeline/OoOExecute.h"
 #include "Parser.hpp"
 
+#include <thread>
 #include <fstream>
 #include <random>
+#include <functional>
 
 using std::make_shared;
 
