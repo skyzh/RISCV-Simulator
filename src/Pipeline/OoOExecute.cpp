@@ -101,8 +101,5 @@ RSID OoOExecute::rename_register(unsigned reg_id, RSID id) {
 
 RS* OoOExecute::occupy_unit(RSID id) {
     get_rs(id)->Busy = true;
-    // TODO: we should split load and store logic with speculation
-    if (id == STORE1) get_rs(LOAD1)->Busy = true;
-    if (id == LOAD1) get_rs(STORE1)->Busy = true;
     return get_rs(id);
 }

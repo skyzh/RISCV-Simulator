@@ -26,6 +26,7 @@ void Issue::update() {
 void Issue::tick() {
     pc.tick();
     branch_issued.tick();
+    issue_cnt.tick();
 }
 
 ALUUnit::OP get_op_ri(InstructionBase inst) {
@@ -99,20 +100,10 @@ ALUUnit::OP get_op_branch(InstructionBase inst) {
 
 Immediate Issue::issue(const InstructionBase &inst) {
     _debug_dispatched_inst = inst;
+    issue_cnt = issue_cnt + 1;
+
     if (inst.t == InstructionBase::J) { // JAL
-        auto unit_id = find_available_op_unit();
-        if (unit_id == NONE) return pc;
-
-        auto rs = session->e->occupy_unit(unit_id);
-        rs->Op = ALUUnit::OP::ADD;
-        rs->Tag = pc;
-
-        issue_imm_to_Vk(pc, rs, unit_id);
-        issue_imm_to_Vj(4, rs, unit_id);
-
-        session->e->rename_register(inst.rd, unit_id);
-
-        return pc + inst.imm;
+        return issue_jal(inst);
     } else if (inst.t == InstructionBase::B) { // Branch
         // TODO: branch should not cause hazard like
         //       this, we should apply speculation method
@@ -133,45 +124,17 @@ Immediate Issue::issue(const InstructionBase &inst) {
             return resolve_jalr(inst);
         return pc;
     } else if (inst.opcode == 0b0000011) { // Load
-        return pc;
+        return issue_load(inst);
     } else if (inst.opcode == 0b0100011) { // Store
-        return pc;
+        return issue_store(inst);
     } else if (inst.opcode == 0b0010011) { // Immediate Op
         return issue_immediate_op(inst);
     } else if (inst.opcode == 0b0110011) { // Op
         return issue_op(inst);
     } else if (inst.opcode == 0b0110111) { // LUI
-        auto op = get_op_ri(inst);
-        auto unit_id = find_available_op_unit();
-        if (unit_id == NONE) return pc;
-
-        auto rs = session->e->occupy_unit(unit_id);
-
-        rs->Op = ALUUnit::OP::ADD;
-        rs->Tag = pc;
-
-        issue_imm_to_Vk(0, rs, unit_id);
-        issue_imm_to_Vk(inst.imm, rs, unit_id);
-
-        session->e->rename_register(inst.rd, unit_id);
-
-        return pc + 4;
+        return issue_lui(inst);
     } else if (inst.opcode == 0b0110111) { // AUIPC
-        auto op = get_op_ri(inst);
-        auto unit_id = find_available_op_unit();
-        if (unit_id == NONE) return pc;
-
-        auto rs = session->e->occupy_unit(unit_id);
-
-        rs->Op = ALUUnit::OP::ADD;
-        rs->Tag = pc;
-
-        issue_imm_to_Vk(pc, rs, unit_id);
-        issue_imm_to_Vk(inst.imm, rs, unit_id);
-
-        session->e->rename_register(inst.rd, unit_id);
-
-        return pc + 4;
+        return issue_auipc(inst);
     }
     return pc;
 }
@@ -200,12 +163,20 @@ void Issue::debug() {
 }
 
 RSID Issue::find_available_op_unit() {
-    static std::vector<RSID> op_unit = {ADD1, ADD2, ADD3};
-    for (auto &&unit : op_unit) {
-        if (session->e->available(unit)) return unit;
-    }
-    return NONE;
+    static const std::vector<RSID> op_unit = {ADD1, ADD2, ADD3};
+    return find_available_unit_in(op_unit);
 }
+
+RSID Issue::find_available_load_unit() {
+    static const std::vector<RSID> load_unit = {LOAD1};
+    return find_available_unit_in(load_unit);
+}
+
+RSID Issue::find_available_store_unit() {
+    static const std::vector<RSID> store_unit = {STORE1};
+    return find_available_unit_in(store_unit);
+}
+
 
 Immediate Issue::issue_jalr(const InstructionBase &inst) {
     // TODO: here we use two unit to process jalr.
@@ -220,7 +191,7 @@ Immediate Issue::issue_jalr(const InstructionBase &inst) {
         auto rs = session->e->occupy_unit(BRANCH1);
 
         rs->Op = ALUUnit::OP::ADD;
-        rs->Tag = pc;
+        rs->Tag = issue_cnt;
 
         issue_rs_to_Vj(inst.rs1, rs, BRANCH1);
         issue_imm_to_Vk(inst.imm, rs, BRANCH1);
@@ -230,7 +201,7 @@ Immediate Issue::issue_jalr(const InstructionBase &inst) {
     {   // Write back to rd
         auto rs = session->e->occupy_unit(unit_id);
         rs->Op = ALUUnit::OP::ADD;
-        rs->Tag = pc;
+        rs->Tag = issue_cnt;
 
         issue_imm_to_Vk(pc, rs, unit_id);
         issue_imm_to_Vj(4, rs, unit_id);
@@ -253,7 +224,7 @@ Immediate Issue::issue_branch(const InstructionBase &inst) {
     if (!session->e->available(BRANCH1)) return pc;
     auto rs = session->e->occupy_unit(BRANCH1);
     rs->Op = get_op_branch(inst);
-    rs->Tag = pc;
+    rs->Tag = issue_cnt;
 
     issue_rs_to_Vj(inst.rs1, rs, BRANCH1);
     issue_rs_to_Vk(inst.rs2, rs, BRANCH1);
@@ -273,7 +244,7 @@ Immediate Issue::issue_immediate_op(const InstructionBase &inst) {
     auto rs = session->e->occupy_unit(unit_id);
 
     rs->Op = op;
-    rs->Tag = pc;
+    rs->Tag = issue_cnt;
 
     issue_rs_to_Vj(inst.rs1, rs, unit_id);
     issue_imm_to_Vk(inst.imm, rs, unit_id);
@@ -291,7 +262,7 @@ Immediate Issue::issue_op(const InstructionBase &inst) {
     auto rs = session->e->occupy_unit(unit_id);
 
     rs->Op = op;
-    rs->Tag = pc;
+    rs->Tag = issue_cnt;
 
     issue_rs_to_Vj(inst.rs1, rs, unit_id);
     issue_rs_to_Vk(inst.rs2, rs, unit_id);
@@ -357,7 +328,102 @@ void Issue::issue_imm_to_Vk(Immediate imm, RS *rs, RSID) {
     rs->Vk = imm;
 }
 
-void Issue::issue_imm_to_Vj(Immediate imm, RS *rs, RSID unit_id) {
+void Issue::issue_imm_to_Vj(Immediate imm, RS *rs, RSID) {
     rs->Qj = NONE;
     rs->Vj = imm;
+}
+
+Immediate Issue::issue_load(const InstructionBase &inst) {
+    auto unit_id = find_available_load_unit();
+    if (unit_id == NONE) return pc;
+
+    auto rs = session->e->occupy_unit(unit_id);
+
+    rs->Op = inst.funct3;
+    rs->Tag = issue_cnt;
+
+    issue_rs_to_Vj(inst.rs1, rs, unit_id);
+    issue_imm_to_Vk(0, rs, unit_id);
+    issue_imm_to_A(inst.imm, rs, unit_id);
+
+    session->e->rename_register(inst.rd, unit_id);
+
+    return pc + 4;
+}
+
+Immediate Issue::issue_store(const InstructionBase &inst) {
+    auto unit_id = find_available_store_unit();
+    if (unit_id == NONE) return pc;
+
+    auto rs = session->e->occupy_unit(unit_id);
+
+    rs->Op = inst.funct3;
+    rs->Tag = issue_cnt;
+
+    issue_rs_to_Vj(inst.rs1, rs, unit_id);
+    issue_rs_to_Vk(inst.rs2, rs, unit_id);
+    issue_imm_to_A(inst.imm, rs, unit_id);
+
+    return pc + 4;
+}
+
+Immediate Issue::issue_lui(const InstructionBase &inst) {
+    auto unit_id = find_available_op_unit();
+    if (unit_id == NONE) return pc;
+
+    auto rs = session->e->occupy_unit(unit_id);
+
+    rs->Op = ALUUnit::OP::ADD;
+    rs->Tag = issue_cnt;
+
+    issue_imm_to_Vk(0, rs, unit_id);
+    issue_imm_to_Vk(inst.imm, rs, unit_id);
+
+    session->e->rename_register(inst.rd, unit_id);
+
+    return pc + 4;
+}
+
+Immediate Issue::issue_auipc(const InstructionBase &inst) {
+    auto unit_id = find_available_op_unit();
+    if (unit_id == NONE) return pc;
+
+    auto rs = session->e->occupy_unit(unit_id);
+
+    rs->Op = ALUUnit::OP::ADD;
+    rs->Tag = issue_cnt;
+
+    issue_imm_to_Vk(pc, rs, unit_id);
+    issue_imm_to_Vk(inst.imm, rs, unit_id);
+
+    session->e->rename_register(inst.rd, unit_id);
+
+    return pc + 4;
+}
+
+RSID Issue::find_available_unit_in(const std::vector<RSID> &src) {
+    for (auto &&unit : src) {
+        if (session->e->available(unit)) return unit;
+    }
+    return NONE;
+}
+
+Immediate Issue::issue_jal(const InstructionBase &inst) {
+    auto unit_id = find_available_op_unit();
+    if (unit_id == NONE) return pc;
+
+    auto rs = session->e->occupy_unit(unit_id);
+    rs->Op = ALUUnit::OP::ADD;
+    rs->Tag = issue_cnt;
+
+    issue_imm_to_Vk(pc, rs, unit_id);
+    issue_imm_to_Vj(4, rs, unit_id);
+
+    session->e->rename_register(inst.rd, unit_id);
+
+    return pc + inst.imm;
+}
+
+void Issue::issue_imm_to_A(Immediate imm, RS *rs, RSID) {
+    rs->A = imm;
 }

@@ -16,6 +16,9 @@ class Issue {
 public:
     Register<Immediate> pc;
     Register<bool> branch_issued;
+    // TODO: this is used for handling w-w hazard in memory,
+    //       should be eliminated once speculation is possible
+    Register<long long> issue_cnt;
 
     InstructionBase _debug_dispatched_inst;
 
@@ -33,7 +36,13 @@ public:
 
     void debug();
 
+    RSID find_available_unit_in(const std::vector<RSID> &src);
+
     RSID find_available_op_unit();
+
+    RSID find_available_load_unit();
+
+    RSID find_available_store_unit();
 
     Immediate issue_branch(const InstructionBase &inst);
 
@@ -47,6 +56,16 @@ public:
 
     Immediate resolve_jalr(const InstructionBase &inst);
 
+    Immediate issue_load(const InstructionBase &inst);
+
+    Immediate issue_store(const InstructionBase &inst);
+
+    Immediate issue_lui(const InstructionBase &inst);
+
+    Immediate issue_auipc(const InstructionBase &inst);
+
+    Immediate issue_jal(const InstructionBase &inst);
+
     void issue_rs_to_Vj(unsigned reg_id, RS *rs, RSID unit_id);
 
     void issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id);
@@ -54,6 +73,8 @@ public:
     void issue_imm_to_Vj(Immediate imm, RS *rs, RSID unit_id);
 
     void issue_imm_to_Vk(Immediate imm, RS *rs, RSID unit_id);
+
+    void issue_imm_to_A(Immediate imm, RS *rs, RSID unit_id);
 };
 
 
