@@ -15,3 +15,5 @@ void Issue::tick() {
 void Issue::issue(const InstructionBase &inst) {
 
 }
+
+Issue::Issue(Session *session) : session(session) {}

@@ -10,9 +10,9 @@
 
 class RS {
 public:
-    Register<Immediate> Op, Qj, Qk, Vj, Vk, A;
+    Register<Immediate> Op, Qj, Qk, Vj, Vk, A, Tag;
     Register<bool> Busy;
-    RS() : Op(0), Qj(0), Qk(0), Vj(0), Vk(0), A(0), Busy(false) {}
+    RS() : Op(0), Qj(0), Qk(0), Vj(0), Vk(0), A(0), Tag(0), Busy(false) {}
 
     void tick() {
         Op.tick();
@@ -20,6 +20,7 @@ public:
         Qk.tick();
         Vj.tick();
         Vk.tick();
+        Tag.tick();
         A.tick();
         Busy.tick();
     }

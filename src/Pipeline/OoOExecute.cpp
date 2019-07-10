@@ -5,20 +5,27 @@
 #include <cstring>
 #include "OoOExecute.h"
 #include "../Module/ALUUnit.h"
+#include "../Module/LoadStoreUnit.h"
 
 using std::make_unique;
 
-OoOExecute::OoOExecute()
-    : aluUnit(make_unique<ALUUnit>(this)) {
+OoOExecute::OoOExecute(Session *session) : session(session) {
+    aluUnit = make_unique<ALUUnit>(this);
+    loadStoreUnit = make_unique<LoadStoreUnit>(this);
     memset(Qi, 0, sizeof(Qi));
 }
 
 void OoOExecute::update() {
-
+    aluUnit->update();
+    loadStoreUnit->update();
 }
 
 void OoOExecute::tick() {
-
+    for (int i = RS_BEGIN + 1; i < RS_END; i++) {
+        RS *rs = get_rs((RSID) i);
+        rs->tick();
+    }
+    for (int i = 0; i < MAX_REG; i++) Qi[i].tick();
 }
 
 RS *OoOExecute::get_rs(RSID id) {
@@ -31,5 +38,21 @@ RS *OoOExecute::get_rs(RSID id) {
 }
 
 void OoOExecute::put_result(RSID id, Immediate result) {
-
+    for (int i = 0; i < MAX_REG; i++) {
+        if (Qi[i] == id) {
+            Qi[i] = NONE;
+            session->rf.write(i, result);
+        }
+    }
+    for (int i = RS_BEGIN + 1; i < RS_END; i++) {
+        RS *rs = get_rs((RSID) i);
+        if (rs->Qj == id) {
+            rs->Qj = NONE;
+            rs->Vj = result;
+        }
+        if (rs->Qk == id) {
+            rs->Qk = NONE;
+            rs->Vk = result;
+        }
+    }
 }

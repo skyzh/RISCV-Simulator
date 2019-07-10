@@ -14,7 +14,7 @@ public:
 
     bool _stall;
 
-    Register() : prev(0), next(0), _stall(false) {}
+    Register() : prev((T) 0), next((T) 0), _stall(false) {}
 
     Register(T d) : prev(d), next(d), _stall(false) {}
 
@@ -30,7 +30,7 @@ public:
 
     operator T() { return read(); }
 
-    void operator= (T next) { write(next); }
+    void operator=(T next) { write(next); }
 };
 
 #endif //RISCV_SIMULATOR_REGISTER_HPP

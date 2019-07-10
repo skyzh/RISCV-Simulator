@@ -10,7 +10,7 @@ void ALUUnit::update() {
     for (auto &&r_id : rs) {
         RS* r = e->get_rs(r_id);
         if (r->Busy) {
-            if (r->Qj == 0 && r->Qk == 0) {
+            if (r->Qj == NONE && r->Qk == NONE) {
                 Immediate result = get_result(r->Op, r->Vj, r->Vk);
                 e->put_result(r_id, result);
                 r->Busy = false;

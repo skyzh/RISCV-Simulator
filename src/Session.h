@@ -6,52 +6,38 @@
 #define RISCV_SIMULATOR_SESSION_H
 
 #include <iostream>
+#include <memory>
 
 #include "Common.h"
 #include "Register.hpp"
 #include "Tickable.h"
 #include "Memory.hpp"
 #include "RegisterFile.hpp"
-#include "Module/Branch.h"
 
-class Fetch;
+using std::shared_ptr;
 
-class Decode;
+class OoOExecute;
 
-class Execute;
-
-class MemoryAccess;
-
-class WriteBack;
+class Issue;
 
 class Session { // : public Tickable {
     bool _debug;
 public:
-    Fetch *f;
-    Decode *d;
-    Execute *e;
-    MemoryAccess *m;
-    WriteBack *w;
-
     RegisterFile rf;
     Memory memory;
 
-    Branch branch;
-
-    struct Stat {
-        unsigned long long mis_pred, branches;
-        Stat() : mis_pred(0), branches(0) {}
-    } s;
+    OoOExecute *e;
+    Issue *i;
 
     Session(bool debug = false);
 
     void tick();
 
-    void load_memory(const char* path);
+    void load_memory(const char *path);
 
-    void load_memory(std::istream& in);
+    void load_memory(std::istream &in);
 
-    void load_hex(const char* path);
+    void load_hex(const char *path);
 
     virtual ~Session();
 

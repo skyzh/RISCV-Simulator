@@ -7,20 +7,28 @@
 
 #include "OoOCommon.h"
 #include "../ReservationStation.hpp"
+#include "../Session.h"
+#include "../Register.hpp"
 #include <memory>
 
 using std::unique_ptr;
 
+class Session;
 class ALUUnit;
+class LoadStoreUnit;
 
 class OoOExecute {
 public:
+    static const unsigned MAX_REG = 32;
     RS Add1, Add2, Add3, Load1, Store1;
-    RS *Qi[32];
+    Register<RSID> Qi[MAX_REG];
 
     unique_ptr <ALUUnit> aluUnit;
+    unique_ptr <LoadStoreUnit> loadStoreUnit;
 
-    OoOExecute();
+    Session* session;
+
+    OoOExecute(Session* session);
 
     void update();
 

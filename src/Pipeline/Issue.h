@@ -7,8 +7,14 @@
 
 #include "../Instruction.hpp"
 
+class Session;
+
 class Issue {
 public:
+    Session* session;
+
+    Issue(Session *session);
+
     void issue(const InstructionBase &inst);
     void update();
     void tick();
