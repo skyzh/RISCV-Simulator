@@ -43,11 +43,17 @@ public:
 
     Immediate issue_op(const InstructionBase &inst);
 
-    void issue_rs_to_Vj(unsigned reg_id, RS* rs, RSID unit_id);
+    Immediate issue_jalr(const InstructionBase &inst);
 
-    void issue_rs_to_Vk(unsigned reg_id, RS* rs, RSID unit_id);
+    Immediate resolve_jalr(const InstructionBase &inst);
 
-    void issue_imm_to_Vk(Immediate imm, RS* rs, RSID unit_id);
+    void issue_rs_to_Vj(unsigned reg_id, RS *rs, RSID unit_id);
+
+    void issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id);
+
+    void issue_imm_to_Vj(Immediate imm, RS *rs, RSID unit_id);
+
+    void issue_imm_to_Vk(Immediate imm, RS *rs, RSID unit_id);
 };
 
 

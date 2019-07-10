@@ -6,8 +6,7 @@
 #include "Module/ALUUnit.h"
 
 void RS::debug() {
-    std::cout << "Busy\tOp\t\t\tQj\t\t\tQk\t\t\tVj\t\t\tVk\t\t\tA\t\t\tTag" << std::endl;
-    std::cout << std::boolalpha << Busy.current() << "\t";
+    std::cout << "Op\t\t\tQj\t\t\tQk\t\t\tVj\t\t\tVk\t\t\tA\t\t\tTag" << std::endl;
     std::cout << ALUUnit::resolve((ALUUnit::OP) Op.current());
     std::cout << "\t";
     std::cout << resolve(Qj.current());

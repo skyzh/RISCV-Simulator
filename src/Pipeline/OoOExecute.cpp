@@ -68,7 +68,7 @@ void OoOExecute::debug() {
     std::cout << "Reservation Stations" << std::endl;
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
-        std::cout << rs->resolve(i) << std::endl;
+        std::cout << rs->resolve(i) << (rs->Busy.current() ? " (busy)" : "") <<std::endl;
         rs->debug();
     }
     std::cout << "Register Rename" << std::endl;
@@ -84,6 +84,8 @@ void OoOExecute::debug() {
 }
 
 bool OoOExecute::available(RSID id) {
+    // TODO: we should split load and store logic with speculation
+    if (id == STORE1 || id == LOAD1) return !get_rs(LOAD1)->Busy && !get_rs(STORE1)->Busy;
     return !get_rs(id)->Busy;
 }
 
@@ -97,6 +99,10 @@ RSID OoOExecute::rename_register(unsigned reg_id, RSID id) {
     return prev;
 }
 
-void OoOExecute::occupy_unit(RSID id) {
+RS* OoOExecute::occupy_unit(RSID id) {
     get_rs(id)->Busy = true;
+    // TODO: we should split load and store logic with speculation
+    if (id == STORE1) get_rs(LOAD1)->Busy = true;
+    if (id == LOAD1) get_rs(STORE1)->Busy = true;
+    return get_rs(id);
 }

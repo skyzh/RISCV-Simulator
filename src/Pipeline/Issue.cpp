@@ -3,6 +3,7 @@
 //
 
 #include <vector>
+#include <cassert>
 
 #include "Issue.h"
 #include "OoOExecute.h"
@@ -81,7 +82,7 @@ ALUUnit::OP get_op_rr(InstructionBase inst) {
 }
 
 ALUUnit::OP get_op_branch(InstructionBase inst) {
-    switch(inst.funct3) {
+    switch (inst.funct3) {
         case 0b000: // BEQ
         case 0b001: // BNE
             return ALUUnit::OP::SUB;
@@ -99,16 +100,37 @@ ALUUnit::OP get_op_branch(InstructionBase inst) {
 Immediate Issue::issue(const InstructionBase &inst) {
     _debug_dispatched_inst = inst;
     if (inst.t == InstructionBase::J) { // JAL
+        auto unit_id = find_available_op_unit();
+        if (unit_id == NONE) return pc;
+
+        auto rs = session->e->occupy_unit(unit_id);
+        rs->Op = ALUUnit::OP::ADD;
+        rs->Tag = pc;
+
+        issue_imm_to_Vk(pc, rs, unit_id);
+        issue_imm_to_Vj(4, rs, unit_id);
+
+        session->e->rename_register(inst.rd, unit_id);
+
         return pc + inst.imm;
     } else if (inst.t == InstructionBase::B) { // Branch
         // TODO: branch should not cause hazard like
         //       this, we should apply speculation method
+        // TODO: branch unit is the same as ALU Unit,
+        //       we may randomly select one from them
+        //       instead of specifying BRANCH1.
         if (branch_issued == false)
             return issue_branch(inst);
         // If branch has been resolved, we can issue next inst.
         if (session->e->available(BRANCH1))
             return resolve_branch(inst);
         // If branch is still being resolved, don't move to next inst.
+        return pc;
+    } else if (inst.opcode == 0b1100111) { // JALR
+        if (branch_issued == false)
+            return issue_jalr(inst);
+        if (session->e->available(BRANCH1))
+            return resolve_jalr(inst);
         return pc;
     } else if (inst.opcode == 0b0000011) { // Load
         return pc;
@@ -118,9 +140,40 @@ Immediate Issue::issue(const InstructionBase &inst) {
         return issue_immediate_op(inst);
     } else if (inst.opcode == 0b0110011) { // Op
         return issue_op(inst);
+    } else if (inst.opcode == 0b0110111) { // LUI
+        auto op = get_op_ri(inst);
+        auto unit_id = find_available_op_unit();
+        if (unit_id == NONE) return pc;
+
+        auto rs = session->e->occupy_unit(unit_id);
+
+        rs->Op = ALUUnit::OP::ADD;
+        rs->Tag = pc;
+
+        issue_imm_to_Vk(0, rs, unit_id);
+        issue_imm_to_Vk(inst.imm, rs, unit_id);
+
+        session->e->rename_register(inst.rd, unit_id);
+
+        return pc + 4;
+    } else if (inst.opcode == 0b0110111) { // AUIPC
+        auto op = get_op_ri(inst);
+        auto unit_id = find_available_op_unit();
+        if (unit_id == NONE) return pc;
+
+        auto rs = session->e->occupy_unit(unit_id);
+
+        rs->Op = ALUUnit::OP::ADD;
+        rs->Tag = pc;
+
+        issue_imm_to_Vk(pc, rs, unit_id);
+        issue_imm_to_Vk(inst.imm, rs, unit_id);
+
+        session->e->rename_register(inst.rd, unit_id);
+
+        return pc + 4;
     }
-    // LUI, AUIPC, JALR
-    return pc + 4;
+    return pc;
 }
 
 Issue::Issue(Session *session) : session(session) {}
@@ -154,11 +207,51 @@ RSID Issue::find_available_op_unit() {
     return NONE;
 }
 
+Immediate Issue::issue_jalr(const InstructionBase &inst) {
+    // TODO: here we use two unit to process jalr.
+    //       first we obtain pc + 4 with alu unit,
+    //       then we obtain next pc just as what
+    //       issue does.
+    if (!session->e->available(BRANCH1)) return pc;
+    auto unit_id = find_available_op_unit();
+    if (unit_id == NONE) return pc;
+
+    {   // Branch
+        auto rs = session->e->occupy_unit(BRANCH1);
+
+        rs->Op = ALUUnit::OP::ADD;
+        rs->Tag = pc;
+
+        issue_rs_to_Vj(inst.rs1, rs, BRANCH1);
+        issue_imm_to_Vk(inst.imm, rs, BRANCH1);
+
+        session->e->rename_register(OoOExecute::BRANCH_REG, BRANCH1);
+    }
+    {   // Write back to rd
+        auto rs = session->e->occupy_unit(unit_id);
+        rs->Op = ALUUnit::OP::ADD;
+        rs->Tag = pc;
+
+        issue_imm_to_Vk(pc, rs, unit_id);
+        issue_imm_to_Vj(4, rs, unit_id);
+
+        session->e->rename_register(inst.rd, unit_id);
+    }
+
+    branch_issued = true;
+
+    return pc;
+}
+
+Immediate Issue::resolve_jalr(const InstructionBase &inst) {
+    branch_issued = false;
+    return session->rf.read(OoOExecute::BRANCH_REG);
+}
+
 Immediate Issue::issue_branch(const InstructionBase &inst) {
     // If branch unit is not available, don't move to next inst.
     if (!session->e->available(BRANCH1)) return pc;
-    session->e->occupy_unit(BRANCH1);
-    auto rs = session->e->get_rs(BRANCH1);
+    auto rs = session->e->occupy_unit(BRANCH1);
     rs->Op = get_op_branch(inst);
     rs->Tag = pc;
 
@@ -177,8 +270,7 @@ Immediate Issue::issue_immediate_op(const InstructionBase &inst) {
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
-    session->e->occupy_unit(unit_id);
-    auto rs = session->e->get_rs(unit_id);
+    auto rs = session->e->occupy_unit(unit_id);
 
     rs->Op = op;
     rs->Tag = pc;
@@ -196,8 +288,7 @@ Immediate Issue::issue_op(const InstructionBase &inst) {
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
-    session->e->occupy_unit(unit_id);
-    auto rs = session->e->get_rs(unit_id);
+    auto rs = session->e->occupy_unit(unit_id);
 
     rs->Op = op;
     rs->Tag = pc;
@@ -216,7 +307,7 @@ Immediate Issue::resolve_branch(const InstructionBase &inst) {
     auto branch_target = pc + inst.imm;
     auto next_inst = pc + 4;
 
-    switch(inst.funct3) {
+    switch (inst.funct3) {
         case 0b000: // BEQ
             if (branch_result == 0) return branch_target;
             else return next_inst;
@@ -264,4 +355,9 @@ void Issue::issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id) {
 void Issue::issue_imm_to_Vk(Immediate imm, RS *rs, RSID) {
     rs->Qk = NONE;
     rs->Vk = imm;
+}
+
+void Issue::issue_imm_to_Vj(Immediate imm, RS *rs, RSID unit_id) {
+    rs->Qj = NONE;
+    rs->Vj = imm;
 }

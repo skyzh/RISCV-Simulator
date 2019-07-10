@@ -57,7 +57,7 @@ int run_all_tests() {
     run_session("../data/tak.data", 186);
     run_session("../data/pi.data", 137);
      */
-    run_session("../tests/out-of-order-2.hex", 137, true);
+    run_session("../tests/out-of-order-3.hex", 0x37, true);
     return 0;
 }
 

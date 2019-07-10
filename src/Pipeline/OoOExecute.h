@@ -24,7 +24,8 @@ class LoadStoreUnit;
 class OoOExecute {
 public:
     static const unsigned MAX_REG = 32 + 1;
-    RS Add1, Add2, Add3, Load1, Store1, Branch1;
+    RS Add1, Add2, Add3, Branch1;
+    RS Load1, Store1; // These two will be implemented afterwards
     // TODO: Here I added another register to indicate
     //       branch status. It should be eliminated.
     Register<RSID> Qi[MAX_REG];
@@ -53,7 +54,7 @@ public:
 
     RSID rename_register(unsigned reg_id, RSID id);
 
-    void occupy_unit(RSID id);
+    RS* occupy_unit(RSID id);
 };
 
 #endif //RISCV_SIMULATOR_OOOEXECUTE_H
