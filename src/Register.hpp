@@ -16,6 +16,8 @@ public:
 
     Register() : prev(0), next(0), _stall(false) {}
 
+    Register(T d) : prev(d), next(d), _stall(false) {}
+
     T read() { return prev; }
 
     T current() { return next; }
@@ -25,6 +27,10 @@ public:
     void tick() { if (!_stall) prev = next; }
 
     void stall(bool stall) { _stall = stall; }
+
+    operator T() { return read(); }
+
+    void operator= (T next) { write(next); }
 };
 
 #endif //RISCV_SIMULATOR_REGISTER_HPP

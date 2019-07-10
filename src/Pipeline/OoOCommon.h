@@ -1,0 +1,12 @@
+//
+// Created by Alex Chi on 2019-07-10.
+//
+
+#ifndef RISCV_SIMULATOR_OOOCOMMON_H
+#define RISCV_SIMULATOR_OOOCOMMON_H
+
+enum RSID {
+    ADD1 = 256, ADD2, ADD3, LOAD1, STORE1
+};
+
+#endif //RISCV_SIMULATOR_OOOCOMMON_H

@@ -20,3 +20,18 @@ TEST(Register, ReadWrite) {
     r.tick();
     EXPECT_EQ(r.read(), 2);
 }
+
+TEST(Register, ReadWriteOperator) {
+    Register <unsigned> r;
+    r = 1;
+    EXPECT_EQ((unsigned) r, 0);
+    r.tick();
+    EXPECT_EQ((unsigned) r, 1);
+    r = 2;
+    r.stall(true);
+    r.tick();
+    EXPECT_EQ((unsigned) r, 1);
+    r.stall(false);
+    r.tick();
+    EXPECT_EQ((unsigned) r, 2);
+}
