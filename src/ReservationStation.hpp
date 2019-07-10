@@ -50,7 +50,7 @@ public:
 
     void debug() {
         std::cout << "Busy\tOp\t\t\tQj\t\t\tQk\t\t\tVj\t\t\tVk\t\t\tA\t\t\tTag" << std::endl;
-        std::cout << Busy.current() << "\t";
+        std::cout << std::boolalpha << Busy.current() << "\t";
         debug_immediate(Op.current());
         std::cout << "\t";
         std::cout << resolve(Qj.current());
@@ -64,6 +64,7 @@ public:
         debug_immediate(A.current());
         std::cout << "\t";
         debug_immediate(Tag.current());
+        std::cout << std::endl;
 
     }
 };

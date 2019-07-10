@@ -6,7 +6,6 @@
 #define RISCV_SIMULATOR_UTILS_H
 
 #include "Instruction.hpp"
-#include <iostream>
 
 void debug_immediate(Immediate v);
 

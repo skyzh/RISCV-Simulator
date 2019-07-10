@@ -10,7 +10,8 @@
 #include "Register.hpp"
 
 #include <iostream>
-
+#include <vector>
+#include "utils.h"
 
 class RegisterFile { // : public Tickable {
     static const int REG_NUM = 32;
@@ -26,13 +27,22 @@ public:
     void tick() { memcpy(prev, next, sizeof(prev)); }
 
     Immediate read(int id) { return id == 0 ? 0 : prev[id]; }
+
     void write(int id, Immediate val) { next[id] = val; }
 
     void debug() {
-        for (int i = 0; i < 32; i++) {
-            if (i % 8 == 0) std::cout << i << " - " << i + 8 << std::endl;
-            std::cout << std::dec << next[i] << std::hex << "(0x" << next[i] << ") ";
-            if ((i + 1) % 8 == 0) std::cout << std::endl;
+        static std::vector<std::string> rf_name = {"0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
+                                                   "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
+                                                   "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
+                                                   "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
+        for (int i = 0; i < 4; i++) {
+            for (int j = i * 8; j < i * 8 + 8; j++) std::cout << rf_name[j] << "\t\t";
+            std::cout << std::endl;
+            for (int j = i * 8; j < i * 8 + 8; j++) {
+                debug_immediate(prev[j]);
+                std::cout << "\t";
+            }
+            std::cout << std::endl;
         }
     }
 };

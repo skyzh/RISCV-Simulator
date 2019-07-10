@@ -25,9 +25,10 @@ class Session { // : public Tickable {
 public:
     RegisterFile rf;
     Memory memory;
-
     OoOExecute *e;
     Issue *i;
+
+    unsigned long long cycle;
 
     Session(bool debug = false);
 

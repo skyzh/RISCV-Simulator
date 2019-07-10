@@ -14,7 +14,7 @@
 
 using std::make_shared;
 
-Session::Session(bool debug) : _debug(debug) {
+Session::Session(bool debug) : _debug(debug), cycle(0) {
     i = new Issue(this);
     e = new OoOExecute(this);
 }
@@ -23,6 +23,8 @@ Session::~Session() {
 }
 
 void Session::tick() {
+    ++cycle;
+
     i->update();
     e->update();
 
@@ -40,6 +42,7 @@ void Session::load_memory(const char *path) {
 }
 
 void Session::debug() {
+    std::cout << "   Cycle " << std::dec << cycle << std::endl;
     std::cout << "---- Issue Stage ----" << std::endl;
     i->debug();
     std::cout << "--- Execute Stage ---" << std::endl;

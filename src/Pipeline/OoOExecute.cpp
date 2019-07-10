@@ -64,3 +64,17 @@ void OoOExecute::debug() {
         rs->debug();
     }
 }
+
+bool OoOExecute::available(RSID id) {
+    return !get_rs(id)->Busy;
+}
+
+bool OoOExecute::should_rename_register(unsigned reg_id) {
+    return Qi[reg_id] != NONE;
+}
+
+RSID OoOExecute::rename_register(unsigned reg_id, RSID id) {
+    RSID prev = Qi[reg_id];
+    Qi[reg_id] = id;
+    return prev;
+}

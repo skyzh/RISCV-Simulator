@@ -39,6 +39,12 @@ public:
     RS *get_rs(RSID id);
 
     void debug();
+
+    bool available(RSID id);
+
+    bool should_rename_register(unsigned reg_id);
+
+    RSID rename_register(unsigned reg_id, RSID id);
 };
 
 

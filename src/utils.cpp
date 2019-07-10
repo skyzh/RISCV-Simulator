@@ -3,6 +3,8 @@
 //
 
 #include "utils.h"
+#include <iomanip>
+#include <iostream>
 
 void debug_immediate(Immediate v) {
     std::cout << std::dec << v << " (" << std::hex << v << ")";

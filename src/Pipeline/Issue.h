@@ -7,6 +7,7 @@
 
 #include "../Instruction.hpp"
 #include "../Register.hpp"
+#include "OoOCommon.h"
 
 class Session;
 
@@ -18,15 +19,17 @@ public:
 
     Issue(Session *session);
 
-    InstructionBase parse_opcode(unsigned opcode, Immediate imm);
+    InstructionBase parse_inst(unsigned opcode, Immediate inst);
 
-    void issue(const InstructionBase &inst);
+    Immediate issue(const InstructionBase &inst);
 
     void update();
 
     void tick();
 
     void debug();
+
+    RSID find_available_op_unit();
 };
 
 
