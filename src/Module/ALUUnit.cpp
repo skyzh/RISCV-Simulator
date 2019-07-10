@@ -2,6 +2,7 @@
 // Created by Alex Chi on 2019-07-10.
 //
 
+#include <cassert>
 #include "ALUUnit.h"
 #include "../Instruction.hpp"
 #include "../Pipeline/OoOExecute.h"
