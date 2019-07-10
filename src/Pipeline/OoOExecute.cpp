@@ -56,3 +56,11 @@ void OoOExecute::put_result(RSID id, Immediate result) {
         }
     }
 }
+
+void OoOExecute::debug() {
+    for (int i = RS_BEGIN + 1; i < RS_END; i++) {
+        RS *rs = get_rs((RSID) i);
+        std::cout << rs->resolve(i) << std::endl;
+        rs->debug();
+    }
+}

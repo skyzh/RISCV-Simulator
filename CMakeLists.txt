@@ -3,7 +3,7 @@ project(RISCV_Simulator)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_library(RISCV_Simulator STATIC src/Parser.hpp src/Instruction.hpp src/Module/ALU.cpp src/Module/ALU.h src/Register.hpp src/Tickable.h src/Session.cpp src/Session.h src/Memory.hpp src/RegisterFile.hpp src/Common.h src/Module/Branch.cpp src/Module/Branch.h src/Pipeline/Issue.cpp src/Pipeline/Issue.h src/ReservationStation.hpp src/Pipeline/OoOExecute.cpp src/Pipeline/OoOExecute.h src/Module/ALUUnit.cpp src/Module/ALUUnit.h src/Pipeline/OoOCommon.h src/Module/LoadStoreUnit.cpp src/Module/LoadStoreUnit.h)
+add_library(RISCV_Simulator STATIC src/Parser.hpp src/Instruction.hpp src/Module/ALU.cpp src/Module/ALU.h src/Register.hpp src/Tickable.h src/Session.cpp src/Session.h src/Memory.hpp src/RegisterFile.hpp src/Common.h src/Module/Branch.cpp src/Module/Branch.h src/Pipeline/Issue.cpp src/Pipeline/Issue.h src/ReservationStation.hpp src/Pipeline/OoOExecute.cpp src/Pipeline/OoOExecute.h src/Module/ALUUnit.cpp src/Module/ALUUnit.h src/Pipeline/OoOCommon.h src/Module/LoadStoreUnit.cpp src/Module/LoadStoreUnit.h src/utils.h src/utils.cpp)
 add_executable(RISCV_Simulator_Test src/main_test.cpp src/Parser_test.cpp src/Instruction_test.cpp src/Register_test.cpp src/Module/ALU_test.cpp src/Session_test.cpp src/Memory_test.cpp src/RegisterFile_test.cpp)
 add_executable(RISCV_Simulator_Main src/main.cpp)
 

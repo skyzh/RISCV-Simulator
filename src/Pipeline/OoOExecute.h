@@ -37,6 +37,8 @@ public:
     void put_result(RSID id, Immediate result);
 
     RS *get_rs(RSID id);
+
+    void debug();
 };
 
 

@@ -6,18 +6,27 @@
 #define RISCV_SIMULATOR_ISSUE_H
 
 #include "../Instruction.hpp"
+#include "../Register.hpp"
 
 class Session;
 
 class Issue {
 public:
-    Session* session;
+    Register<Immediate> pc;
+
+    Session *session;
 
     Issue(Session *session);
 
+    InstructionBase parse_opcode(unsigned opcode, Immediate imm);
+
     void issue(const InstructionBase &inst);
+
     void update();
+
     void tick();
+
+    void debug();
 };
 
 

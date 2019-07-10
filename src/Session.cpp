@@ -40,7 +40,11 @@ void Session::load_memory(const char *path) {
 }
 
 void Session::debug() {
-    std::cout << "Registers" << std::endl;
+    std::cout << "---- Issue Stage ----" << std::endl;
+    i->debug();
+    std::cout << "--- Execute Stage ---" << std::endl;
+    e->debug();
+    std::cout << "----- Registers -----" << std::endl;
     rf.debug();
 }
 
