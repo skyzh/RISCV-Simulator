@@ -94,3 +94,9 @@ void LoadStoreUnit::write_value(RS *rs) {
             assert(false);
     }
 }
+
+void LoadStoreUnit::tick() {
+    load1_buffer.tick();
+    load1_cnt.tick();
+    store1_cnt.tick();
+}

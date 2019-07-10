@@ -18,6 +18,10 @@ OoOExecute::OoOExecute(Session *session) : session(session) {
 void OoOExecute::update() {
     aluUnit->update();
     loadStoreUnit->update();
+    aluUnit->update();
+    loadStoreUnit->update();
+    aluUnit->update();
+    loadStoreUnit->update();
 }
 
 void OoOExecute::tick() {
@@ -26,6 +30,7 @@ void OoOExecute::tick() {
         rs->tick();
     }
     for (int i = 0; i < MAX_REG; i++) Qi[i].tick();
+    loadStoreUnit->tick();
 }
 
 RS *OoOExecute::get_rs(RSID id) {
@@ -47,11 +52,11 @@ void OoOExecute::put_result(RSID id, Immediate result) {
     }
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
-        if (rs->Qj == id) {
+        if (rs->Qj.current() == id) {
             rs->Qj = NONE;
             rs->Vj = result;
         }
-        if (rs->Qk == id) {
+        if (rs->Qk.current() == id) {
             rs->Qk = NONE;
             rs->Vk = result;
         }
@@ -68,7 +73,7 @@ void OoOExecute::debug() {
     std::cout << "Reservation Stations" << std::endl;
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
-        std::cout << rs->resolve(i) << (rs->Busy.current() ? " (busy)" : "") <<std::endl;
+        std::cout << rs->resolve(i) << (rs->Busy.current() ? " (busy)" : "") << std::endl;
         rs->debug();
     }
     std::cout << "Register Rename" << std::endl;
@@ -99,7 +104,7 @@ RSID OoOExecute::rename_register(unsigned reg_id, RSID id) {
     return prev;
 }
 
-RS* OoOExecute::occupy_unit(RSID id) {
+RS *OoOExecute::occupy_unit(RSID id) {
     get_rs(id)->Busy = true;
     return get_rs(id);
 }

@@ -35,6 +35,8 @@ public:
     void write_value(RS *rs);
 
     void update();
+
+    void tick();
 };
 
 
