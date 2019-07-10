@@ -19,7 +19,7 @@ public:
     OoOExecute *e;
     vector<RSID> rs;
     enum OP {
-        ADD = 233, SUB, SLT, SLTU, XOR, OR, AND, SLL, SRL, SRA, NONE
+        ADD = 233, SUB, SLT, SLTU, XOR, OR, AND, SLL, SRL, SRA, NONE_OP
     };
 
     ALUUnit(OoOExecute *e);

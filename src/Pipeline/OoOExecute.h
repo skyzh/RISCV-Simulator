@@ -45,6 +45,8 @@ public:
     bool should_rename_register(unsigned reg_id);
 
     RSID rename_register(unsigned reg_id, RSID id);
+
+    void occupy_unit(RSID id);
 };
 
 

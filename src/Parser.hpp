@@ -18,6 +18,7 @@ public:
     }
 
     static void parse(std::istream &in, Memory &mem) {
+        if (!in) std::cerr << "parse failed, invalid stream" << std::endl;
         unsigned base_addr = 0;
         while (in) {
             std::string line;
@@ -37,6 +38,7 @@ public:
     }
 
     static void parse_hex(std::istream &in, Memory &mem) {
+        if (!in) std::cerr << "parse failed, invalid stream" << std::endl;
         unsigned base_addr = 0;
         std::string hex;
         while(in >> hex) {

@@ -49,7 +49,7 @@ ALUUnit::OP get_op_ri(InstructionBase inst) {
                 return ALUUnit::OP::SRL;
     }
     assert(false);
-    return ALUUnit::OP::NONE;
+    return ALUUnit::OP::NONE_OP;
 }
 
 ALUUnit::OP get_op_rr(InstructionBase inst) {
@@ -76,10 +76,11 @@ ALUUnit::OP get_op_rr(InstructionBase inst) {
             return ALUUnit::OP::AND;
     }
     assert(false);
-    return ALUUnit::OP::NONE;
+    return ALUUnit::OP::NONE_OP;
 }
 
 Immediate Issue::issue(const InstructionBase &inst) {
+    _debug_dispatched_inst = inst;
     if (inst.t == InstructionBase::J) {
         // JAL
         return pc + inst.imm;
@@ -91,8 +92,10 @@ Immediate Issue::issue(const InstructionBase &inst) {
         auto op = get_op_ri(inst);
         auto unit_id = find_available_op_unit();
         if (unit_id == NONE) return pc;
+        session->e->occupy_unit(unit_id);
         auto rs = session->e->get_rs(unit_id);
         rs->Op = op;
+        rs->Tag = pc;
         rs->Qk = NONE;
         rs->Vk = inst.imm;
         if (session->e->should_rename_register(inst.rs1)) {
@@ -102,12 +105,30 @@ Immediate Issue::issue(const InstructionBase &inst) {
             rs->Vj = session->rf.read(inst.rs1);
             rs->Qj = NONE;
         }
+        session->e->rename_register(inst.rd, unit_id);
     } else if (inst.opcode == 0b0110011) { // Op
         auto op = get_op_rr(inst);
         auto unit_id = find_available_op_unit();
         if (unit_id == NONE) return pc;
+        session->e->occupy_unit(unit_id);
         auto rs = session->e->get_rs(unit_id);
         rs->Op = op;
+        rs->Tag = pc;
+        if (session->e->should_rename_register(inst.rs1)) {
+            rs->Vj = 0;
+            rs->Qj = session->e->rename_register(inst.rs1, unit_id);
+        } else {
+            rs->Vj = session->rf.read(inst.rs1);
+            rs->Qj = NONE;
+        }
+        if (session->e->should_rename_register(inst.rs2)) {
+            rs->Vk = 0;
+            rs->Qk = session->e->rename_register(inst.rs2, unit_id);
+        } else {
+            rs->Vk = session->rf.read(inst.rs2);
+            rs->Qk = NONE;
+        }
+        session->e->rename_register(inst.rd, unit_id);
     }
     // LUI, AUIPC, JALR
     return pc + 4;
@@ -129,8 +150,10 @@ InstructionBase Issue::parse_inst(unsigned opcode, Immediate inst) {
 }
 
 void Issue::debug() {
-    std::cout << "PC" << std::endl;
-    std::cout << pc.current() << std::endl;
+    std::cout << "PC prev->current" << std::endl;
+    std::cout << "\t" << pc << "\t" << pc.current() << std::endl;
+    std::cout << "Instruction" << std::endl;
+    _debug_dispatched_inst.debug();
 }
 
 RSID Issue::find_available_op_unit() {

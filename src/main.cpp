@@ -1,11 +1,6 @@
 #include <iostream>
 #include <iomanip>
 #include "Session.h"
-#include "Pipeline/Fetch.h"
-#include "Pipeline/Decode.h"
-#include "Pipeline/Execute.h"
-#include "Pipeline/MemoryAccess.h"
-#include "Pipeline/WriteBack.h"
 #include <cassert>
 #include <chrono>
 
@@ -24,6 +19,8 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
         if (session->memory[0x30004]) {
             break;
         }
+
+        std::cin.get();
     }
     auto ret_val = session->rf.read(10) & 0xff;
     std::clog << "\t" << ret_val << " == " << ret_value << std::endl;
@@ -59,7 +56,7 @@ int run_all_tests() {
     run_session("../data/tak.data", 186);
     run_session("../data/pi.data", 137);
      */
-    run_session("../data/out-of-order-1.hex", 137, true);
+    run_session("../tests/out-of-order-1.hex", 137, true);
     return 0;
 }
 

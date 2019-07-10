@@ -15,6 +15,8 @@ class Issue {
 public:
     Register<Immediate> pc;
 
+    InstructionBase _debug_dispatched_inst;
+
     Session *session;
 
     Issue(Session *session);

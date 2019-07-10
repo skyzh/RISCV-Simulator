@@ -58,10 +58,25 @@ void OoOExecute::put_result(RSID id, Immediate result) {
 }
 
 void OoOExecute::debug() {
+    std::cout << "Reservation Stations" << std::endl;
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         std::cout << rs->resolve(i) << std::endl;
         rs->debug();
+    }
+    std::cout << "Register Rename" << std::endl;
+    static std::vector<std::string> rf_name = {"0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
+                                               "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
+                                               "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
+                                               "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
+    for (int i = 0; i < 4; i++) {
+        for (int j = i * 8; j < i * 8 + 8; j++) std::cout << rf_name[j] << "\t\t";
+        std::cout << std::endl;
+        for (int j = i * 8; j < i * 8 + 8; j++) {
+            std::cout << RS::resolve(Qi[j].current());
+            std::cout << "\t";
+        }
+        std::cout << std::endl;
     }
 }
 
@@ -77,4 +92,8 @@ RSID OoOExecute::rename_register(unsigned reg_id, RSID id) {
     RSID prev = Qi[reg_id];
     Qi[reg_id] = id;
     return prev;
+}
+
+void OoOExecute::occupy_unit(RSID id) {
+    get_rs(id)->Busy = true;
 }
