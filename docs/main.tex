@@ -10,6 +10,8 @@
 \usepackage{graphicx}
 \usepackage[stable]{footmisc}
 \usepackage{hyperref}
+\usepackage{csvsimple}
+
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
@@ -62,7 +64,8 @@
 
     \begin{aside}{什么样的实现是贴近电路的？}
         电路不受外界条件影响，在寄存器的值和内存给定的情况下，不论仿真多少次，
-        都能得到同一个值 (pure)。为了达成这个目标，我设计了第 \ref{register_model}
+        都能得到同一个值 (pure)。电路中也不宜设计一些复杂的数据结构（比如队列）。
+        为了达成这个目标，我设计了第 \ref{register_model}
         章所述的寄存器类，并且在编程的时候增加了几个限制，这一部分参见第 
         \ref{feed_forward_evaluation} 章。
     \end{aside}
@@ -95,17 +98,17 @@ int dstE = [
     某个语言中的惰性求值 (Lazy Evaluation)。
 
     \begin{verbatim}
-v_source = 1
+v_source = 1.0
 current = 0.003333333
-voltage_at_c :: Float
-voltage_at_b :: Float
-voltage_at_a :: Float
+voltage_at_c :: Double
+voltage_at_b :: Double
+voltage_at_a :: Double
 voltage_at_c = voltage_at_b - 100 * current
 voltage_at_b = voltage_at_a - 100 * current
-voltage_at_a = v_source - 100 * current
+voltage_at_a = v_source
 
 ghci> voltage_at_c
-1.7881393e-7
+0.33333339999999995
     \end{verbatim}
 
     在 Haskell 中，我们可以描述函数之间的关系。在定义函数的时候，这些值都不会被立刻求出来。只有
@@ -172,9 +175,12 @@ public:
     对于 CPU 中的每一个电路端口，我都确定了一个唯一的标签。通过标签即可得到端口的数据。
     比如，如果我们要在 Write-back 阶段完成 load 指令，将内存读取的值写入寄存器：
     \begin{verbatim}
-auto rd = session->d->get(Decode::rd);                  // 获取寄存器写入目标
-auto m_val = session->m->get(MemoryAccess::m_val);      // 获取内存阶段读到的值
-session->rf.write(rd, m_val);                           // 写入寄存器
+// 获取寄存器写入目标
+auto rd = session->d->get(Decode::rd);
+// 获取内存阶段读到的值
+auto m_val = session->m->get(MemoryAccess::m_val);
+// 写入寄存器
+session->rf.write(rd, m_val);
     \end{verbatim}
 
     在 Memory Access 阶段，我们定义求 \texttt{m\_val} 的方式。
@@ -298,6 +304,14 @@ for (int i = 0; i < 10; i++) {
     https://github.com/skyzh/RISCV-Simulator/files/3362948/RISCV.Design.pdf
     
     \subsection{分支预测}
+    
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \bfseries 数据 & \bfseries 预测前周期 & \bfseries 预测后周期 & \bfseries 周期减少率 & \bfseries 预测成功率
+        \csvreader[head to column names]{tables/branch_prediction.csv}{}
+        {\\\hline $\data$ & \beforecycles & \aftercycles & \cycleimprovement & \afterrate}
+        \\\hline
+    \end{tabular}
 
     \section{基于 Tomasulo 算法的乱序执行}\label{out_of_order_execution}
 
@@ -338,4 +352,10 @@ void Issue::issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id) {
     在这里，\texttt{Vk}, \texttt{Qk} 都是寄存器。对 \texttt{Vk} 和 \texttt{Qk} 的
     操作，只有在下一个周期才会生效。因而，这种寄存器类的设计在不影响理解的同时，增加了
     代码的可读性。
+
+    \subsection{没有 Reorder Buffer 的 CPU 设计}
+
+    在 \emph{Computer Architecture: A Quantitative Approach} 的 3.5 节中，作者介绍了
+    Tomasulo 算法。但是在这一章节中，缺少很多实现的细节。
+
 \end{document}
