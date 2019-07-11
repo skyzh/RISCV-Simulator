@@ -12,7 +12,7 @@
 
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
-Still WIP. For complete implementation and documentation, refer to 
+Out-of-order execution still WIP. For complete implementation and documentation, refer to 
 [pipeline](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) branch.
 I hope I could add speculation into this branch, therefore making a fully-capable simulator.
 

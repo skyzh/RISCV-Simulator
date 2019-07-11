@@ -13,5 +13,4 @@ target_link_libraries(RISCV_Simulator_Test PRIVATE RISCV_Simulator GTest::GTest 
 target_link_libraries(RISCV_Simulator_Main RISCV_Simulator)
 
 enable_testing()
-find_package(GTest MODULE REQUIRED)
 add_test(AllTestsInMain RISCV_Simulator_Test)

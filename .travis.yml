@@ -9,8 +9,8 @@ before_script:
   - export CC=gcc-9
   - export CXX=g++-9
   - pushd . && cd ~
-  - if [ ! -f "vcpkg/bootstrap-vcpkg.sh" ] ; then git clone https://github.com/Microsoft/vcpkg.git ; fi
-  - cd vcpkg && ./bootstrap-vcpkg.sh && ./vcpkg install gtest
+  - if [ ! -f "vcpkg/bootstrap-vcpkg.sh" ] ; then git clone https://github.com/Microsoft/vcpkg.git && cd vcpkg && ./bootstrap-vcpkg.sh && cd .. ; fi
+  - cd vcpkg && ./vcpkg install gtest
 script:
   - popd
   - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake
