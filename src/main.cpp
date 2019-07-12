@@ -7,7 +7,7 @@
 void run_session(const char *path, unsigned ret_value, bool use_hex_parser = false) {
     std::clock_t c_start = std::clock();
     std::clog << "Running " << path << "... " << std::endl;
-    Session *session = new Session(true);
+    Session *session = new Session(false);
     if (use_hex_parser) session->load_hex(path); else session->load_memory(path);
     int pc_cnt = 0;
 
@@ -18,7 +18,7 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
 
         if (session->memory[0x30004]) break;
 
-        if (pc_cnt >= 200) break;
+        // if (pc_cnt >= 200) break;
     }
     auto ret_val = session->rf.read(10) & 0xff;
     std::clog << "\t" << ret_val << " == " << ret_value << std::endl;
@@ -31,13 +31,13 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
 int run_all_tests() {
 
     run_session("../tests/out-of-order-3.hex", 0x37, true);
-    /*
     run_session("../tests/data-hazard-1.hex", 0x1f, true);
     run_session("../tests/data-hazard-2.hex", 0x1f, true);
     run_session("../tests/control-hazard-1.hex", 0x8, true);
     run_session("../tests/control-hazard-2.hex", 0x8, true);
     run_session("../tests/control-hazard-3.hex", 0x1c, true);
     run_session("../tests/rename-register-1.hex", 0x320 & 0xff, true);
+    /*
     run_session("../data/naive.data", 94);
     run_session("../data/gcd.data", 178);
     run_session("../data/lvalue2.data", 175);
