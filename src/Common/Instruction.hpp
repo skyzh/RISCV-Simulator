@@ -33,9 +33,9 @@ struct InstructionBase {
         this->inst = -1;
     }
 
-    static InstructionBase nop() {
-        return InstructionBase(0);
-    }
+    static InstructionBase nop() { return InstructionBase(0); }
+
+    bool is_nop() { return this->inst == -1; }
 
     unsigned opcode, rs1, rs2, rd, funct3, funct7;
     Immediate imm;

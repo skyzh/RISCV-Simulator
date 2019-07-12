@@ -18,7 +18,7 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
 
         if (session->memory[0x30004]) break;
 
-        if (pc_cnt >= 50) break;
+        if (pc_cnt >= 200) break;
     }
     auto ret_val = session->rf.read(10) & 0xff;
     std::clog << "\t" << ret_val << " == " << ret_value << std::endl;

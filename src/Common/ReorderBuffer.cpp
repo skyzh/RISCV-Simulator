@@ -12,10 +12,10 @@ void ROB::debug() {
     using std::endl;
     using std::setw;
     std::cout << setw(4) << __debug_identifier
-              << setw(8) << resolve(Type.current());
+              << setw(8) << resolve(Inst.current().opcode);
     debug_immediate(Dest.current(), 7);
     debug_immediate(Value.current(), 7);
-    std::cout << (Type.current() == 0 ? "  (⚪idle)" : "");
+    std::cout << (Inst.current().is_nop() ? "  (⚪idle)" : "");
     std::cout << (Ready.current() ? "  (⚪ready)" : "");
     std::cout << std::endl;
 }

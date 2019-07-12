@@ -16,7 +16,6 @@ void Issue::update() {
     // many times update is executed, pc always
     // stays the same.
 
-
     auto _inst = session->memory.read_word(pc);
     auto inst = parse_inst(_inst & 0x7f, _inst);
 
@@ -24,8 +23,11 @@ void Issue::update() {
 }
 
 void Issue::tick() {
+    if (__jump_flag) {
+        __jump_flag = false;
+        pc = __jump_dest;
+    }
     pc.tick();
-    branch_issued.tick();
     issue_cnt.tick();
 }
 
@@ -110,19 +112,9 @@ Immediate Issue::issue(const InstructionBase &inst) {
         // TODO: branch unit is the same as ALU Unit,
         //       we may randomly select one from them
         //       instead of specifying BRANCH1.
-        if (branch_issued == false)
-            return issue_branch(inst);
-        // If branch has been resolved, we can issue next inst.
-        if (session->e->available(BRANCH1))
-            return resolve_branch(inst);
-        // If branch is still being resolved, don't move to next inst.
-        return pc;
+        return issue_branch(inst);
     } else if (inst.opcode == 0b1100111) { // JALR
-        if (branch_issued == false)
-            return issue_jalr(inst);
-        if (session->e->available(BRANCH1))
-            return resolve_jalr(inst);
-        return pc;
+        return issue_jalr(inst);
     } else if (inst.opcode == 0b0000011) { // Load
         return issue_load(inst);
     } else if (inst.opcode == 0b0100011) { // Store
@@ -139,7 +131,8 @@ Immediate Issue::issue(const InstructionBase &inst) {
     return pc;
 }
 
-Issue::Issue(Session *session) : session(session) {}
+Issue::Issue(Session *session) :
+    session(session) {}
 
 InstructionBase Issue::parse_inst(unsigned opcode, Immediate inst) {
     if (opcode == 0b0110011) { return InstructionR(inst); } // ***
@@ -159,7 +152,10 @@ void Issue::debug() {
     std::cout << std::hex << "\t" << pc << "\t" << pc.current() << std::endl;
     std::cout << "Instruction" << std::endl;
     _debug_dispatched_inst.debug();
-    if (branch_issued.current()) std::cout << "(branch issued)" << std::endl;
+    if (__jump_flag) {
+        std::cout << "⭕" << "(jump to "
+                  << std::hex << __jump_dest << ")" << std::endl;
+    }
 }
 
 RSID Issue::find_available_op_unit() {
@@ -218,28 +214,37 @@ Immediate Issue::issue_jalr(const InstructionBase &inst) {
 }
 
 Immediate Issue::resolve_jalr(const InstructionBase &inst) {
-    branch_issued = false;
-    return session->rf.read(OoOExecute::BRANCH_REG);
+    return pc;
 }
 
 Immediate Issue::issue_branch(const InstructionBase &inst) {
-    /*
+    auto e = session->e;
+
     // If branch unit is not available, don't move to next inst.
-    if (!session->e->available(BRANCH1)) return pc;
-    auto rs = session->e->occupy_unit(BRANCH1);
+    if (!e->available(BRANCH1)) return pc;
+
+    auto b = e->acquire_rob();
+    if (b == -1) return pc;
+
+    auto rs = e->occupy_unit(BRANCH1);
+
     rs->Op = get_op_branch(inst);
     rs->Tag = issue_cnt;
 
     issue_rs_to_Vj(inst.rs1, rs, BRANCH1);
     issue_rs_to_Vk(inst.rs2, rs, BRANCH1);
 
-    session->e->rename_register(OoOExecute::BRANCH_REG, BRANCH1);
+    rs->Dest = b;
 
-    branch_issued = true;
+    e->rob[b].Dest = pc;
+    e->rob[b].Inst = inst;
 
-    return pc;
-     */
-    return pc;
+    e->occupy_register(inst.rd, b);
+
+    // TODO: here we should return predicted branch,
+    //       now we just apply always-not-taken strategy
+    auto pred_pc = pc + 4;
+    return pred_pc;
 }
 
 Immediate Issue::issue_immediate_op(const InstructionBase &inst) {
@@ -262,7 +267,7 @@ Immediate Issue::issue_immediate_op(const InstructionBase &inst) {
     rs->Dest = b;
 
     e->rob[b].Dest = inst.rd;
-    e->rob[b].Type = inst.opcode;
+    e->rob[b].Inst = inst;
 
     e->occupy_register(inst.rd, b);
 
@@ -289,42 +294,11 @@ Immediate Issue::issue_op(const InstructionBase &inst) {
     rs->Dest = b;
 
     e->rob[b].Dest = inst.rd;
-    e->rob[b].Type = inst.opcode;
+    e->rob[b].Inst = inst;
 
     e->occupy_register(inst.rd, b);
 
     return pc + 4;
-}
-
-Immediate Issue::resolve_branch(const InstructionBase &inst) {
-    branch_issued = false;
-    auto branch_result = session->rf.read(OoOExecute::BRANCH_REG);
-    auto branch_target = pc + inst.imm;
-    auto next_inst = pc + 4;
-
-    switch (inst.funct3) {
-        case 0b000: // BEQ
-            if (branch_result == 0) return branch_target;
-            else return next_inst;
-        case 0b001: // BNE
-            if (branch_result != 0) return branch_target;
-            else return next_inst;
-        case 0b100: // BLT
-            if (branch_result == 1) return branch_target;
-            else return next_inst;
-        case 0b101: // BGE
-            if (branch_result == 0) return branch_target;
-            else return next_inst;
-        case 0b110: // BLTU
-            if (branch_result == 1) return branch_target;
-            else return next_inst;
-        case 0b111: // BGEU
-            if (branch_result == 0) return branch_target;
-            else return next_inst;
-    }
-
-    assert(false);
-    return pc;
 }
 
 void Issue::issue_rs_to_Vj(unsigned reg_id, RS *rs, RSID unit_id) {
@@ -472,7 +446,7 @@ Immediate Issue::issue_jal(const InstructionBase &inst) {
     rs->Dest = b;
 
     e->rob[b].Dest = inst.rd;
-    e->rob[b].Type = inst.opcode;
+    e->rob[b].Inst = inst.inst;
 
     e->occupy_register(inst.rd, b);
 
@@ -481,4 +455,9 @@ Immediate Issue::issue_jal(const InstructionBase &inst) {
 
 void Issue::issue_imm_to_A(Immediate imm, RS *rs, RSID) {
     rs->A = imm;
+}
+
+void Issue::notify_jump(Immediate jump_dest) {
+    __jump_flag = true;
+    __jump_dest = jump_dest;
 }

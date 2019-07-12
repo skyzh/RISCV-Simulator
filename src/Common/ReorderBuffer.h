@@ -7,19 +7,20 @@
 
 #include "Register.hpp"
 #include <string>
+#include "Instruction.hpp"
 
 class ROB {
 public:
-    Register<unsigned> Type;
+    Register<InstructionBase> Inst;
     Register<unsigned> Dest, Value;
     Register<bool> Ready;
 
     unsigned __debug_identifier;
 
-    ROB() : Type(0), Dest(0), Value(0), Ready(false) {}
+    ROB() : Inst(0), Dest(0), Value(0), Ready(false) {}
 
     void tick() {
-        Type.tick();
+        Inst.tick();
         Dest.tick();
         Value.tick();
         Ready.tick();

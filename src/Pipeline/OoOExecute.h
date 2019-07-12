@@ -26,7 +26,7 @@ class CommitUnit;
 
 class OoOExecute {
 public:
-    static const unsigned MAX_REG = 32 + 1;
+    static const unsigned MAX_REG = 32;
     static const unsigned ROB_SIZE = 4;
     RS Add1, Add2, Add3, Branch1;
     RS Load1, Store1; // These two will be implemented afterwards
@@ -34,7 +34,6 @@ public:
     Register<bool> Busy[MAX_REG];
     // TODO: Here I added another register to indicate
     //       branch status. It should be eliminated.
-    static const unsigned BRANCH_REG = MAX_REG - 1;
 
     ROB rob[ROB_SIZE];
     Register <unsigned> rob_front, rob_rear;
@@ -44,6 +43,8 @@ public:
     unique_ptr<CommitUnit> commitUnit;
 
     Session *session;
+
+    bool __rob_flush_flag;
 
     OoOExecute(Session *session);
 
@@ -64,6 +65,8 @@ public:
     unsigned acquire_rob();
 
     void occupy_register(unsigned reg_id, unsigned b);
+
+    void flush_rob();
 };
 
 #endif //RISCV_SIMULATOR_OOOEXECUTE_H

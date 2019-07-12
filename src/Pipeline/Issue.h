@@ -15,10 +15,12 @@ class Session;
 class Issue {
 public:
     Register<Immediate> pc;
-    Register<bool> branch_issued;
     // TODO: this is used for handling w-w hazard in memory,
     //       should be eliminated once speculation is possible
     Register<long long> issue_cnt;
+
+    bool __jump_flag;
+    Immediate __jump_dest;
 
     InstructionBase _debug_dispatched_inst;
 
@@ -45,8 +47,6 @@ public:
     RSID find_available_store_unit();
 
     Immediate issue_branch(const InstructionBase &inst);
-
-    Immediate resolve_branch(const InstructionBase &inst);
 
     Immediate issue_immediate_op(const InstructionBase &inst);
 
@@ -75,6 +75,8 @@ public:
     void issue_imm_to_Vk(Immediate imm, RS *rs, RSID unit_id);
 
     void issue_imm_to_A(Immediate imm, RS *rs, RSID unit_id);
+
+    void notify_jump(Immediate jump_dest);
 };
 
 

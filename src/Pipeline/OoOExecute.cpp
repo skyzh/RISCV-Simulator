@@ -10,7 +10,9 @@
 
 using std::make_unique;
 
-OoOExecute::OoOExecute(Session *session) : session(session) {
+OoOExecute::OoOExecute(Session *session) :
+    session(session),
+    __rob_flush_flag(false) {
     aluUnit = make_unique<ALUUnit>(this);
     loadStoreUnit = make_unique<LoadStoreUnit>(this);
     commitUnit = make_unique<CommitUnit>(this);
@@ -32,6 +34,22 @@ void OoOExecute::update() {
 }
 
 void OoOExecute::tick() {
+    if (__rob_flush_flag) {
+        for (int i = 0; i < MAX_REG; i++) Busy[i] = false;
+        for (int i = 0; i < ROB_SIZE; i++) {
+            rob[i].Ready = false;
+            // TODO: set to nop just for more debug information
+            rob[i].Inst = InstructionBase::nop();
+        }
+        for (int i = RS_BEGIN + 1; i < RS_END; i++) {
+            RS *rs = get_rs((RSID) i);
+            if (rs == nullptr) continue;
+            rs->Busy = false;
+        }
+        rob_front = 0;
+        rob_rear = 0;
+        __rob_flush_flag = false;
+    }
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         if (rs == nullptr) continue;
@@ -107,6 +125,9 @@ void OoOExecute::debug() {
         }
         std::cout << std::endl;
     }
+    if (__rob_flush_flag) {
+        std::cout << "⭕" << "(rob flush in next cycle)" << std::endl;
+    }
 }
 
 bool OoOExecute::available(RSID id) {
@@ -131,4 +152,8 @@ unsigned OoOExecute::acquire_rob() {
 void OoOExecute::occupy_register(unsigned reg_id, unsigned b) {
     Reorder[reg_id] = b;
     Busy[reg_id] = true;
+}
+
+void OoOExecute::flush_rob() {
+    __rob_flush_flag = true;
 }
