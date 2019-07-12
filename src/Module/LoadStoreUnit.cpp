@@ -101,3 +101,8 @@ bool LoadStoreUnit::no_store_in_rob(unsigned addr, unsigned current_rob) {
     }
     return true;
 }
+
+void LoadStoreUnit::reset() {
+    load1_cnt = 0;
+    store1_cnt = 0;
+}

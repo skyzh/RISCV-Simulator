@@ -37,6 +37,8 @@ public:
     void tick();
 
     bool no_store_in_rob(unsigned addr, unsigned current_rob);
+
+    void reset();
 };
 
 

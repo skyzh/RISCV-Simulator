@@ -33,6 +33,8 @@ public:
     static string resolve(OP op);
 
     void tick();
+
+    void reset();
 };
 
 

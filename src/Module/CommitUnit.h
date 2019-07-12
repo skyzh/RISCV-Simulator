@@ -30,6 +30,8 @@ public:
     void resolve_jalr(ROB& rob_entry);
 
     void flush_rob_entry(ROB& rob_entry);
+
+    void reset();
 };
 
 

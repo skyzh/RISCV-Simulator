@@ -58,3 +58,7 @@ std::string ALUUnit::resolve(ALUUnit::OP op) {
 void ALUUnit::tick() {
 
 }
+
+void ALUUnit::reset() {
+
+}

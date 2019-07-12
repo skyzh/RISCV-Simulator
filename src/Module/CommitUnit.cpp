@@ -126,3 +126,7 @@ void CommitUnit::flush_rob_entry(ROB &rob_entry) {
     rob_entry.Ready = false;
     rob_entry.Inst = InstructionBase::nop();
 }
+
+void CommitUnit::reset() {
+
+}

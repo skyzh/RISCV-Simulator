@@ -47,10 +47,14 @@ void OoOExecute::tick() {
             RS *rs = get_rs((RSID) i);
             if (rs == nullptr) continue;
             rs->Dest = 0;
+            rs->Busy = false;
         }
         rob_front = 1;
         rob_rear = 1;
         __rob_flush_flag = false;
+        loadStoreUnit->reset();
+        commitUnit->reset();
+        aluUnit->reset();
     }
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
@@ -160,7 +164,6 @@ std::vector<unsigned> OoOExecute::acquire_robs(unsigned size) {
     unsigned b = rob_rear;
     std::vector <unsigned> robs;
     for (int i = 0; i < size; i++, b = next_rob_entry(b)) {
-        if (b == rob_front) assert(false);
         rob[b].Ready = false;
         robs.push_back(b);
     }
