@@ -25,10 +25,10 @@ class LoadStoreUnit;
 class OoOExecute {
 public:
     static const unsigned MAX_REG = 32 + 1;
-    static const unsigned ROB_SIZE = 8;
+    static const unsigned ROB_SIZE = 4;
     RS Add1, Add2, Add3, Branch1;
     RS Load1, Store1; // These two will be implemented afterwards
-    Register<RSID> Qi[MAX_REG];
+    Register<unsigned> Reorder[MAX_REG];
     Register<bool> Busy[MAX_REG];
     // TODO: Here I added another register to indicate
     //       branch status. It should be eliminated.
@@ -56,13 +56,11 @@ public:
 
     bool available(RSID id);
 
-    bool should_rename_register(unsigned reg_id);
-
-    RSID rename_register(unsigned reg_id, RSID id);
-
-    RSID get_renamed_register(unsigned reg_id);
-
     RS* occupy_unit(RSID id);
+
+    unsigned acquire_rob();
+
+    void occupy_register(unsigned reg_id, unsigned b);
 };
 
 #endif //RISCV_SIMULATOR_OOOEXECUTE_H

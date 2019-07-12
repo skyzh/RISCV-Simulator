@@ -31,6 +31,8 @@ public:
     Immediate get_result(Immediate op, Immediate op1, Immediate op2);
 
     static string resolve(OP op);
+
+    void tick();
 };
 
 

@@ -54,3 +54,7 @@ std::string ALUUnit::resolve(ALUUnit::OP op) {
     }
     return "UNKNOWN";
 }
+
+void ALUUnit::tick() {
+
+}

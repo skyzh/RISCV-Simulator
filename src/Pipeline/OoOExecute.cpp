@@ -12,7 +12,6 @@ using std::make_unique;
 OoOExecute::OoOExecute(Session *session) : session(session) {
     aluUnit = make_unique<ALUUnit>(this);
     loadStoreUnit = make_unique<LoadStoreUnit>(this);
-    memset(Qi, 0, sizeof(Qi));
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         if (rs == nullptr) continue;
@@ -34,7 +33,12 @@ void OoOExecute::tick() {
         if (rs == nullptr) continue;
         rs->tick();
     }
-    for (int i = 0; i < MAX_REG; i++) Qi[i].tick();
+    for (int i = 0; i < MAX_REG; i++) Reorder[i].tick();
+    for (int i = 0; i < MAX_REG; i++) Busy[i].tick();
+    for (int i = 0; i < ROB_SIZE; i++) rob[i].tick();
+    rob_front.tick();
+    rob_rear.tick();
+    aluUnit->tick();
     loadStoreUnit->tick();
 }
 
@@ -49,12 +53,9 @@ RS *OoOExecute::get_rs(RSID id) {
 }
 
 void OoOExecute::put_result(RSID id, Immediate result) {
-    for (int i = 0; i < MAX_REG; i++) {
-        if (Qi[i].current() == id) {
-            Qi[i] = NONE;
-            session->rf.write(i, result);
-        }
-    }
+    auto from_rs = get_rs(id);
+    rob[from_rs->Dest].Ready = true;
+    rob[from_rs->Dest].Value = result;
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         if (rs == nullptr) continue;
@@ -94,7 +95,7 @@ void OoOExecute::debug() {
         std::cout << std::endl;
         for (int j = i * 8; j < i * 8 + 8; j++) {
             if (Busy[j].current()) {
-                std::cout << "⚪#" << Qi[j].current() << "\t";
+                std::cout << "⚪" << Reorder[j].current() << "   \t";
             } else {
                 std::cout << "idle" << "\t";
             }
@@ -109,21 +110,20 @@ bool OoOExecute::available(RSID id) {
     return !get_rs(id)->Busy;
 }
 
-bool OoOExecute::should_rename_register(unsigned reg_id) {
-    return Qi[reg_id] != NONE;
-}
-
-RSID OoOExecute::rename_register(unsigned reg_id, RSID id) {
-    RSID prev = Qi[reg_id];
-    Qi[reg_id] = id;
-    return prev;
-}
-
 RS *OoOExecute::occupy_unit(RSID id) {
     get_rs(id)->Busy = true;
     return get_rs(id);
 }
 
-RSID OoOExecute::get_renamed_register(unsigned reg_id) {
-    return Qi[reg_id];
+unsigned OoOExecute::acquire_rob() {
+    if ((rob_rear + 1) % ROB_SIZE == rob_front) return -1;
+    auto b = rob_rear;
+    rob_rear = rob_rear + 1;
+    rob[b].Ready = false;
+    return b;
+}
+
+void OoOExecute::occupy_register(unsigned reg_id, unsigned b) {
+    Reorder[reg_id] = b;
+    Busy[reg_id] = true;
 }

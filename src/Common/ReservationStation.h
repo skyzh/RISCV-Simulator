@@ -14,11 +14,11 @@
 
 class RS {
 public:
-    Register<Immediate> Op, Qj, Qk, Vj, Vk, A, Tag;
+    Register<Immediate> Op, Qj, Qk, Vj, Vk, A, Tag, Dest;
     Register<bool> Busy;
     unsigned __debug_identifier;
 
-    RS() : Op(0), Qj(0), Qk(0), Vj(0), Vk(0), A(0), Tag(0), Busy(false) {}
+    RS() : Op(0), Qj(0), Qk(0), Vj(0), Vk(0), A(0), Tag(0), Dest(0), Busy(false) {}
 
     void tick() {
         Op.tick();
@@ -29,6 +29,7 @@ public:
         Tag.tick();
         A.tick();
         Busy.tick();
+        Dest.tick();
     }
 
     static std::string resolve(Immediate tag) {

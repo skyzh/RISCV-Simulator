@@ -179,6 +179,7 @@ RSID Issue::find_available_store_unit() {
 
 
 Immediate Issue::issue_jalr(const InstructionBase &inst) {
+    /*
     // TODO: here we use two unit to process jalr.
     //       first we obtain pc + 4 with alu unit,
     //       then we obtain next pc just as what
@@ -212,6 +213,8 @@ Immediate Issue::issue_jalr(const InstructionBase &inst) {
     branch_issued = true;
 
     return pc;
+     */
+    return pc;
 }
 
 Immediate Issue::resolve_jalr(const InstructionBase &inst) {
@@ -220,6 +223,7 @@ Immediate Issue::resolve_jalr(const InstructionBase &inst) {
 }
 
 Immediate Issue::issue_branch(const InstructionBase &inst) {
+    /*
     // If branch unit is not available, don't move to next inst.
     if (!session->e->available(BRANCH1)) return pc;
     auto rs = session->e->occupy_unit(BRANCH1);
@@ -234,40 +238,60 @@ Immediate Issue::issue_branch(const InstructionBase &inst) {
     branch_issued = true;
 
     return pc;
+     */
+    return pc;
 }
 
 Immediate Issue::issue_immediate_op(const InstructionBase &inst) {
-    auto op = get_op_ri(inst);
+    auto e = session->e;
+
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
+    auto b = e->acquire_rob();
+    if (b == -1) return pc;
+
     auto rs = session->e->occupy_unit(unit_id);
 
-    rs->Op = op;
+    rs->Op = get_op_ri(inst);
     rs->Tag = issue_cnt;
 
     issue_rs_to_Vj(inst.rs1, rs, unit_id);
     issue_imm_to_Vk(inst.imm, rs, unit_id);
 
-    session->e->rename_register(inst.rd, unit_id);
+    rs->Dest = b;
+
+    e->rob[b].Dest = inst.rd;
+    e->rob[b].Type = inst.opcode;
+
+    e->occupy_register(inst.rd, b);
 
     return pc + 4;
 }
 
 Immediate Issue::issue_op(const InstructionBase &inst) {
-    auto op = get_op_rr(inst);
+    auto e = session->e;
+
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
+    auto b = e->acquire_rob();
+    if (b == -1) return pc;
+
     auto rs = session->e->occupy_unit(unit_id);
 
-    rs->Op = op;
+    rs->Op = get_op_rr(inst);
     rs->Tag = issue_cnt;
 
     issue_rs_to_Vj(inst.rs1, rs, unit_id);
     issue_rs_to_Vk(inst.rs2, rs, unit_id);
 
-    session->e->rename_register(inst.rd, unit_id);
+    rs->Dest = b;
+
+    e->rob[b].Dest = inst.rd;
+    e->rob[b].Type = inst.opcode;
+
+    e->occupy_register(inst.rd, b);
 
     return pc + 4;
 }
@@ -304,9 +328,13 @@ Immediate Issue::resolve_branch(const InstructionBase &inst) {
 }
 
 void Issue::issue_rs_to_Vj(unsigned reg_id, RS *rs, RSID unit_id) {
-    if (reg_id != 0 && session->e->should_rename_register(reg_id)) {
-        rs->Vj = 0;
-        rs->Qj = session->e->get_renamed_register(reg_id);
+    auto e = session->e;
+    if (reg_id != 0 && e->Busy[reg_id]) {
+        auto h = e->Reorder[reg_id];
+        if (e->rob[h].Ready) {
+            rs->Vj = e->rob[h].Value;
+            rs->Qj = 0;
+        } else rs->Qj = h;
     } else {
         rs->Vj = session->rf.read(reg_id);
         rs->Qj = NONE;
@@ -314,9 +342,13 @@ void Issue::issue_rs_to_Vj(unsigned reg_id, RS *rs, RSID unit_id) {
 }
 
 void Issue::issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id) {
-    if (reg_id != 0 && session->e->should_rename_register(reg_id)) {
-        rs->Vk = 0;
-        rs->Qk = session->e->get_renamed_register(reg_id);
+    auto e = session->e;
+    if (reg_id != 0 && e->Busy[reg_id]) {
+        auto h = e->Reorder[reg_id];
+        if (e->rob[h].Ready) {
+            rs->Vk = e->rob[h].Value;
+            rs->Qk = 0;
+        } else rs->Qk = h;
     } else {
         rs->Vk = session->rf.read(reg_id);
         rs->Qk = NONE;
@@ -334,6 +366,7 @@ void Issue::issue_imm_to_Vj(Immediate imm, RS *rs, RSID) {
 }
 
 Immediate Issue::issue_load(const InstructionBase &inst) {
+    /*
     auto unit_id = find_available_load_unit();
     if (unit_id == NONE) return pc;
 
@@ -349,9 +382,12 @@ Immediate Issue::issue_load(const InstructionBase &inst) {
     session->e->rename_register(inst.rd, unit_id);
 
     return pc + 4;
+     */
+    return pc;
 }
 
 Immediate Issue::issue_store(const InstructionBase &inst) {
+    /*
     auto unit_id = find_available_store_unit();
     if (unit_id == NONE) return pc;
 
@@ -365,9 +401,12 @@ Immediate Issue::issue_store(const InstructionBase &inst) {
     issue_imm_to_A(inst.imm, rs, unit_id);
 
     return pc + 4;
+     */
+    return pc;
 }
 
 Immediate Issue::issue_lui(const InstructionBase &inst) {
+    /*
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
@@ -382,9 +421,12 @@ Immediate Issue::issue_lui(const InstructionBase &inst) {
     session->e->rename_register(inst.rd, unit_id);
 
     return pc + 4;
+     */
+    return pc;
 }
 
 Immediate Issue::issue_auipc(const InstructionBase &inst) {
+    /*
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
@@ -399,6 +441,8 @@ Immediate Issue::issue_auipc(const InstructionBase &inst) {
     session->e->rename_register(inst.rd, unit_id);
 
     return pc + 4;
+     */
+    return pc;
 }
 
 RSID Issue::find_available_unit_in(const std::vector<RSID> &src) {
@@ -409,6 +453,7 @@ RSID Issue::find_available_unit_in(const std::vector<RSID> &src) {
 }
 
 Immediate Issue::issue_jal(const InstructionBase &inst) {
+    /*
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
@@ -422,6 +467,8 @@ Immediate Issue::issue_jal(const InstructionBase &inst) {
     session->e->rename_register(inst.rd, unit_id);
 
     return pc + inst.imm;
+     */
+    return pc;
 }
 
 void Issue::issue_imm_to_A(Immediate imm, RS *rs, RSID) {
