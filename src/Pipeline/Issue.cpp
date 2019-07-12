@@ -453,22 +453,30 @@ RSID Issue::find_available_unit_in(const std::vector<RSID> &src) {
 }
 
 Immediate Issue::issue_jal(const InstructionBase &inst) {
-    /*
+    auto e = session->e;
+
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
+    auto b = e->acquire_rob();
+    if (b == -1) return pc;
+
     auto rs = session->e->occupy_unit(unit_id);
+
     rs->Op = ALUUnit::OP::ADD;
     rs->Tag = issue_cnt;
 
     issue_imm_to_Vk(pc, rs, unit_id);
     issue_imm_to_Vj(4, rs, unit_id);
 
-    session->e->rename_register(inst.rd, unit_id);
+    rs->Dest = b;
+
+    e->rob[b].Dest = inst.rd;
+    e->rob[b].Type = inst.opcode;
+
+    e->occupy_register(inst.rd, b);
 
     return pc + inst.imm;
-     */
-    return pc;
 }
 
 void Issue::issue_imm_to_A(Immediate imm, RS *rs, RSID) {

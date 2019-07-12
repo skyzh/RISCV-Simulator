@@ -15,7 +15,9 @@ void ROB::debug() {
               << setw(8) << resolve(Type.current());
     debug_immediate(Dest.current(), 7);
     debug_immediate(Value.current(), 7);
-    std::cout << (Ready.current() ? "  (⚪ready)" : "") << std::endl;
+    std::cout << (Type.current() == 0 ? "  (⚪idle)" : "");
+    std::cout << (Ready.current() ? "  (⚪ready)" : "");
+    std::cout << std::endl;
 }
 
 void ROB::debug_header() {

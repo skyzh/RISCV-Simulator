@@ -17,8 +17,6 @@ void CommitUnit::update() {
                 break;
             case 0b0110111: // LUI
             case 0b0010111: // AUIPC
-            case 0b1101111: // JAL
-            case 0b1100111: // JALR
             case 0b1100011: // BRANCH
             case 0b0000011: // LOAD
             case 0b0100011: // STORE
@@ -26,8 +24,13 @@ void CommitUnit::update() {
                 break;
             case 0b0010011: // OP-IMM
             case 0b0110011: // OP
+            case 0b1101111: // JAL
+            case 0b1100111: // JALR
                 e->Busy[rob_entry.Dest] = false;
                 rob_entry.Ready = false;
+                // TODO: this statement can be removed, I add this just
+                //       for debug.
+                rob_entry.Type = 0;
                 e->session->rf.write(rob_entry.Dest, rob_entry.Value);
                 break;
             default:
