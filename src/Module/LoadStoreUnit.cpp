@@ -13,17 +13,20 @@ void LoadStoreUnit::update() {
     for (auto &&r_id : rs_load) {
         RS *r = e->get_rs(r_id);
         if (r->Busy) {
-            assert(false);
             // TODO: add more functional unit
             // here load takes 3 cycles
             if (load1_cnt == 0) {
-                if (r->Qj == NONE && r->Qk == NONE) {
+                unsigned a = r->A;
+                if (r->Qj == NONE) {
                     r->A = r->Vj + r->A;
                     load1_cnt = 1;
                 }
             } else if (load1_cnt == 1) {
-                load_value(r);
-                load1_cnt = 2;
+                unsigned a = r->A;
+                if (no_store_in_rob(r->A, r->Dest)) {
+                    load_value(r);
+                    load1_cnt = 2;
+                }
             } else if (load1_cnt == 2) {
                 commit_value(r_id, load1_buffer);
                 r->Busy = false;
@@ -86,4 +89,15 @@ void LoadStoreUnit::tick() {
     load1_buffer.tick();
     load1_cnt.tick();
     store1_cnt.tick();
+}
+
+bool LoadStoreUnit::no_store_in_rob(unsigned addr, unsigned current_rob) {
+    if (current_rob == 0) return true;
+    for (unsigned i = e->rob_front; i != current_rob; i = OoOExecute::next_rob_entry(i)) {
+        InstructionBase inst = e->rob[i].Inst;
+        if (inst.opcode == 0b0100011) { // STORE
+            return false;
+        }
+    }
+    return true;
 }

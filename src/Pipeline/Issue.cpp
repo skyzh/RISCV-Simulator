@@ -132,7 +132,8 @@ Immediate Issue::issue(const InstructionBase &inst) {
 }
 
 Issue::Issue(Session *session) :
-    session(session) {}
+    session(session),
+    __jump_flag(false) {}
 
 InstructionBase Issue::parse_inst(unsigned opcode, Immediate inst) {
     if (opcode == 0b0110011) { return InstructionR(inst); } // ***
@@ -149,7 +150,11 @@ InstructionBase Issue::parse_inst(unsigned opcode, Immediate inst) {
 
 void Issue::debug() {
     std::cout << "PC prev->current" << std::endl;
-    std::cout << std::hex << "\t" << pc << "\t" << pc.current() << std::endl;
+    std::cout << std::hex << "\t" << pc << "\t" << pc.current();
+    if (pc.current() == pc) {
+        std::cout << " ⭕(instruction stalled)";
+    }
+    std::cout << std::endl;
     std::cout << "Instruction" << std::endl;
     _debug_dispatched_inst.debug();
     if (__jump_flag) {
@@ -352,12 +357,15 @@ void Issue::issue_imm_to_Vj(Immediate imm, RS *rs, RSID) {
 }
 
 Immediate Issue::issue_load(const InstructionBase &inst) {
-    assert(false);
-    /*
+    auto e = session->e;
+
     auto unit_id = find_available_load_unit();
     if (unit_id == NONE) return pc;
 
-    auto rs = session->e->occupy_unit(unit_id);
+    auto b = e->acquire_rob();
+    if (b == -1) return pc;
+
+    auto rs = e->occupy_unit(unit_id);
 
     rs->Op = inst.funct3;
     rs->Tag = issue_cnt;
@@ -366,11 +374,14 @@ Immediate Issue::issue_load(const InstructionBase &inst) {
     issue_imm_to_Vk(0, rs, unit_id);
     issue_imm_to_A(inst.imm, rs, unit_id);
 
-    session->e->rename_register(inst.rd, unit_id);
+    rs->Dest = b;
+
+    e->rob[b].Inst = inst;
+    e->rob[b].Dest = inst.rd;
+
+    e->occupy_register(inst.rd, b);
 
     return pc + 4;
-     */
-    return pc;
 }
 
 Immediate Issue::issue_store(const InstructionBase &inst) {

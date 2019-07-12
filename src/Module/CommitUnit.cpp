@@ -17,9 +17,6 @@ void CommitUnit::update() {
         switch (inst.opcode) {
             case 0:
                 break;
-            case 0b0000011: // LOAD
-                assert(false);
-                break;
             case 0b0100011: // STORE
                 resolve_store(rob_entry);
                 break;
@@ -34,6 +31,7 @@ void CommitUnit::update() {
             case 0b0010011: // OP-IMM
             case 0b0110011: // OP
             case 0b1101111: // JAL
+            case 0b0000011: // LOAD
                 resolve_op(rob_entry, rob_front);
                 break;
             default:

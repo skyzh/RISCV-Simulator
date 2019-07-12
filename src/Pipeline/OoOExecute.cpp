@@ -46,7 +46,7 @@ void OoOExecute::tick() {
         for (int i = RS_BEGIN + 1; i < RS_END; i++) {
             RS *rs = get_rs((RSID) i);
             if (rs == nullptr) continue;
-            rs->Busy = false;
+            rs->Dest = 0;
         }
         rob_front = 1;
         rob_rear = 1;
@@ -80,6 +80,7 @@ RS *OoOExecute::get_rs(RSID id) {
 void OoOExecute::put_result(RSID id, Immediate result) {
     auto from_rs = get_rs(id);
     auto rob_dst = from_rs->Dest;
+    if (rob_dst == 0) return;
     rob[rob_dst].Ready = true;
     rob[rob_dst].Value = result;
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
