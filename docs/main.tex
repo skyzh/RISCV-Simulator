@@ -222,6 +222,12 @@ switch (session->d->get(Decode::funct3)) {
     写入 PC 寄存器中。写入寄存器的数据在这一个时钟周期中无法被读出。在数据更新完成后，对所有
     时间控制元件执行``tick''操作，开始下一个时钟周期后，这些写入的数据才能被电路元件读取到。
 
+    \begin{aside}{一些常见的坑}
+        第 0 个寄存器永远是 0。
+        
+        \texttt{JAL}、\texttt{JALR} 指令要把 \texttt{PC + 4} 写入 \texttt{rd}。
+    \end{aside}
+
     因而，从程序模拟的角度来说，我们只需要求得电路输出的值就可以完成一个周期的模拟。在串行 CPU
     中，整个电路有三个输出：到 PC 寄存器的输出，向内存写入，以及向 32 个寄存器写入。这就是每次
     更新所需要做的事情。
@@ -312,6 +318,10 @@ for (int i = 0; i < 10; i++) {
     https://github.com/skyzh/RISCV-Simulator/files/3362948/RISCV.Design.pdf
     
     \subsection{分支预测}
+
+    在完成五级流水线后，我开始探究分支预测的实现。原本的实现对于分支指令，一律预测紧接的一句
+    (Always not taken)。对于 \texttt{JAL}、\texttt{JALR} 之类的指令，也在 Execute
+    阶段才进行处理。在此基础上，我实现了两位自适应分支预测 (Two-level Adaptive Predictor)。
     
     \begin{tabular}{|l|c|c|c|c|}
         \hline
@@ -368,9 +378,57 @@ void Issue::issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id) {
     操作，只有在下一个周期才会生效。因而，这种寄存器类的设计在不影响理解的同时，增加了
     代码的可读性。
 
-    \subsection{没有 Reorder Buffer 的 CPU 设计}
+    当然，在某些情况下，这种写法或许会让人有些误解。比如在发出指令阶段。
+
+    \begin{verbatim}
+pc = pc + 4
+    \end{verbatim}
+
+    在这里，我们把当前时钟周期 \texttt{PC} 读出，通过某个硬件单元加了 $4$，并把结果接回了
+    \texttt{PC} 寄存器上。因而，在同一个时钟周期里，不论这句话被执行几次，下一周期的 \texttt{PC}
+    永远是这一周期的 \texttt{PC} 加上 $4$。
+
+    \subsection{仅基于 Tomasulo 算法的 CPU 设计}
 
     在 \emph{Computer Architecture: A Quantitative Approach} 的第 3.5 节中，作者介绍了
-    Tomasulo 算法。但是在这一章节中，缺少很多实现的细节。
+    Tomasulo 算法。但是在这一章节中，缺少很多实现的细节，以至于我无法直接参照书本实现一个 CPU。
+
+    \subsection{RV32I 中较难处理的指令}
+
+    在实现 Tomasulo 算法的过程中，我发现 RV32I 的部分指令需要多个硬件单元或者特殊处理才能完成。
+
+    \texttt{JALR} 指令需要将指令中 \texttt{rs1 + imm} 计算出来作为跳转的目标，而后将
+    \texttt{PC + 4} 存入 \texttt{rd} 之中。在 Tomasulo 算法的实现中，我将这一指令发送
+    到两个计算单元。由 \texttt{BRANCH1} 计算 \texttt{rs1 + imm}，并且用 \texttt{ADD1}
+    计算 \texttt{PC + 4}。当 Issue 阶段发现这个指令时，流水暂停，直到 \texttt{BRANCH1} 计算出
+    下一个指令的地址才继续发送指令。
+
+    在后文第 \ref{hardware-speculation} 章中实现推测执行时，\texttt{JALR} 指令需要更加复杂
+    的处理。由于使用了两个运算单元，它需要分配两个重排缓冲中的空位。两个空位中，第一个为 \texttt{ADD1}
+    的输出，并且在向第一个空位发送指令的时候，将指令当作 \texttt{JAL} 处理。（\texttt{JAL} 指令
+    在发出的时候就能确定跳转目标，在最后提交的时候就只需要把 \texttt{PC + 4} 存入 \texttt{rd}，
+    提交的过程和 \texttt{JALR} 拆分的第一个操作一致）。第二个操作和分支指令类似，只不过是无条件
+    跳转。当提交 \texttt{JALR} 的第二个操作时，就相当于分支预测失败，要清除重排缓存。
+    
+    分支指令的实现也比较困难。我给分支指令分配了一个运算单元 \texttt{BRANCH1}，它的功能和其他的 ALU
+    单元一致。当发出分支指令时，流水线停止，将分支按照跳转方法转换为 ALU 可以处理的运算，并将运算结果
+    存入新增的第 33 个寄存器中。当这个专用寄存器被写入、\texttt{BRANCH1} 运算单元空闲时，发出
+    阶段就能确定下一条指令的位置。这个过程会导致大量的时钟周期浪费在处理分支上，流水线在处理分支的时候
+    不能发出新的指令。这一问题也在后文第 \ref{hardware-speculation} 章中通过硬件推测解决了。
+
+
+    \begin{aside}{调整 Debug 输出，或许会有好心情}
+        在实现乱序执行的过程中，我时常要观赏一个时钟周期里的所有硬件数据，来判定问题发生的地方。
+        这些数据包括：发出的指令、PC、寄存器的值、寄存器重命名情况、Reservation Station 的
+        情况。一个 Cycle 的信息可以打一整屏幕。此时，对 Debug 输出排版就显得尤为重要。
+        对于 32 个寄存器，我在调试信息中打出了它们的名字，并同时输出十进制值和十六进制值。
+        对于正在处理数据 (busy) 的单元，我会用 Emoji 符号（比如红色的圈圈)突出显示。
+    \end{aside}
+
+    \subsection{推测执行与重排缓冲}\label{hardware-speculation}
+
+    在完成基于 Tomasulo 算法的乱序执行后，根据 \emph{Computer Architecture: A Quantitative Approach}
+    的介绍，我对设计进行改进，添加了重排缓冲 (Reorder Buffer)，实现了推测执行 
+    (Hardware Speculation)。
 
 \end{document}

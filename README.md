@@ -12,14 +12,15 @@
 
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
-Out-of-order execution still WIP. For complete implementation and documentation, refer to 
-[pipeline](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) branch.
-I hope I could add speculation into this branch, therefore making a fully-capable simulator.
+中文文档：[make-you-a-riscv-simulator (draft).pdf](https://github.com/skyzh/RISCV-Simulator/files/3386561/make-you-a-riscv-simulator.draft.pdf)
 
-This branch simulates a RISC-V CPU of 2 stage: issue and execute, which supports out-of-order execution.
+This branch simulates a RISC-V CPU of 2 stage: issue and execute, 
+which supports out-of-order execution.
+
 It implements out-of-order execution with Tomasulo algorithm. 
-Stall when encountering branch. 1 load-store Unit, 3 ALU unit.
+For branch, It applies hardware speculation to speculate the following
+instructions. 1 load buffer, 1 store buffer, 3 ALU unit, 1 branch unit,
+and a 4-entry reorder buffer.
 
-Note that since I was unable to design the equivalent circuit, this branch just shows a programmer's way to
-illustrate out-of-order execution design.
-
+Note that since I was unable to design the equivalent circuit, this branch 
+just shows a programmer's way to illustrate out-of-order execution design.
