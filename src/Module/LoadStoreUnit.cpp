@@ -13,6 +13,7 @@ void LoadStoreUnit::update() {
     for (auto &&r_id : rs_load) {
         RS *r = e->get_rs(r_id);
         if (r->Busy) {
+            assert(false);
             // TODO: add more functional unit
             // here load takes 3 cycles
             if (load1_cnt == 0) {
@@ -35,14 +36,16 @@ void LoadStoreUnit::update() {
         RS *r = e->get_rs(r_id);
         if (r->Busy) {
             if (store1_cnt == 0) {
-                if (r->Qj == NONE && r->Qk == NONE) {
-                    r->A = r->Vj + r->A;
+                if (r->Qj == NONE) {
+                    e->rob[r->Dest].Dest = r->Vj + r->A;
                     store1_cnt = 1;
                 }
             } else if (store1_cnt == 1) {
-                write_value(r);
-                r->Busy = false;
-                store1_cnt = 0;
+                if (r->Qk == NONE) {
+                    e->put_result(r_id, r->Vk);
+                    r->Busy = false;
+                    store1_cnt = 0;
+                }
             } else
                 assert(false);
         }
@@ -77,22 +80,6 @@ void LoadStoreUnit::load_value(RS *rs) {
 
 void LoadStoreUnit::commit_value(RSID r_id, Immediate val) {
     e->put_result(r_id, val);
-}
-
-void LoadStoreUnit::write_value(RS *rs) {
-    switch (rs->Op) {
-        case 0b000: // SB
-            e->session->memory[rs->A] = rs->Vk;
-            break;
-        case 0b001: // SH
-            e->session->memory.write_ushort(rs->A, rs->Vk);
-            break;
-        case 0b010: // SW
-            e->session->memory.write_word(rs->A, rs->Vk);
-            break;
-        default:
-            assert(false);
-    }
 }
 
 void LoadStoreUnit::tick() {

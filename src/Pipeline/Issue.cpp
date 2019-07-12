@@ -175,46 +175,58 @@ RSID Issue::find_available_store_unit() {
 
 
 Immediate Issue::issue_jalr(const InstructionBase &inst) {
-    /*
-    // TODO: here we use two unit to process jalr.
-    //       first we obtain pc + 4 with alu unit,
-    //       then we obtain next pc just as what
-    //       issue does.
-    if (!session->e->available(BRANCH1)) return pc;
+    auto e = session->e;
+
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
-    {   // Branch
-        auto rs = session->e->occupy_unit(BRANCH1);
+    if (!e->available(BRANCH1)) return pc;
+
+    // we need 2 slots for jalr instruction
+    if (!e->probe_rob(2)) return pc;
+
+    auto robs = e->acquire_robs(2);
+
+    {   // save pc + 4 to rd
+        auto b = robs[0];
+        auto rs = e->occupy_unit(unit_id);
 
         rs->Op = ALUUnit::OP::ADD;
         rs->Tag = issue_cnt;
 
-        issue_rs_to_Vj(inst.rs1, rs, BRANCH1);
-        issue_imm_to_Vk(inst.imm, rs, BRANCH1);
+        issue_imm_to_Vj(pc, rs, unit_id);
+        issue_imm_to_Vk(4, rs, unit_id);
 
-        session->e->rename_register(OoOExecute::BRANCH_REG, BRANCH1);
+        rs->Dest = b;
+
+        e->rob[b].Dest = inst.rd;
+        InstructionBase _mock_inst = inst;
+        _mock_inst.opcode = 0b1101111; // it just works like JAL
+        e->rob[b].Inst = _mock_inst;
+
+        e->occupy_register(inst.rd, b);
     }
-    {   // Write back to rd
-        auto rs = session->e->occupy_unit(unit_id);
+
+    {   // process jalr
+        auto b = robs[1];
+        auto rs = e->occupy_unit(BRANCH1);
+
         rs->Op = ALUUnit::OP::ADD;
         rs->Tag = issue_cnt;
 
-        issue_imm_to_Vk(pc, rs, unit_id);
-        issue_imm_to_Vj(4, rs, unit_id);
+        issue_rs_to_Vj(inst.rs1, rs, unit_id);
+        issue_imm_to_Vk(inst.imm, rs, unit_id);
 
-        session->e->rename_register(inst.rd, unit_id);
+        rs->Dest = b;
+
+        e->rob[b].Dest = 0;
+        e->rob[b].Inst = inst;
     }
 
-    branch_issued = true;
+    // TODO: just stall instead of executing non-sense instructions
+    auto pred_pc = pc + 4;
 
-    return pc;
-     */
-    return pc;
-}
-
-Immediate Issue::resolve_jalr(const InstructionBase &inst) {
-    return pc;
+    return pred_pc;
 }
 
 Immediate Issue::issue_branch(const InstructionBase &inst) {
@@ -256,7 +268,7 @@ Immediate Issue::issue_immediate_op(const InstructionBase &inst) {
     auto b = e->acquire_rob();
     if (b == -1) return pc;
 
-    auto rs = session->e->occupy_unit(unit_id);
+    auto rs = e->occupy_unit(unit_id);
 
     rs->Op = get_op_ri(inst);
     rs->Tag = issue_cnt;
@@ -283,7 +295,7 @@ Immediate Issue::issue_op(const InstructionBase &inst) {
     auto b = e->acquire_rob();
     if (b == -1) return pc;
 
-    auto rs = session->e->occupy_unit(unit_id);
+    auto rs = e->occupy_unit(unit_id);
 
     rs->Op = get_op_rr(inst);
     rs->Tag = issue_cnt;
@@ -340,6 +352,7 @@ void Issue::issue_imm_to_Vj(Immediate imm, RS *rs, RSID) {
 }
 
 Immediate Issue::issue_load(const InstructionBase &inst) {
+    assert(false);
     /*
     auto unit_id = find_available_load_unit();
     if (unit_id == NONE) return pc;
@@ -361,11 +374,15 @@ Immediate Issue::issue_load(const InstructionBase &inst) {
 }
 
 Immediate Issue::issue_store(const InstructionBase &inst) {
-    /*
+    auto e = session->e;
+
     auto unit_id = find_available_store_unit();
     if (unit_id == NONE) return pc;
 
-    auto rs = session->e->occupy_unit(unit_id);
+    auto b = e->acquire_rob();
+    if (b == -1) return pc;
+
+    auto rs = e->occupy_unit(unit_id);
 
     rs->Op = inst.funct3;
     rs->Tag = issue_cnt;
@@ -374,17 +391,23 @@ Immediate Issue::issue_store(const InstructionBase &inst) {
     issue_rs_to_Vk(inst.rs2, rs, unit_id);
     issue_imm_to_A(inst.imm, rs, unit_id);
 
+    rs->Dest = b;
+
+    e->rob[b].Inst = inst;
+
     return pc + 4;
-     */
-    return pc;
 }
 
 Immediate Issue::issue_lui(const InstructionBase &inst) {
-    /*
+    auto e = session->e;
+
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
-    auto rs = session->e->occupy_unit(unit_id);
+    auto b = e->acquire_rob();
+    if (b == -1) return pc;
+
+    auto rs = e->occupy_unit(unit_id);
 
     rs->Op = ALUUnit::OP::ADD;
     rs->Tag = issue_cnt;
@@ -392,19 +415,26 @@ Immediate Issue::issue_lui(const InstructionBase &inst) {
     issue_imm_to_Vj(0, rs, unit_id);
     issue_imm_to_Vk(inst.imm, rs, unit_id);
 
-    session->e->rename_register(inst.rd, unit_id);
+    rs->Dest = b;
+
+    e->rob[b].Dest = inst.rd;
+    e->rob[b].Inst = inst;
+
+    e->occupy_register(inst.rd, b);
 
     return pc + 4;
-     */
-    return pc;
 }
 
 Immediate Issue::issue_auipc(const InstructionBase &inst) {
-    /*
+    auto e = session->e;
+
     auto unit_id = find_available_op_unit();
     if (unit_id == NONE) return pc;
 
-    auto rs = session->e->occupy_unit(unit_id);
+    auto b = e->acquire_rob();
+    if (b == -1) return pc;
+
+    auto rs = e->occupy_unit(unit_id);
 
     rs->Op = ALUUnit::OP::ADD;
     rs->Tag = issue_cnt;
@@ -412,11 +442,14 @@ Immediate Issue::issue_auipc(const InstructionBase &inst) {
     issue_imm_to_Vj(pc, rs, unit_id);
     issue_imm_to_Vk(inst.imm, rs, unit_id);
 
-    session->e->rename_register(inst.rd, unit_id);
+    rs->Dest = b;
+
+    e->rob[b].Dest = inst.rd;
+    e->rob[b].Inst = inst;
+
+    e->occupy_register(inst.rd, b);
 
     return pc + 4;
-     */
-    return pc;
 }
 
 RSID Issue::find_available_unit_in(const std::vector<RSID> &src) {
@@ -435,7 +468,7 @@ Immediate Issue::issue_jal(const InstructionBase &inst) {
     auto b = e->acquire_rob();
     if (b == -1) return pc;
 
-    auto rs = session->e->occupy_unit(unit_id);
+    auto rs = e->occupy_unit(unit_id);
 
     rs->Op = ALUUnit::OP::ADD;
     rs->Tag = issue_cnt;
@@ -446,7 +479,7 @@ Immediate Issue::issue_jal(const InstructionBase &inst) {
     rs->Dest = b;
 
     e->rob[b].Dest = inst.rd;
-    e->rob[b].Inst = inst.inst;
+    e->rob[b].Inst = inst;
 
     e->occupy_register(inst.rd, b);
 

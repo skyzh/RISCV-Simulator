@@ -32,8 +32,6 @@ public:
 
     void commit_value(RSID r_id, Immediate val);
 
-    void write_value(RS *rs);
-
     void update();
 
     void tick();

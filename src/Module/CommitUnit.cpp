@@ -17,25 +17,29 @@ void CommitUnit::update() {
         switch (inst.opcode) {
             case 0:
                 break;
-            case 0b0110111: // LUI
-            case 0b0010111: // AUIPC
             case 0b0000011: // LOAD
-            case 0b0100011: // STORE
                 assert(false);
+                break;
+            case 0b0100011: // STORE
+                resolve_store(rob_entry);
                 break;
             case 0b1100011: // BRANCH
                 resolve_branch(rob_entry);
                 break;
+            case 0b1100111: // JALR
+                resolve_jalr(rob_entry);
+                break;
+            case 0b0110111: // LUI
+            case 0b0010111: // AUIPC
             case 0b0010011: // OP-IMM
             case 0b0110011: // OP
             case 0b1101111: // JAL
-            case 0b1100111: // JALR
-                resolve_op(rob_entry);
+                resolve_op(rob_entry, rob_front);
                 break;
             default:
                 assert(false);
         }
-        rob_front = (rob_front + 1) % e->ROB_SIZE;
+        rob_front = OoOExecute::next_rob_entry(rob_front);
     }
 }
 
@@ -55,18 +59,21 @@ void CommitUnit::resolve_branch(ROB &rob_entry) {
         e->flush_rob();
         e->session->i->notify_jump(next_pc);
     }
+
+    flush_rob_entry(rob_entry);
 }
 
-void CommitUnit::resolve_op(ROB &rob_entry) {
-    e->Busy[rob_entry.Dest] = false;
-    rob_entry.Ready = false;
-    // TODO: this statement can be removed, I add this just
-    //       for debug.
-    rob_entry.Inst = InstructionBase::nop();
+void CommitUnit::resolve_op(ROB &rob_entry, unsigned rob_id) {
     e->session->rf.write(rob_entry.Dest, rob_entry.Value);
+
+    if (e->Reorder[rob_entry.Dest].current() == rob_id) {
+        e->Busy[rob_entry.Dest] = false;
+    }
+
+    flush_rob_entry(rob_entry);
 }
 
-Immediate CommitUnit::get_next_pc(InstructionBase& inst, ROB& rob_entry, Immediate pc) {
+Immediate CommitUnit::get_next_pc(InstructionBase &inst, ROB &rob_entry, Immediate pc) {
     auto branch_target = pc + inst.imm;
     auto next_inst = pc + 4;
     switch (inst.funct3) {
@@ -91,4 +98,33 @@ Immediate CommitUnit::get_next_pc(InstructionBase& inst, ROB& rob_entry, Immedia
     }
     assert(false);
     return 0;
+}
+
+void CommitUnit::resolve_store(ROB &rob_entry) {
+    InstructionBase inst = rob_entry.Inst;
+    switch (inst.funct3) {
+        case 0b000: // SB
+            e->session->memory[rob_entry.Dest] = rob_entry.Value;
+            break;
+        case 0b001: // SH
+            e->session->memory.write_ushort(rob_entry.Dest, rob_entry.Value);
+            break;
+        case 0b010: // SW
+            e->session->memory.write_word(rob_entry.Dest, rob_entry.Value);
+            break;
+        default:
+            assert(false);
+    }
+
+    flush_rob_entry(rob_entry);
+}
+
+void CommitUnit::resolve_jalr(ROB &rob_entry) {
+    e->flush_rob();
+    e->session->i->notify_jump(rob_entry.Value);
+}
+
+void CommitUnit::flush_rob_entry(ROB &rob_entry) {
+    rob_entry.Ready = false;
+    rob_entry.Inst = InstructionBase::nop();
 }

@@ -54,8 +54,6 @@ public:
 
     Immediate issue_jalr(const InstructionBase &inst);
 
-    Immediate resolve_jalr(const InstructionBase &inst);
-
     Immediate issue_load(const InstructionBase &inst);
 
     Immediate issue_store(const InstructionBase &inst);

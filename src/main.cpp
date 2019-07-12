@@ -30,7 +30,7 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
 
 int run_all_tests() {
 
-    run_session("../tests/out-of-order-2.hex", 0x37, true);
+    run_session("../tests/out-of-order-3.hex", 0x37, true);
     /*
     run_session("../tests/data-hazard-1.hex", 0x1f, true);
     run_session("../tests/data-hazard-2.hex", 0x1f, true);

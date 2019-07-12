@@ -12,8 +12,11 @@ void RS::debug() {
     using std::endl;
     cout << resolve(__debug_identifier) << (Busy.current() ? " (⚪busy)" : "") << std::endl;
     cout << setw(8) << ALUUnit::resolve((ALUUnit::OP) Op.current());
-    cout << setw(8) << resolve(Qj.current());
-    cout << setw(8) << resolve(Qk.current());
+    char buffer[100];
+    sprintf(buffer, "#%d", Qj.current());
+    cout << setw(8) << buffer;
+    sprintf(buffer, "#%d", Qk.current());
+    cout << setw(8) << buffer;
     debug_immediate(Vj.current(), 7);
     debug_immediate(Vk.current(), 7);
     debug_immediate(A.current(), 7);

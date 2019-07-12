@@ -32,11 +32,8 @@ public:
     RS Load1, Store1; // These two will be implemented afterwards
     Register<unsigned> Reorder[MAX_REG];
     Register<bool> Busy[MAX_REG];
-    // TODO: Here I added another register to indicate
-    //       branch status. It should be eliminated.
-
-    ROB rob[ROB_SIZE];
-    Register <unsigned> rob_front, rob_rear;
+    ROB rob[ROB_SIZE + 1];
+    Register<unsigned> rob_front, rob_rear;
 
     unique_ptr<ALUUnit> aluUnit;
     unique_ptr<LoadStoreUnit> loadStoreUnit;
@@ -60,13 +57,19 @@ public:
 
     bool available(RSID id);
 
-    RS* occupy_unit(RSID id);
+    RS *occupy_unit(RSID id);
+
+    bool probe_rob(unsigned size);
 
     unsigned acquire_rob();
+
+    std::vector<unsigned> acquire_robs(unsigned size);
 
     void occupy_register(unsigned reg_id, unsigned b);
 
     void flush_rob();
+
+    static unsigned next_rob_entry(unsigned id);
 };
 
 #endif //RISCV_SIMULATOR_OOOEXECUTE_H

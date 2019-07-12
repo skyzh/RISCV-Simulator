@@ -19,10 +19,17 @@ public:
 
     void tick();
 
-    void resolve_branch(ROB& rob_entry);
+    void resolve_branch(ROB &rob_entry);
 
-    Immediate get_next_pc(InstructionBase& inst, ROB& rob_entry, Immediate pc);
-    void resolve_op(ROB& rob_entry);
+    Immediate get_next_pc(InstructionBase &inst, ROB &rob_entry, Immediate pc);
+
+    void resolve_op(ROB &rob_entry, unsigned rob_id);
+
+    void resolve_store(ROB &rob_entry);
+
+    void resolve_jalr(ROB& rob_entry);
+
+    void flush_rob_entry(ROB& rob_entry);
 };
 
 
