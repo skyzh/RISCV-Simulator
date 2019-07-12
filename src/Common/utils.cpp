@@ -6,6 +6,6 @@
 #include <iomanip>
 #include <iostream>
 
-void debug_immediate(Immediate v) {
-    std::cout << std::dec << v << " (" << std::hex << v << ")";
+void debug_immediate(Immediate v, unsigned width) {
+    std::cout << std::dec << std::setw(width) << v << "(" << std::hex << std::setw(width) << v << ")";
 }

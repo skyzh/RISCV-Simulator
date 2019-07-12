@@ -9,6 +9,7 @@
 #include "Register.hpp"
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include "utils.h"
 
@@ -35,11 +36,10 @@ public:
                                                    "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
                                                    "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
         for (int i = 0; i < 4; i++) {
-            for (int j = i * 8; j < i * 8 + 8; j++) std::cout << rf_name[j] << "\t\t";
+            for (int j = i * 8; j < i * 8 + 8; j++) std::cout << std::setw(16) << rf_name[j];
             std::cout << std::endl;
             for (int j = i * 8; j < i * 8 + 8; j++) {
-                debug_immediate(next[j]);
-                std::cout << "\t";
+                debug_immediate(next[j], 7);
             }
             std::cout << std::endl;
         }

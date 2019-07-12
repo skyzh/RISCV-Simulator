@@ -13,6 +13,14 @@ OoOExecute::OoOExecute(Session *session) : session(session) {
     aluUnit = make_unique<ALUUnit>(this);
     loadStoreUnit = make_unique<LoadStoreUnit>(this);
     memset(Qi, 0, sizeof(Qi));
+    for (int i = RS_BEGIN + 1; i < RS_END; i++) {
+        RS *rs = get_rs((RSID) i);
+        if (rs == nullptr) continue;
+        rs->__debug_identifier = i;
+    }
+    for (int i = 0; i < ROB_SIZE; i++) {
+        rob[i].__debug_identifier = i;
+    }
 }
 
 void OoOExecute::update() {
@@ -23,6 +31,7 @@ void OoOExecute::update() {
 void OoOExecute::tick() {
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
+        if (rs == nullptr) continue;
         rs->tick();
     }
     for (int i = 0; i < MAX_REG; i++) Qi[i].tick();
@@ -48,6 +57,7 @@ void OoOExecute::put_result(RSID id, Immediate result) {
     }
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
+        if (rs == nullptr) continue;
         if (rs->Qj.current() == id) {
             rs->Qj = NONE;
             rs->Vj = result;
@@ -67,18 +77,27 @@ void OoOExecute::debug() {
             "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6",
             "branch"};
     std::cout << "Reservation Stations" << std::endl;
+    RS::debug_header();
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
-        std::cout << rs->resolve(i) << (rs->Busy.current() ? " (busy)" : "") << std::endl;
+        if (rs == nullptr) continue;
         rs->debug();
+    }
+    std::cout << "Reorder Buffer" << std::endl;
+    ROB::debug_header();
+    for (int i = 0; i < ROB_SIZE; i++) {
+        rob[i].debug();
     }
     std::cout << "Register Rename" << std::endl;
     for (int i = 0; i < 4; i++) {
         for (int j = i * 8; j < i * 8 + 8; j++) std::cout << rf_name[j] << "\t\t";
         std::cout << std::endl;
         for (int j = i * 8; j < i * 8 + 8; j++) {
-            std::cout << RS::resolve(Qi[j].current());
-            std::cout << "\t";
+            if (Busy[j].current()) {
+                std::cout << "⚪#" << Qi[j].current() << "\t";
+            } else {
+                std::cout << "idle" << "\t";
+            }
         }
         std::cout << std::endl;
     }

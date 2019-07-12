@@ -4,22 +4,27 @@
 
 #include "ReservationStation.h"
 #include "../Module/ALUUnit.h"
+#include <iomanip>
 
 void RS::debug() {
-    std::cout << "Op\t\t\tQj\t\t\tQk\t\t\tVj\t\t\tVk\t\t\tA\t\t\tTag" << std::endl;
-    std::cout << ALUUnit::resolve((ALUUnit::OP) Op.current());
-    std::cout << "\t";
-    std::cout << resolve(Qj.current());
-    std::cout << "\t";
-    std::cout << resolve(Qk.current());
-    std::cout << "\t";
-    debug_immediate(Vj.current());
-    std::cout << "\t";
-    debug_immediate(Vk.current());
-    std::cout << "\t";
-    debug_immediate(A.current());
-    std::cout << "\t";
-    debug_immediate(Tag.current());
-    std::cout << std::endl;
+    using std::cout;
+    using std::setw;
+    using std::endl;
+    cout << resolve(__debug_identifier) << (Busy.current() ? " (⚪busy)" : "") << std::endl;
+    cout << setw(8) << ALUUnit::resolve((ALUUnit::OP) Op.current());
+    cout << setw(8) << resolve(Qj.current());
+    cout << setw(8) << resolve(Qk.current());
+    debug_immediate(Vj.current(), 7);
+    debug_immediate(Vk.current(), 7);
+    debug_immediate(A.current(), 7);
+    debug_immediate(Tag.current(), 7);
+    cout << endl;
+}
+
+void RS::debug_header() {
+    char buffer[1000];
+    sprintf(buffer, "%8s%8s%8s%16s%16s%16s%16s\n",
+            "Op", "Qj", "Qk", "Vj", "Vk", "A", "Tag");
+    std::cout << buffer << std::endl;
 }
 

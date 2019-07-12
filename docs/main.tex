@@ -301,6 +301,14 @@ for (int i = 0; i < 10; i++) {
     \end{tcolorbox}
 
     \subsection{模拟器使用的 CPU 电路}
+
+    \begin{aside}{自己造数据}
+        如果直接用现有的样例测试模拟器的正确性，似乎有些难度。因而，我通过 
+        \href{https://github.com/TheThirdOne/rars}{RARS} 编写 RISC-V 汇编，
+        造了几组测试数据，用于检查模拟器面对 Data Hazard 和
+        Control Hazard 时的行为。这些测试样例都可以在 \texttt{tests/} 目录下找到。
+    \end{aside}
+
     https://github.com/skyzh/RISCV-Simulator/files/3362948/RISCV.Design.pdf
     
     \subsection{分支预测}
@@ -312,6 +320,13 @@ for (int i = 0; i < 10; i++) {
         {\\\hline $\data$ & \beforecycles & \aftercycles & \cycleimprovement & \afterrate}
         \\\hline
     \end{tabular}
+
+    \begin{aside}{使用 git 管理工程}
+        说到分支，就不得不提 git 的分支（虽然此分支非彼分支）。在这个项目中，我通过 git 管理工程，开了许多分支。
+        它们包括：seq (Sequential, 串行实现)、feedforward (手动指定求值顺序的串行实现)、pipeline (并行实现)、
+        out-of-order (乱序实现)。我时常在不同分支间切换，以修改某个版本的 bug。偶尔也会在大改项目
+        之后，再切换分支参考之前写过的代码。
+    \end{aside}
 
     \section{基于 Tomasulo 算法的乱序执行}\label{out_of_order_execution}
 
@@ -355,7 +370,7 @@ void Issue::issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id) {
 
     \subsection{没有 Reorder Buffer 的 CPU 设计}
 
-    在 \emph{Computer Architecture: A Quantitative Approach} 的 3.5 节中，作者介绍了
+    在 \emph{Computer Architecture: A Quantitative Approach} 的第 3.5 节中，作者介绍了
     Tomasulo 算法。但是在这一章节中，缺少很多实现的细节。
 
 \end{document}

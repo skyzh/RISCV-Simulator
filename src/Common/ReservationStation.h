@@ -16,6 +16,7 @@ class RS {
 public:
     Register<Immediate> Op, Qj, Qk, Vj, Vk, A, Tag;
     Register<bool> Busy;
+    unsigned __debug_identifier;
 
     RS() : Op(0), Qj(0), Qk(0), Vj(0), Vk(0), A(0), Tag(0), Busy(false) {}
 
@@ -50,6 +51,7 @@ public:
         return "UNKNOWN";
     }
 
+    static void debug_header();
     void debug();
 };
 

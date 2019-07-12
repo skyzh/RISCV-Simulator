@@ -9,6 +9,7 @@
 #include "../Common/ReservationStation.h"
 #include "../Common/Session.h"
 #include "../Common/Register.hpp"
+#include "../Common/ReorderBuffer.h"
 #include <memory>
 #include <vector>
 #include <string>
@@ -24,12 +25,17 @@ class LoadStoreUnit;
 class OoOExecute {
 public:
     static const unsigned MAX_REG = 32 + 1;
+    static const unsigned ROB_SIZE = 8;
     RS Add1, Add2, Add3, Branch1;
     RS Load1, Store1; // These two will be implemented afterwards
+    Register<RSID> Qi[MAX_REG];
+    Register<bool> Busy[MAX_REG];
     // TODO: Here I added another register to indicate
     //       branch status. It should be eliminated.
-    Register<RSID> Qi[MAX_REG];
     static const unsigned BRANCH_REG = MAX_REG - 1;
+
+    ROB rob[ROB_SIZE];
+    Register <unsigned> rob_front, rob_rear;
 
     unique_ptr<ALUUnit> aluUnit;
     unique_ptr<LoadStoreUnit> loadStoreUnit;
