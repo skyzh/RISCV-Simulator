@@ -16,7 +16,7 @@ public:
 
     unsigned __debug_identifier;
 
-    ROB() : Type(0), Dest(0), Value(0), Ready(true) {}
+    ROB() : Type(0), Dest(0), Value(0), Ready(false) {}
 
     void tick() {
         Type.tick();

@@ -6,12 +6,15 @@
 #include "OoOExecute.h"
 #include "../Module/ALUUnit.h"
 #include "../Module/LoadStoreUnit.h"
+#include "../Module/CommitUnit.h"
 
 using std::make_unique;
 
 OoOExecute::OoOExecute(Session *session) : session(session) {
     aluUnit = make_unique<ALUUnit>(this);
     loadStoreUnit = make_unique<LoadStoreUnit>(this);
+    commitUnit = make_unique<CommitUnit>(this);
+
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         if (rs == nullptr) continue;
@@ -25,6 +28,7 @@ OoOExecute::OoOExecute(Session *session) : session(session) {
 void OoOExecute::update() {
     loadStoreUnit->update();
     aluUnit->update();
+    commitUnit->update();
 }
 
 void OoOExecute::tick() {
@@ -40,6 +44,7 @@ void OoOExecute::tick() {
     rob_rear.tick();
     aluUnit->tick();
     loadStoreUnit->tick();
+    commitUnit->tick();
 }
 
 RS *OoOExecute::get_rs(RSID id) {
@@ -118,7 +123,7 @@ RS *OoOExecute::occupy_unit(RSID id) {
 unsigned OoOExecute::acquire_rob() {
     if ((rob_rear + 1) % ROB_SIZE == rob_front) return -1;
     auto b = rob_rear;
-    rob_rear = rob_rear + 1;
+    rob_rear = (rob_rear + 1) % ROB_SIZE;
     rob[b].Ready = false;
     return b;
 }

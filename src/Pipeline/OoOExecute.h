@@ -22,6 +22,8 @@ class ALUUnit;
 
 class LoadStoreUnit;
 
+class CommitUnit;
+
 class OoOExecute {
 public:
     static const unsigned MAX_REG = 32 + 1;
@@ -39,6 +41,7 @@ public:
 
     unique_ptr<ALUUnit> aluUnit;
     unique_ptr<LoadStoreUnit> loadStoreUnit;
+    unique_ptr<CommitUnit> commitUnit;
 
     Session *session;
 

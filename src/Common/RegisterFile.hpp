@@ -35,10 +35,15 @@ public:
                                                    "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
                                                    "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
                                                    "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
-        for (int i = 0; i < 4; i++) {
-            for (int j = i * 8; j < i * 8 + 8; j++) std::cout << std::setw(16) << rf_name[j];
+        for (int i = 0; i < 8; i++) {
+            for (int j = i * 4; j < i * 4 + 4; j++) {
+                char buffer[10];
+                sprintf(buffer, "#%d", j);
+                std::cout << std::setw(12) << buffer
+                          << std::setw(4) << rf_name[j];
+            }
             std::cout << std::endl;
-            for (int j = i * 8; j < i * 8 + 8; j++) {
+            for (int j = i * 4; j < i * 4 + 4; j++) {
                 debug_immediate(next[j], 7);
             }
             std::cout << std::endl;

@@ -15,7 +15,7 @@ void ROB::debug() {
               << setw(8) << resolve(Type.current());
     debug_immediate(Dest.current(), 7);
     debug_immediate(Value.current(), 7);
-    std::cout << (Ready.current() ? "" : "  (⚪busy)") << std::endl;
+    std::cout << (Ready.current() ? "  (⚪ready)" : "") << std::endl;
 }
 
 void ROB::debug_header() {
