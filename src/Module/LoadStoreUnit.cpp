@@ -54,7 +54,9 @@ void LoadStoreUnit::update() {
 }
 
 LoadStoreUnit::LoadStoreUnit(OoOExecute *e)
-        : e(e), rs_load({LOAD1, LOAD2, LOAD3}), rs_store({STORE1, STORE2, STORE3}) {}
+        : e(e), rs_load({LOAD1, LOAD2, LOAD3}), rs_store({STORE1, STORE2, STORE3}) {
+    reset();
+}
 
 void LoadStoreUnit::load_value(RS *rs, Register<Immediate> &load_buffer) {
     switch (rs->Op) {

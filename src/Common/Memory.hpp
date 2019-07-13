@@ -21,7 +21,9 @@ public:
 
     bool check_addr(unsigned int addr) {
         if (0 <= addr && addr < MEMORY_SIZE) return true;
-        assert(false);
+        // TODO: there may be exception when checking address,
+        //       I'm looking forward to solving this.
+        // assert(false);
         return false;
     }
 
