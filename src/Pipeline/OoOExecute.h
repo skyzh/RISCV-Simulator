@@ -38,11 +38,12 @@ public:
         unsigned long long flush_cycle;
         unsigned long long rob_usage;
         unsigned rob_usage_max;
-        unsigned long long total_branch;
-        unsigned long long correct_branch;
+        unsigned long long total_branch, correct_branch;
+        unsigned long long hazard_load;
 
         Stat() : flush_cycle(0), rob_usage(0), rob_usage_max(0),
-                 total_branch(0), correct_branch(0) {
+                 total_branch(0), correct_branch(0),
+                 hazard_load(0) {
             memset(unit_busy, 0, sizeof(unit_busy));
         }
     } stat;

@@ -13,16 +13,16 @@ void LoadStoreUnit::update() {
             auto &load_cnt = get_load_cnt_register(r_id);
             // here load takes 3 cycles
             if (load_cnt == 0) {
-                unsigned a = r->A;
                 if (r->Qj == NONE) {
                     r->A = r->Vj + r->A;
                     load_cnt = 1;
                 }
             } else if (load_cnt == 1) {
-                unsigned a = r->A;
                 if (no_store_in_rob(r->A, r->Dest)) {
                     load_value(r, get_load_buffer(r_id));
                     load_cnt = 2;
+                } else {
+                    ++e->stat.hazard_load;
                 }
             } else if (load_cnt == 2) {
                 commit_value(r_id, get_load_buffer(r_id));
@@ -93,7 +93,7 @@ bool LoadStoreUnit::no_store_in_rob(unsigned addr, unsigned current_rob) {
     for (unsigned i = e->rob_front; i != current_rob; i = OoOExecute::next_rob_entry(i)) {
         InstructionBase inst = e->rob[i].Inst;
         if (inst.opcode == 0b0100011) { // STORE
-            return false;
+            if (e->rob[i].Dest == addr) return false;
         }
     }
     return true;

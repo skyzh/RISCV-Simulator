@@ -217,6 +217,7 @@ void OoOExecute::report(std::ostream &out) {
     out << " (" << 100.0 * stat.flush_cycle / total_cycle << "%)";
     out << " cycles with rob flush" << std::endl;
     out << "\t" << stat.correct_branch << " out of " << stat.total_branch << " (" << 100.0 * stat.correct_branch / stat.total_branch << "%) branches predicted" << std::endl;
+    out << "\t" << stat.hazard_load << " load hazard detected" << std::endl;
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         if (rs == nullptr) continue;
