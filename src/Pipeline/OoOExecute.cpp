@@ -84,13 +84,13 @@ RS *OoOExecute::get_rs(RSID id) {
     if (id == ADD1) return &Add1;
     if (id == ADD2) return &Add2;
     if (id == ADD3) return &Add3;
+    if (id == ADD4) return &Add4;
     if (id == LOAD1) return &Load1;
     if (id == LOAD2) return &Load2;
     if (id == LOAD3) return &Load3;
     if (id == STORE1) return &Store1;
     if (id == STORE2) return &Store2;
     if (id == STORE3) return &Store3;
-    if (id == BRANCH1) return &Branch1;
     return nullptr;
 }
 

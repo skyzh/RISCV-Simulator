@@ -40,6 +40,8 @@ public:
                 return "ADD2";
             case ADD3:
                 return "ADD3";
+            case ADD4:
+                return "ADD4";
             case STORE1:
                 return "STORE1";
             case LOAD1:
@@ -52,8 +54,6 @@ public:
                 return "STORE3";
             case LOAD3:
                 return "LOAD3";
-            case BRANCH1:
-                return "BRANCH1";
             case NONE:
                 return "NONE";
         }

@@ -31,6 +31,7 @@ public:
 
     struct Stat {
         unsigned long long cycle;
+        Stat() : cycle(0) {}
     } stat;
 
     Session(bool debug = false);

@@ -36,7 +36,7 @@ Immediate ALUUnit::get_result(Immediate op, Immediate op1, Immediate op2) {
 }
 
 ALUUnit::ALUUnit(OoOExecute *e)
-    : e(e), rs({ ADD1, ADD2, ADD3, BRANCH1 }) {}
+    : e(e), rs({ ADD1, ADD2, ADD3, ADD4 }) {}
 
 std::string ALUUnit::resolve(ALUUnit::OP op) {
     switch(op) {

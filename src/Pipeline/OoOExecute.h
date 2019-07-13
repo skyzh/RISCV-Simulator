@@ -44,7 +44,7 @@ public:
     } stat;
 
     // Reservation Stations
-    RS Add1, Add2, Add3, Branch1;
+    RS Add1, Add2, Add3, Add4;
     RS Load1, Load2, Load3, Store1, Store2, Store3;
 
     // Register Rename

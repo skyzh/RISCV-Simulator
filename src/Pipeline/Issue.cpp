@@ -108,11 +108,6 @@ Immediate Issue::issue(const InstructionBase &inst) {
     if (inst.t == InstructionBase::J) { // JAL
         return issue_jal(inst);
     } else if (inst.t == InstructionBase::B) { // Branch
-        // TODO: branch should not cause hazard like
-        //       this, we should apply speculation method
-        // TODO: branch unit is the same as ALU Unit,
-        //       we may randomly select one from them
-        //       instead of specifying BRANCH1.
         return issue_branch(inst);
     } else if (inst.opcode == 0b1100111) { // JALR
         return issue_jalr(inst);
@@ -165,8 +160,13 @@ void Issue::debug() {
 }
 
 RSID Issue::find_available_op_unit() {
-    static const std::vector<RSID> op_unit = {ADD1, ADD2, ADD3};
+    static const std::vector<RSID> op_unit = {ADD1, ADD2, ADD3, ADD4};
     return find_available_unit_in(op_unit);
+}
+
+std::vector<RSID> Issue::find_available_op_units(unsigned size) {
+    static const std::vector<RSID> op_unit = {ADD1, ADD2, ADD3, ADD4};
+    return find_available_units_in(op_unit, size);
 }
 
 RSID Issue::find_available_load_unit() {
@@ -183,10 +183,8 @@ RSID Issue::find_available_store_unit() {
 Immediate Issue::issue_jalr(const InstructionBase &inst) {
     auto e = session->e;
 
-    auto unit_id = find_available_op_unit();
-    if (unit_id == NONE) return pc;
-
-    if (!e->available(BRANCH1)) return pc;
+    auto unit_ids = find_available_op_units(2);
+    if (unit_ids.size() == 0) return pc;
 
     // we need 2 slots for jalr instruction
     if (!e->probe_rob(2)) return pc;
@@ -195,6 +193,7 @@ Immediate Issue::issue_jalr(const InstructionBase &inst) {
 
     {   // save pc + 4 to rd
         auto b = robs[0];
+        auto unit_id = unit_ids[0];
         auto rs = e->occupy_unit(unit_id);
 
         rs->Op = ALUUnit::OP::ADD;
@@ -215,7 +214,8 @@ Immediate Issue::issue_jalr(const InstructionBase &inst) {
 
     {   // process jalr
         auto b = robs[1];
-        auto rs = e->occupy_unit(BRANCH1);
+        auto unit_id = unit_ids[1];
+        auto rs = e->occupy_unit(unit_id);
 
         rs->Op = ALUUnit::OP::ADD;
         rs->Tag = issue_cnt;
@@ -238,19 +238,19 @@ Immediate Issue::issue_jalr(const InstructionBase &inst) {
 Immediate Issue::issue_branch(const InstructionBase &inst) {
     auto e = session->e;
 
-    // If branch unit is not available, don't move to next inst.
-    if (!e->available(BRANCH1)) return pc;
+    auto unit_id = find_available_op_unit();
+    if (unit_id == NONE) return pc;
 
     auto b = e->acquire_rob();
     if (b == -1) return pc;
 
-    auto rs = e->occupy_unit(BRANCH1);
+    auto rs = e->occupy_unit(unit_id);
 
     rs->Op = get_op_branch(inst);
     rs->Tag = issue_cnt;
 
-    issue_rs_to_Vj(inst.rs1, rs, BRANCH1);
-    issue_rs_to_Vk(inst.rs2, rs, BRANCH1);
+    issue_rs_to_Vj(inst.rs1, rs, unit_id);
+    issue_rs_to_Vk(inst.rs2, rs, unit_id);
 
     rs->Dest = b;
 
@@ -469,6 +469,18 @@ RSID Issue::find_available_unit_in(const std::vector<RSID> &src) {
         if (session->e->available(unit)) return unit;
     }
     return NONE;
+}
+
+std::vector<RSID> Issue::find_available_units_in(const std::vector<RSID> &src, unsigned size) {
+    std::vector<RSID> rs;
+    for (auto &&unit : src) {
+        if (session->e->available(unit)) {
+            rs.push_back(unit);
+            --size;
+        }
+        if (size == 0) return rs;
+    }
+    return std::vector<RSID>();
 }
 
 Immediate Issue::issue_jal(const InstructionBase &inst) {

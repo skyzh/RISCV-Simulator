@@ -6,7 +6,7 @@
 
 void run_session(const char *path, unsigned ret_value, bool use_hex_parser = false) {
     std::clock_t c_start = std::clock();
-    std::cout << "Running " << path << "... " << std::endl;
+    std::cout << "Running " << path << "... ";
     Session *session = new Session(false);
     if (use_hex_parser) session->load_hex(path); else session->load_memory(path);
 
@@ -14,14 +14,12 @@ void run_session(const char *path, unsigned ret_value, bool use_hex_parser = fal
         session->tick();
 
         if (session->memory[0x30004]) break;
-
-        // if (pc_cnt >= 200) break;
     }
     auto ret_val = session->rf.read(10) & 0xff;
-    std::cout << "\t" << ret_val << " == " << ret_value << std::endl;
-    session->report(std::cout);
     std::cout << "\t" << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms"
               << std::endl;
+    std::cout << "\t" << ret_val << " == " << ret_value << std::endl;
+    session->report(std::cout);
     assert(ret_val == ret_value);
     delete session;
 }

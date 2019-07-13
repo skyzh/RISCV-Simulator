@@ -6,6 +6,7 @@
 #define RISCV_SIMULATOR_ISSUE_H
 
 #include <iostream>
+#include <vector>
 
 #include "../Common/Instruction.hpp"
 #include "../Common/Register.hpp"
@@ -50,9 +51,13 @@ public:
 
     RSID find_available_op_unit();
 
+    std::vector<RSID> find_available_op_units(unsigned size);
+
     RSID find_available_load_unit();
 
     RSID find_available_store_unit();
+
+    std::vector<RSID> find_available_units_in(const std::vector<RSID> &src, unsigned size);
 
     Immediate issue_branch(const InstructionBase &inst);
 
