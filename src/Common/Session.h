@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <memory>
+#include <cstring>
 
 #include "Common.h"
 #include "Register.hpp"
@@ -27,7 +28,10 @@ public:
     OoOExecute *e;
     Issue *i;
 
-    unsigned long long cycle;
+
+    struct Stat {
+        unsigned long long cycle;
+    } stat;
 
     Session(bool debug = false);
 
@@ -38,6 +42,8 @@ public:
     void load_memory(std::istream &in);
 
     void load_hex(const char *path);
+
+    void report(std::ostream& out);
 
     virtual ~Session();
 

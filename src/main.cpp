@@ -6,30 +6,27 @@
 
 void run_session(const char *path, unsigned ret_value, bool use_hex_parser = false) {
     std::clock_t c_start = std::clock();
-    std::clog << "Running " << path << "... " << std::endl;
+    std::cout << "Running " << path << "... " << std::endl;
     Session *session = new Session(false);
     if (use_hex_parser) session->load_hex(path); else session->load_memory(path);
-    int pc_cnt = 0;
 
     while (true) {
         session->tick();
-
-        ++pc_cnt;
 
         if (session->memory[0x30004]) break;
 
         // if (pc_cnt >= 200) break;
     }
     auto ret_val = session->rf.read(10) & 0xff;
-    std::clog << "\t" << ret_val << " == " << ret_value << std::endl;
-    std::clog << "\t" << pc_cnt << " cycles in " << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms"
+    std::cout << "\t" << ret_val << " == " << ret_value << std::endl;
+    session->report(std::cout);
+    std::cout << "\t" << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms"
               << std::endl;
     assert(ret_val == ret_value);
     delete session;
 }
 
 int run_all_tests() {
-
     run_session("../tests/out-of-order-3.hex", 0x37, true);
     run_session("../tests/data-hazard-1.hex", 0x1f, true);
     run_session("../tests/data-hazard-2.hex", 0x1f, true);

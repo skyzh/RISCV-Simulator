@@ -5,15 +5,23 @@
 #ifndef RISCV_SIMULATOR_ISSUE_H
 #define RISCV_SIMULATOR_ISSUE_H
 
+#include <iostream>
+
 #include "../Common/Instruction.hpp"
 #include "../Common/Register.hpp"
-#include "OoOCommon.h"
 #include "../Common/ReservationStation.h"
+#include "OoOCommon.h"
 
 class Session;
 
 class Issue {
 public:
+    struct Stat {
+        unsigned long long stall_cycle;
+
+        Stat() : stall_cycle(0) {}
+    } stat;
+
     Register<Immediate> pc;
     // TODO: this is used for handling w-w hazard in memory,
     //       should be eliminated once speculation is possible
@@ -75,6 +83,10 @@ public:
     void issue_imm_to_A(Immediate imm, RS *rs, RSID unit_id);
 
     void notify_jump(Immediate jump_dest);
+
+    void report(std::ostream &out);
+
+    bool instruction_stalled();
 };
 
 

@@ -23,6 +23,7 @@ void Issue::update() {
 }
 
 void Issue::tick() {
+    if (instruction_stalled()) stat.stall_cycle++;
     if (__jump_flag) {
         __jump_flag = false;
         pc = __jump_dest;
@@ -151,7 +152,7 @@ InstructionBase Issue::parse_inst(unsigned opcode, Immediate inst) {
 void Issue::debug() {
     std::cout << "PC prev->current" << std::endl;
     std::cout << std::hex << "\t" << pc << "\t" << pc.current();
-    if (pc.current() == pc) {
+    if (instruction_stalled()) {
         std::cout << " ⭕(instruction stalled)";
     }
     std::cout << std::endl;
@@ -169,12 +170,12 @@ RSID Issue::find_available_op_unit() {
 }
 
 RSID Issue::find_available_load_unit() {
-    static const std::vector<RSID> load_unit = {LOAD1};
+    static const std::vector<RSID> load_unit = {LOAD1, LOAD2, LOAD3};
     return find_available_unit_in(load_unit);
 }
 
 RSID Issue::find_available_store_unit() {
-    static const std::vector<RSID> store_unit = {STORE1};
+    static const std::vector<RSID> store_unit = {STORE1, STORE2, STORE3};
     return find_available_unit_in(store_unit);
 }
 
@@ -504,4 +505,16 @@ void Issue::issue_imm_to_A(Immediate imm, RS *rs, RSID) {
 void Issue::notify_jump(Immediate jump_dest) {
     __jump_flag = true;
     __jump_dest = jump_dest;
+}
+
+void Issue::report(std::ostream &out) {
+    out << "\t--- Issue Stage Report ---" << std::endl;
+    out << "\t" << stat.stall_cycle;
+    out << " (" << 100.0 * stat.stall_cycle / session->stat.cycle << "%)";
+    out << " cycles with no instruction issued";
+    out << std::endl;
+}
+
+bool Issue::instruction_stalled() {
+    return pc.current() == pc;
 }

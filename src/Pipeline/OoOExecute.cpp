@@ -11,10 +11,10 @@
 using std::make_unique;
 
 OoOExecute::OoOExecute(Session *session) :
-    session(session),
-    __rob_flush_flag(false),
-    rob_front(1),
-    rob_rear(1) {
+        session(session),
+        __rob_flush_flag(false),
+        rob_front(1),
+        rob_rear(1) {
     aluUnit = make_unique<ALUUnit>(this);
     loadStoreUnit = make_unique<LoadStoreUnit>(this);
     commitUnit = make_unique<CommitUnit>(this);
@@ -37,6 +37,8 @@ void OoOExecute::update() {
 
 void OoOExecute::tick() {
     if (__rob_flush_flag) {
+        stat.flush_cycle++;
+
         for (int i = 0; i < MAX_REG; i++) Busy[i] = false;
         for (int i = 1; i <= ROB_SIZE; i++) {
             rob[i].Ready = false;
@@ -59,11 +61,18 @@ void OoOExecute::tick() {
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         if (rs == nullptr) continue;
+
+        if (rs->Busy.current()) stat.unit_busy[i]++;
+
         rs->tick();
     }
     for (int i = 0; i < MAX_REG; i++) Reorder[i].tick();
     for (int i = 0; i < MAX_REG; i++) Busy[i].tick();
-    for (int i = 1; i <= ROB_SIZE; i++)  rob[i].tick();
+    for (int i = 1; i <= ROB_SIZE; i++) rob[i].tick();
+
+    auto rob_usage_current = (rob_rear - rob_front + ROB_SIZE) % ROB_SIZE;
+    stat.rob_usage += rob_usage_current;
+    stat.rob_usage_max = std::max(stat.rob_usage_max, rob_usage_current);
     rob_front.tick();
     rob_rear.tick();
     aluUnit->tick();
@@ -76,7 +85,11 @@ RS *OoOExecute::get_rs(RSID id) {
     if (id == ADD2) return &Add2;
     if (id == ADD3) return &Add3;
     if (id == LOAD1) return &Load1;
+    if (id == LOAD2) return &Load2;
+    if (id == LOAD3) return &Load3;
     if (id == STORE1) return &Store1;
+    if (id == STORE2) return &Store2;
+    if (id == STORE3) return &Store3;
     if (id == BRANCH1) return &Branch1;
     return nullptr;
 }
@@ -141,8 +154,6 @@ void OoOExecute::debug() {
 }
 
 bool OoOExecute::available(RSID id) {
-    // TODO: we should split load and store logic with speculation
-    if (id == STORE1 || id == LOAD1) return !get_rs(LOAD1)->Busy && !get_rs(STORE1)->Busy;
     return !get_rs(id)->Busy;
 }
 
@@ -162,7 +173,7 @@ unsigned OoOExecute::acquire_rob() {
 std::vector<unsigned> OoOExecute::acquire_robs(unsigned size) {
     // you should check rob slot yourself
     unsigned b = rob_rear;
-    std::vector <unsigned> robs;
+    std::vector<unsigned> robs;
     for (int i = 0; i < size; i++, b = next_rob_entry(b)) {
         rob[b].Ready = false;
         robs.push_back(b);
@@ -197,4 +208,21 @@ unsigned OoOExecute::next_rob_entry(unsigned id) {
     id++;
     if (id > ROB_SIZE) return id - ROB_SIZE;
     return id;
+}
+
+void OoOExecute::report(std::ostream &out) {
+    auto total_cycle = session->stat.cycle;
+    out << "\t--- Execute Stage Report ---" << std::endl;
+    out << "\t" << stat.flush_cycle;
+    out << " (" << 100.0 * stat.flush_cycle / total_cycle << "%)";
+    out << " cycles with rob flush" << std::endl;
+    for (int i = RS_BEGIN + 1; i < RS_END; i++) {
+        RS *rs = get_rs((RSID) i);
+        if (rs == nullptr) continue;
+        out << "\t" << RS::resolve(i) << " busy ";
+        out << stat.unit_busy[i];
+        out << " (" << 100.0 * stat.unit_busy[i] / total_cycle << "%) cycles" << std::endl;
+    }
+    out << "\tROB usage mean " << 1.0 * stat.rob_usage / total_cycle << " out of " << ROB_SIZE << std::endl;
+    out << "\tROB usage max " << stat.rob_usage_max << " out of " << ROB_SIZE << std::endl;
 }

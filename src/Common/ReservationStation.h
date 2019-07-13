@@ -44,6 +44,14 @@ public:
                 return "STORE1";
             case LOAD1:
                 return "LOAD1";
+            case STORE2:
+                return "STORE2";
+            case LOAD2:
+                return "LOAD2";
+            case STORE3:
+                return "STORE3";
+            case LOAD3:
+                return "LOAD3";
             case BRANCH1:
                 return "BRANCH1";
             case NONE:
