@@ -15,9 +15,9 @@ OoOExecute::OoOExecute(Session *session) :
         __rob_flush_flag(false),
         rob_front(1),
         rob_rear(1) {
-    aluUnit = make_unique<ALUUnit>(this);
-    loadStoreUnit = make_unique<LoadStoreUnit>(this);
-    commitUnit = make_unique<CommitUnit>(this);
+    aluUnit = new ALUUnit(this);
+    loadStoreUnit = new LoadStoreUnit(this);
+    commitUnit = new CommitUnit(this);
 
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
@@ -216,6 +216,7 @@ void OoOExecute::report(std::ostream &out) {
     out << "\t" << stat.flush_cycle;
     out << " (" << 100.0 * stat.flush_cycle / total_cycle << "%)";
     out << " cycles with rob flush" << std::endl;
+    out << "\t" << stat.correct_branch << " out of " << stat.total_branch << " (" << 100.0 * stat.correct_branch / stat.total_branch << "%) branches predicted" << std::endl;
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         if (rs == nullptr) continue;
@@ -225,4 +226,10 @@ void OoOExecute::report(std::ostream &out) {
     }
     out << "\tROB usage mean " << 1.0 * stat.rob_usage / total_cycle << " out of " << ROB_SIZE << std::endl;
     out << "\tROB usage max " << stat.rob_usage_max << " out of " << ROB_SIZE << std::endl;
+}
+
+OoOExecute::~OoOExecute() {
+    delete aluUnit;
+    delete loadStoreUnit;
+    delete commitUnit;
 }

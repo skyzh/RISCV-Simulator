@@ -9,6 +9,7 @@
 #include "OoOExecute.h"
 
 #include "../Module/ALUUnit.h"
+#include "../Module/BranchPrediction.h"
 #include "../Common/Session.h"
 
 void Issue::update() {
@@ -254,14 +255,17 @@ Immediate Issue::issue_branch(const InstructionBase &inst) {
 
     rs->Dest = b;
 
+    // TODO: here we should return predicted branch,
+    //       now we just apply always-not-taken strategy
+    bool take = session->branch->take(pc);
+    auto pred_pc = take ? pc + inst.imm : pc + 4;
+
     e->rob[b].Dest = pc;
     e->rob[b].Inst = inst;
+    e->rob[b].Tag = pred_pc;
 
     e->occupy_register(inst.rd, b);
 
-    // TODO: here we should return predicted branch,
-    //       now we just apply always-not-taken strategy
-    auto pred_pc = pc + 4;
     return pred_pc;
 }
 
@@ -523,7 +527,7 @@ void Issue::report(std::ostream &out) {
     out << "\t--- Issue Stage Report ---" << std::endl;
     out << "\t" << stat.stall_cycle;
     out << " (" << 100.0 * stat.stall_cycle / session->stat.cycle << "%)";
-    out << " cycles with no instruction issued";
+    out << " cycles stall instruction";
     out << std::endl;
 }
 

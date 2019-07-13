@@ -3,6 +3,7 @@
 //
 
 #include "CommitUnit.h"
+#include "BranchPrediction.h"
 #include "../Common/ReorderBuffer.h"
 #include "../Pipeline/OoOExecute.h"
 #include "../Pipeline/Issue.h"
@@ -46,17 +47,19 @@ void CommitUnit::tick() {
 }
 
 void CommitUnit::resolve_branch(ROB &rob_entry) {
-    // TODO: since we use always-taken approach,
-    //       we can easily figure out whether
-    //       we predicted correctly.
     InstructionBase inst = rob_entry.Inst;
     auto pc = rob_entry.Dest;
     auto next_pc = get_next_pc(inst, rob_entry, pc);
-    // TODO: for always-not-taken
-    if (next_pc != pc + 4) {
+
+    bool taken = next_pc != pc + 4;
+
+    e->session->branch->report(pc, taken);
+    e->stat.total_branch++;
+
+    if (next_pc != rob_entry.Tag) {
         e->flush_rob();
         e->session->i->notify_jump(next_pc);
-    }
+    } else e->stat.correct_branch++;
 
     flush_rob_entry(rob_entry);
 }

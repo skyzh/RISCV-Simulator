@@ -15,6 +15,7 @@ void ROB::debug() {
               << setw(8) << resolve(Inst.current().opcode);
     debug_immediate(Dest.current(), 7);
     debug_immediate(Value.current(), 7);
+    debug_immediate(Tag.current(), 7);
     std::cout << (Inst.current().is_nop() ? "  (⚪idle)" : "");
     std::cout << (Ready.current() ? "  (⚪ready)" : "");
     std::cout << std::endl;
@@ -22,7 +23,7 @@ void ROB::debug() {
 
 void ROB::debug_header() {
     char buffer[100];
-    sprintf(buffer, "%4s%8s%16s%16s\n",
-            "ID", "Type", "Dest", "Val");
+    sprintf(buffer, "%4s%8s%16s%16s%16s\n",
+            "ID", "Type", "Dest", "Val", "Tag");
     std::cout << buffer;
 }

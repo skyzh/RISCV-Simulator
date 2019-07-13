@@ -20,6 +20,8 @@ class OoOExecute;
 
 class Issue;
 
+class BranchPrediction;
+
 class Session { // : public Tickable {
     bool _debug;
 public:
@@ -27,6 +29,7 @@ public:
     Memory memory;
     OoOExecute *e;
     Issue *i;
+    BranchPrediction* branch;
 
 
     struct Stat {

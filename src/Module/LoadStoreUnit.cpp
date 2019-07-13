@@ -7,14 +7,10 @@
 #include "../Pipeline/OoOExecute.h"
 
 void LoadStoreUnit::update() {
-    // TODO: here we should handle data hazard,
-    //       since we only have one functional unit,
-    //       we don't need to handle this situation
     for (auto &&r_id : rs_load) {
         RS *r = e->get_rs(r_id);
         if (r->Busy) {
             auto &load_cnt = get_load_cnt_register(r_id);
-            // TODO: add more functional unit
             // here load takes 3 cycles
             if (load_cnt == 0) {
                 unsigned a = r->A;

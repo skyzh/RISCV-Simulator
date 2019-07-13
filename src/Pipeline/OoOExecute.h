@@ -31,14 +31,18 @@ class CommitUnit;
 class OoOExecute {
 public:
     static const unsigned MAX_REG = 32;
-    static const unsigned ROB_SIZE = 16;
+    static const unsigned ROB_SIZE = 8;
 
     struct Stat {
         unsigned long long unit_busy[RS_END];
         unsigned long long flush_cycle;
         unsigned long long rob_usage;
         unsigned rob_usage_max;
-        Stat() : flush_cycle(0), rob_usage(0), rob_usage_max(0) {
+        unsigned long long total_branch;
+        unsigned long long correct_branch;
+
+        Stat() : flush_cycle(0), rob_usage(0), rob_usage_max(0),
+                 total_branch(0), correct_branch(0) {
             memset(unit_busy, 0, sizeof(unit_busy));
         }
     } stat;
@@ -55,15 +59,17 @@ public:
     ROB rob[ROB_SIZE + 1];
     Register<unsigned> rob_front, rob_rear;
 
-    unique_ptr<ALUUnit> aluUnit;
-    unique_ptr<LoadStoreUnit> loadStoreUnit;
-    unique_ptr<CommitUnit> commitUnit;
+    ALUUnit *aluUnit;
+    LoadStoreUnit *loadStoreUnit;
+    CommitUnit *commitUnit;
 
     Session *session;
 
     bool __rob_flush_flag;
 
     OoOExecute(Session *session);
+
+    virtual ~OoOExecute();
 
     void update();
 

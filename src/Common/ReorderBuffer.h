@@ -12,7 +12,9 @@
 class ROB {
 public:
     Register<InstructionBase> Inst;
-    Register<unsigned> Dest, Value;
+    // TODO: Tag is used for branch prediction now and
+    //       will be expanded to eliminate store buffer
+    Register<Immediate> Dest, Value, Tag;
     Register<bool> Ready;
 
     unsigned __debug_identifier;
@@ -24,6 +26,7 @@ public:
         Dest.tick();
         Value.tick();
         Ready.tick();
+        Tag.tick();
     }
 
     static void debug_header();

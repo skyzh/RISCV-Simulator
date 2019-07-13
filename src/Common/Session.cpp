@@ -5,6 +5,7 @@
 #include "Session.h"
 #include "../Pipeline/Issue.h"
 #include "../Pipeline/OoOExecute.h"
+#include "../Module/BranchPrediction.h"
 #include "Parser.hpp"
 
 #include <thread>
@@ -17,9 +18,13 @@ using std::make_shared;
 Session::Session(bool debug) : _debug(debug) {
     i = new Issue(this);
     e = new OoOExecute(this);
+    branch = new BranchPrediction;
 }
 
 Session::~Session() {
+    delete i;
+    delete e;
+    delete branch;
 }
 
 void Session::tick() {
