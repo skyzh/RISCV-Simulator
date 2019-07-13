@@ -1,7 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{fontspec}
 \usepackage{xeCJK}
-\usepackage{minted}
 \usepackage{xcolor}
 \usepackage[a4paper, margin=2cm]{geometry}
 \usepackage{setspace}
@@ -11,6 +10,8 @@
 \usepackage[stable]{footmisc}
 \usepackage{hyperref}
 \usepackage{csvsimple}
+\usepackage{float}
+\usepackage{subcaption}
 
 \hypersetup{
     colorlinks=true,
@@ -48,6 +49,7 @@
         } { \end{tcolorbox} }
         
 \renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
 
 \begin{document}
 
@@ -174,6 +176,7 @@ public:
 
     对于 CPU 中的每一个电路端口，我都确定了一个唯一的标签。通过标签即可得到端口的数据。
     比如，如果我们要在 Write-back 阶段完成 load 指令，将内存读取的值写入寄存器：
+    
     \begin{verbatim}
 // 获取寄存器写入目标
 auto rd = session->d->get(Decode::rd);
@@ -260,21 +263,49 @@ w->hook();                         // 写入寄存器
 
     \subsection{手动指定求值顺序}
 
-    \begin{verbatim}
-w->hook(); // Write back
-m->hook(); // Memory access
-e->hook(); // Execute
-d->hook(); // Decode
-f->hook(); // Fetch
-    \end{verbatim}
+    观察串行模拟器使用的电路，我们可以发现，CPU 的电路设计在程序编写时就已经设计好了。因而，
+    我们可以手动指定求解电路的顺序。
+    \footnote{手动指定求值顺序的串行模拟器实现在 feed-forward 分支。
+        \url{https://github.com/skyzh/RISCV-Simulator/tree/feed-forward}}
 
-    比如，在 Decode 阶段，我们需要确定后面的阶段中是否有 Hazard。因而，Decode 阶段必然在 Write Back、Memory Access 和 Execute 阶段之后执行。
+    比如图 \ref{fig:circuit} 所示的电路，我们完全可以依次求出 A, B, C, D 点所对应的
+    电平。因为在求解之前，我们就已经知道电路端口与信号源的远近关系（即拓扑序）。这种按
+    顺序一次求值，就能求出当前时钟周期里每个端口的值的方法，和之前的惰性求解是等价的。
 
-    以这样的求值顺序，只需要将不同阶段的 hook 调用一次，就可以达到电路稳态。这样，模拟器运行起来就更快了。
+    以串行模拟器为例。要求出 Write-back 阶段写入的值，就要求出 Memory 阶段读取的值，
+    以及 Execute 阶段运算的值。求 Execute 阶段运算的值，就要求出 Decode 阶段、
+    Fetch 阶段的指令和寄存器值。因而，我们很快就能发现五级模块间的依赖关系。所以，
+    我们可以以 Fetch, Decode, Execute, Memory, Write-back 的顺序传播
+    电路信号，在传播的过程中写入寄存器和内存，并获取下一条指令的地址。
 
     \subsection{五级流水线设计与实现\protect
-        \footnote{并行模拟器的实现在 pipeline 分支。
-        \url{https://github.com/skyzh/RISCV-Simulator/tree/pipeline}}}
+    \footnote{并行模拟器的实现在 pipeline 分支。
+    \url{https://github.com/skyzh/RISCV-Simulator/tree/pipeline}}}
+
+    在改为五级流水线后，情况就不一样了。由于每两级之间都有寄存器隔离，所以每个阶段的
+    电路信号仅和两级之间的寄存器有关。在这种情况下，不论以什么顺序求值都可以一次得到
+    电路每一个端口的值。
+
+    在通过暂停流水处理数据冲突时，Decode 阶段需要知道后面三个阶段正在执行的指令和
+    需要写入的寄存器。因而，必然有一组导线从后面三个阶段接到 Decode 阶段。在这种
+    情况下，电路求值就有了依赖关系。Decode 阶段必须要等到 Execute, Memory
+    和 Write-back 的电路端口达到稳态后，才能求值。
+
+    在处理 Control Hazard 的时候，Fetch 阶段需要知道 Execute 阶段所处理的分支
+    指令的跳转目标是否和先前预测的一致。因而，Fetch 阶段必然要在 Execute 阶段前执行。
+
+    所以，我们可以构建出一个求值顺序，保证一次传播电路信号，就能正确求出当前周期
+    中每一个端口的值。其中一种正确的顺序如下。
+
+    \begin{verbatim}
+        w->hook(); // Write-back
+        m->hook(); // Memory
+        e->hook(); // Execute
+        d->hook(); // Decode
+        f->hook(); // Fetch
+    \end{verbatim}
+
+    在电路信号传播完成后，更新时钟，开始下一个时钟周期，就能完成并行 CPU 的模拟。
 
     \subsection{验证并行实现确实并行}
 
@@ -308,28 +339,72 @@ for (int i = 0; i < 10; i++) {
 
     \subsection{模拟器使用的 CPU 电路}
 
+    模拟器所使用的电路如图 \ref{fig:simulator-design-fetch} 
+    \ref{fig:simulator-design-decode} 
+    \ref{fig:simulator-design-execute} 
+    \ref{fig:simulator-design-memory} 
+    \ref{fig:simulator-design-writeback} 所示。
+
+    \begin{figure}
+        \centering
+        \includegraphics[page=2,width=0.8\textwidth]{design.pdf}
+        \caption{Fetch 阶段}
+        \label{fig:simulator-design-fetch}
+    \end{figure}
+    \begin{figure}
+        \centering
+        \includegraphics[page=3,width=0.8\textwidth]{design.pdf}
+        \caption{Decode 阶段}
+        \label{fig:simulator-design-decode}
+    \end{figure}
+    \begin{figure}
+        \centering
+        \includegraphics[page=4,width=0.8\textwidth]{design.pdf}
+        \caption{Execute 阶段}
+        \label{fig:simulator-design-execute}
+    \end{figure}
+    \begin{figure}
+        \centering
+        \includegraphics[page=5,width=0.8\textwidth]{design.pdf}
+        \caption{Memory Access 阶段}
+        \label{fig:simulator-design-memory}
+    \end{figure}
+    \begin{figure}
+        \centering
+        \includegraphics[page=6,width=0.8\textwidth]{design.pdf}
+        \caption{Write-back 阶段}
+        \label{fig:simulator-design-writeback}
+    \end{figure}
+
     \begin{aside}{自己造数据}
         如果直接用现有的样例测试模拟器的正确性，似乎有些难度。因而，我通过 
         \href{https://github.com/TheThirdOne/rars}{RARS} 编写 RISC-V 汇编，
         造了几组测试数据，用于检查模拟器面对 Data Hazard 和
         Control Hazard 时的行为。这些测试样例都可以在 \texttt{tests/} 目录下找到。
     \end{aside}
-
-    https://github.com/skyzh/RISCV-Simulator/files/3362948/RISCV.Design.pdf
     
     \subsection{分支预测}
 
     在完成五级流水线后，我开始探究分支预测的实现。原本的实现对于分支指令，一律预测紧接的一句
     (Always not taken)。对于 \texttt{JAL}、\texttt{JALR} 之类的指令，也在 Execute
     阶段才进行处理。在此基础上，我实现了两位自适应分支预测 (Two-level Adaptive Predictor)。
+    结果如表 \ref{table:branch_prediction} 所示。
+
+    分支预测在循环较多的程序中，取得了比较好的效果。
     
-    \begin{tabular}{|l|c|c|c|c|}
-        \hline
-        \bfseries 数据 & \bfseries 预测前周期 & \bfseries 预测后周期 & \bfseries 周期减少率 & \bfseries 预测成功率
-        \csvreader[head to column names]{tables/branch_prediction.csv}{}
-        {\\\hline $\data$ & \beforecycles & \aftercycles & \cycleimprovement & \afterrate}
-        \\\hline
-    \end{tabular}
+    \begin{table}[H]
+        \caption{分支预测结果}
+        \vspace{0.3cm}
+        \label{table:branch_prediction}
+        \centering
+        \begin{tabular}{|l|c|c|c|c|}
+            \hline
+            \bfseries 数据 & \bfseries 预测前周期 & \bfseries 预测后周期 & \bfseries 周期减少率 & \bfseries 预测成功率
+            \csvreader[head to column names]{tables/branch_prediction.csv}{}
+            {\\\hline $\data$ & \beforecycles & \aftercycles & \cycleimprovement & \afterrate}
+            \\\hline
+        \end{tabular}
+    \end{table}
 
     \begin{aside}{使用 git 管理工程}
         说到分支，就不得不提 git 的分支（虽然此分支非彼分支）。在这个项目中，我通过 git 管理工程，开了许多分支。
@@ -340,7 +415,7 @@ for (int i = 0; i < 10; i++) {
 
     \section{基于 Tomasulo 算法的乱序执行}\label{out_of_order_execution}
 
-    在乱序执行中，原有的五级流水线最后只剩下两个大部分：发布指令 (issue) 阶段和乱序执行
+    在乱序执行中，原有的五级流水线最后只剩下两个大部分：发布指令 (Issue) 阶段和乱序执行
     (OoOExecute) 阶段。在乱序执行阶段中，原有 Execute 阶段的 ALU 变成了一个小单元，
     Memory Access 变成了 Load-Store 单元。
 
@@ -348,6 +423,11 @@ for (int i = 0; i < 10; i++) {
     展现乱序执行的纯算法模拟。
     \footnote{乱序执行模拟器的实现在 out-of-order 分支。
         \url{https://github.com/skyzh/RISCV-Simulator/tree/out-of-order}}
+
+    在这一章中，我将依次介绍仅基于 Tomasulo 算法的实现，以及支持推测执行的实现。最后，
+    我将展示一个支持 Tomasulo 算法、推测执行、分支预测 (Speculation) 的 CPU 模拟器
+    实现。这个模拟器中，重排缓冲 (Reorder Buffer) 有 12 个空位。在 Execute 阶段，
+    有 3 个 Load 缓冲、3 个 Store 缓冲和 4 个 ALU 单元。
 
     \subsection{新的寄存器类设计}\label{new_register_design}
 
@@ -378,7 +458,7 @@ void Issue::issue_rs_to_Vk(unsigned reg_id, RS *rs, RSID unit_id) {
     操作，只有在下一个周期才会生效。因而，这种寄存器类的设计在不影响理解的同时，增加了
     代码的可读性。
 
-    当然，在某些情况下，这种写法或许会让人有些误解。比如在发出指令阶段。
+    当然，在某些情况下，这种写法或许会让人有些误解。比如在发出指令阶段：
 
     \begin{verbatim}
 pc = pc + 4
@@ -392,6 +472,20 @@ pc = pc + 4
 
     在 \emph{Computer Architecture: A Quantitative Approach} 的第 3.5 节中，作者介绍了
     Tomasulo 算法。但是在这一章节中，缺少很多实现的细节，以至于我无法直接参照书本实现一个 CPU。
+    因而，我对书上的设计进行了一定的补充和修改，以便于模拟器的设计。
+
+    模拟器中 Load Buffer 和 Store Buffer 分别只有一个。只有在两者均空闲的时候，Issue 阶段才
+    会发出内存相关的指令。内存控制器单元每个时钟周期仅对一个 Buffer 进行操作。由此，可以保证不出现
+    在内存上的 Data Hazard。
+
+    模拟器碰到分支时会停止发出指令，直到下一条指令的地址被求出。\emph{CAAQA} 以某个 CPU 的浮点单元
+    设计为例阐述了 Tomasulo 算法，因而，书上并没有提到如何处理分支的情况。所以，我在模拟器设计
+    中做了这个修改。为了实现这个功能，我首先增加了 Branch 预留单元 (Reservation Station)。它的处理
+    和其他 ALU 预留单元一致。所以，分支指令会被发送到这个预留单元上。与此同时，我在 RISC-V 32 个寄存
+    器的基础上又新增了一个寄存器，称为 Branch 寄存器，专门用来保存分支处理的结果。一旦 Branch 单元空闲，
+    就说明分支的下一条语句已经被求出。Issue 阶段只需要读出 Branch 寄存器上，\texttt{rs1} 和
+    \texttt{rs2} 两个寄存器的比较结果，结合当前分支指令和 \texttt{PC}，就可以求出下一条语句的
+    地址，从而完成整个分支语句的执行过程。
 
     \subsection{RV32I 中较难处理的指令}
 
@@ -417,12 +511,18 @@ pc = pc + 4
     不能发出新的指令。这一问题也在后文第 \ref{hardware-speculation} 章中通过硬件推测解决了。
 
 
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.7\textwidth]{debug}
+        \caption{Debug 实况}
+    \end{figure}
+
     \begin{aside}{调整 Debug 输出，或许会有好心情}
         在实现乱序执行的过程中，我时常要观赏一个时钟周期里的所有硬件数据，来判定问题发生的地方。
         这些数据包括：发出的指令、PC、寄存器的值、寄存器重命名情况、Reservation Station 的
         情况。一个 Cycle 的信息可以打一整屏幕。此时，对 Debug 输出排版就显得尤为重要。
         对于 32 个寄存器，我在调试信息中打出了它们的名字，并同时输出十进制值和十六进制值。
-        对于正在处理数据 (busy) 的单元，我会用 Emoji 符号（比如红色的圈圈)突出显示。
+        对于正在处理数据 (busy) 的单元，我会用 Emoji 符号（比如红色的圈圈) 突出显示。
     \end{aside}
 
     \subsection{推测执行与重排缓冲}\label{hardware-speculation}
@@ -430,5 +530,19 @@ pc = pc + 4
     在完成基于 Tomasulo 算法的乱序执行后，根据 \emph{Computer Architecture: A Quantitative Approach}
     的介绍，我对设计进行改进，添加了重排缓冲 (Reorder Buffer)，实现了推测执行 
     (Hardware Speculation)。
+
+    在这里，我完全按照 \emph{CAAQA} 设计了整个模拟器。在其中，我也碰到了书上没有讲明白的地方，
+    并自己解决。
+
+    当分支预测出错的时候，我在清除 ROB 的同时，还将所有的运算单元恢复到初始状态。比如，内存单元
+    需要记录自己 Load 或者 Store 到哪一步。这个单元在清除 ROB 的同时需要被重置。
+
+    与此同时，我在设计中保留了 Store Buffer。我并没有按照书上实现 store 指令直接发送到 ROB
+    中的功能，因而保留 Store Buffer 简化了我的模拟器设计。
+
+    在完成分支预测时，我在 ROB 中新增了一个寄存器，用来存储当前分支指令在 Issue 阶段预测的下一条
+    指令的地址。由此，在提交指令的时候，模拟器才能判断分支预测是否正确，并请求清空 ROB。
+
+    至此，乱序执行的 RISC-V 模拟器基本完成。
 
 \end{document}

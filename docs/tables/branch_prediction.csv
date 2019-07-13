@@ -1,9 +1,4 @@
 data,beforecycles,beforetime,beforerate,aftercycles,cycleimprovement,aftertime,afterrate,rateimprovement
-naive.data,34,4.922ms,nan\%,33,2.94\%,5.337ms,nan\%,nan\%
-data-hazard-1.hex,11,0.479ms,nan\%,11,0.00\%,0.729ms,nan\%,nan\%
-data-hazard-2.hex,12,0.464ms,nan\%,12,0.00\%,0.571ms,nan\%,nan\%
-control-hazard-1.hex,11,0.446ms,nan\%,10,9.09\%,0.582ms,nan\%,nan\%
-control-hazard-2.hex,13,0.449ms,0\%,13,0.00\%,0.582ms,0\%,nan\%
 array\_test1.data,218,0.546ms,54.5455\%,209,4.13\%,0.655ms,54.5455\%,0.00\%
 array\_test2.data,247,0.544ms,50\%,237,4.05\%,1.047ms,50\%,0.00\%
 basicopt1.data,633149,56.926ms,58.9774\%,559226,11.68\%,52.074ms,98.8887\%,67.67\%
