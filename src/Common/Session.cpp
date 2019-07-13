@@ -68,6 +68,8 @@ void Session::load_memory(std::istream &in) {
 void Session::report(std::ostream &out) {
     out << "\t--- Session Report ---" << std::endl;
     out << "\t" << stat.cycle << " Cycles" << std::endl;
+    out << std::endl;
     i->report(out);
     e->report(out);
+    out << std::endl;
 }

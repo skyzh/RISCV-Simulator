@@ -529,6 +529,7 @@ void Issue::report(std::ostream &out) {
     out << " (" << 100.0 * stat.stall_cycle / session->stat.cycle << "%)";
     out << " cycles stall instruction";
     out << std::endl;
+    out << std::endl;
 }
 
 bool Issue::instruction_stalled() {

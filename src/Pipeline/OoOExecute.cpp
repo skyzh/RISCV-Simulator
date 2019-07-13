@@ -221,12 +221,13 @@ void OoOExecute::report(std::ostream &out) {
     for (int i = RS_BEGIN + 1; i < RS_END; i++) {
         RS *rs = get_rs((RSID) i);
         if (rs == nullptr) continue;
-        out << "\t" << RS::resolve(i) << " busy ";
+        out << "\t" << RS::resolve(i) << "\t";
         out << stat.unit_busy[i];
-        out << " (" << 100.0 * stat.unit_busy[i] / total_cycle << "%) cycles" << std::endl;
+        out << " (" << 100.0 * stat.unit_busy[i] / total_cycle << "%) cycles utilized" << std::endl;
     }
     out << "\tROB usage mean " << 1.0 * stat.rob_usage / total_cycle << " out of " << ROB_SIZE << std::endl;
     out << "\tROB usage max " << stat.rob_usage_max << " out of " << ROB_SIZE << std::endl;
+    out << std::endl;
 }
 
 OoOExecute::~OoOExecute() {
