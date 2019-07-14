@@ -144,7 +144,7 @@ voltage_at_b = voltage_at_c + 100 * current
 
     \begin{figure}[h]
         \centering
-        \includegraphics[width=0.8\textwidth]{register}
+        \includegraphics[page=1,width=0.8\textwidth]{design}
         \caption{寄存器模型}
         \label{fig:register}
     \end{figure}
@@ -285,14 +285,15 @@ w->hook();                         // 写入寄存器
     在改为五级流水线后，情况就不一样了。由于每两级之间都有寄存器隔离，所以每个阶段的
     电路信号仅和两级之间的寄存器有关。在这种情况下，不论以什么顺序求值都可以一次得到
     电路每一个端口的值。
-
+    
     在通过暂停流水处理数据冲突时，Decode 阶段需要知道后面三个阶段正在执行的指令和
     需要写入的寄存器。因而，必然有一组导线从后面三个阶段接到 Decode 阶段。在这种
     情况下，电路求值就有了依赖关系。Decode 阶段必须要等到 Execute, Memory
     和 Write-back 的电路端口达到稳态后，才能求值。
 
     在处理 Control Hazard 的时候，Fetch 阶段需要知道 Execute 阶段所处理的分支
-    指令的跳转目标是否和先前预测的一致。因而，Fetch 阶段必然要在 Execute 阶段前执行。
+    指令的跳转目标是否和先前预测的一致。因而，Fetch 阶段必然要在 Execute 阶段之后
+    求值。
 
     所以，我们可以构建出一个求值顺序，保证一次传播电路信号，就能正确求出当前周期
     中每一个端口的值。其中一种正确的顺序如下。
