@@ -137,7 +137,7 @@ void OoOExecute::debug() {
     }
     std::cout << "Register Rename" << std::endl;
     for (int i = 0; i < 4; i++) {
-        for (int j = i * 8; j < i * 8 + 8; j++) std::cout << rf_name[j] << "\t\t";
+        for (int j = i * 8; j < i * 8 + 8; j++) std::cout << rf_name[j] << "\t";
         std::cout << std::endl;
         for (int j = i * 8; j < i * 8 + 8; j++) {
             if (Busy[j].current()) {

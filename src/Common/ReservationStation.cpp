@@ -10,15 +10,15 @@ void RS::debug() {
     using std::cout;
     using std::setw;
     using std::endl;
-    cout << resolve(__debug_identifier) << (Busy.current() ? " (⚪busy)" : "") << std::endl;
+    cout << resolve(__debug_identifier) << (Busy.current() ? " (⚪busy)" : "       ") << "\t";
     cout << setw(8) << ALUUnit::resolve((ALUUnit::OP) Op.current());
     char buffer[100];
     sprintf(buffer, "#%d", Qj.current());
     cout << setw(8) << buffer;
     sprintf(buffer, "#%d", Qk.current());
     cout << setw(8) << buffer;
-    debug_immediate(Vj.current(), 7);
-    debug_immediate(Vk.current(), 7);
+    debug_immediate(Vj.current(), 11);
+    debug_immediate(Vk.current(), 11);
     debug_immediate(A.current(), 7);
     debug_immediate(Dest.current(), 7);
     debug_immediate(Tag.current(), 7);
@@ -27,8 +27,8 @@ void RS::debug() {
 
 void RS::debug_header() {
     char buffer[1000];
-    sprintf(buffer, "%8s%8s%8s%16s%16s%16s%16s%16s\n",
-            "Op", "Qj", "Qk", "Vj", "Vk", "A", "Dest", "Tag");
+    sprintf(buffer, "%16s%8s%8s%8s%24s%24s%16s%16s%16s\n",
+            "", "Op", "Qj", "Qk", "Vj", "Vk", "A", "Dest", "Tag");
     std::cout << buffer << std::endl;
 }
 

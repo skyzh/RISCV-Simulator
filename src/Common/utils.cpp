@@ -7,5 +7,5 @@
 #include <iostream>
 
 void debug_immediate(Immediate v, unsigned width) {
-    std::cout << std::dec << std::setw(width) << v << "(" << std::hex << std::setw(width) << v << ")";
+    std::cout << std::dec << std::setw(width) << (SImmediate) v << "(" << std::hex << std::setw(width) << v << ")";
 }

@@ -31,7 +31,7 @@ class CommitUnit;
 class OoOExecute {
 public:
     static const unsigned MAX_REG = 32;
-    static const unsigned ROB_SIZE = 12;
+    static const unsigned ROB_SIZE = 8;
 
     struct Stat {
         unsigned long long unit_busy[RS_END];
