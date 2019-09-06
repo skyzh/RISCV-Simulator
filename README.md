@@ -19,6 +19,11 @@ reorder buffer. Use Two-level adaptive predictor for branch prediction.
 Note that since I was unable to design the equivalent circuit, this branch 
 just shows a programmer's way to illustrate out-of-order execution design.
 
+You may go into Presentation Mode to view detailed execution information.
+
+<img width="1680" alt="Screen Shot 2019-09-06 at 10 07 22 AM" src="https://user-images.githubusercontent.com/4198311/64395894-5dd9d080-d08e-11e9-8b7c-888b3018f431.png">
+
+
 | Branch        |  Build Status | Note |
 | ------------- | ------------- | ------------- |
 | [seq](https://github.com/skyzh/RISCV-Simulator/tree/seq)  | [![Build Status](https://travis-ci.com/skyzh/RISCV-Simulator.svg?branch=seq)](https://travis-ci.com/skyzh/RISCV-Simulator)  | A sequential implementation. First edition. No feed forward. |
