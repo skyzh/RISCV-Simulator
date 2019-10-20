@@ -4,7 +4,13 @@
 
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
-For a full report on how I made this simulator, refer to [Make You a RISC-V Simulator (PDF, Chinese)](https://github.com/skyzh/RISCV-Simulator/files/3389385/make-you-a-riscv-simulator.final.2.pdf)
+The architecture is derived from Tomasulo and Speculation described in CA:AQA Chapter 3. While the method in the textbook is not detailed enough to carry out a CPU design (It illustrates the algorithm with only one float unit instead of a CPU), I came up with some ideas to complete the design for a fully-functional RISC-V CPU. It can be summarized as follows:
+
+* Handle memory hazards
+* RISC-V `jalr` instruction
+* Handle branch mis-prediction in the architecture with just Tomasulo algorithm
+
+For a full report on how I made this simulator and solutions to the challenges above, refer to [Make You a RISC-V Simulator (PDF, Chinese)](https://github.com/skyzh/RISCV-Simulator/files/3389385/make-you-a-riscv-simulator.final.2.pdf)
 
 For statistics and reports on sample programs, refer to Travis-CI build log.
 
