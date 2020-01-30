@@ -4,6 +4,8 @@
 
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
+Generally this should be done with a 5-level pipeline. This implementation may be found at [pipeline](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) branch.
+
 The architecture is derived from Tomasulo and Speculation described in CA:AQA Chapter 3. While the method in the textbook is not detailed enough to carry out a CPU design (It illustrates the algorithm with only one float unit instead of a CPU), I came up with some ideas to complete the design for a fully-functional RISC-V CPU. It can be summarized as follows:
 
 * Handle memory hazards
