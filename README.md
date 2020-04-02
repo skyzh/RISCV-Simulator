@@ -2,11 +2,13 @@
 
 [![Build Status](https://travis-ci.com/skyzh/RISCV-Simulator.svg?branch=out-of-order)](https://travis-ci.com/skyzh/RISCV-Simulator)
 
+News: I'm working on a new "functional" MIPS simulator in Haskell. Check it out [here](https://github.com/skyzh/mips-simulator).
+
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
-Generally this should be done with a 5-level pipeline. This implementation may be found at [pipeline](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) branch.
+Generally this should be done with a **5-level pipeline**. This implementation may be found at [pipeline](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) branch.
 
-The architecture is derived from Tomasulo and Speculation described in CA:AQA Chapter 3. While the method in the textbook is not detailed enough to carry out a CPU design (It illustrates the algorithm with only one float unit instead of a CPU), I came up with some ideas to complete the design for a fully-functional RISC-V CPU. It can be summarized as follows:
+The architecture is derived from **Tomasulo** and **Speculation** described in CA:AQA Chapter 3. While the method in the textbook is not detailed enough to carry out a CPU design (It illustrates the algorithm with only one float unit instead of a CPU), I came up with some ideas to complete the design for a fully-functional RISC-V CPU. It can be summarized as follows:
 
 * Handle memory hazards
 * RISC-V `jalr` instruction
@@ -14,7 +16,7 @@ The architecture is derived from Tomasulo and Speculation described in CA:AQA Ch
 
 For a full report on how I made this simulator and solutions to the challenges above, refer to [Make You a RISC-V Simulator (PDF, Chinese)](https://github.com/skyzh/RISCV-Simulator/files/3389385/make-you-a-riscv-simulator.final.2.pdf)
 
-For statistics and reports on sample programs, refer to Travis-CI build log.
+For statistics and reports on sample programs, refer to [Travis-CI build log](https://travis-ci.com/github/skyzh/RISCV-Simulator).
 
 This branch simulates a RISC-V CPU of 2 stage: issue and execute, 
 which supports out-of-order execution.
