@@ -4,16 +4,16 @@
 
 RISCV-Simulator implemented in C++. Support RV32I ISA.
 
-Generally this should be done with a **5-level pipeline**. This implementation may be found at [pipeline](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) branch.
+Generally this should be done with a **5-stage pipeline**. This implementation may be found at [pipeline](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) branch.
 
 All CPU and CPU simulators I've made are listed below.
 
 |                                                                     | Technique                                      | Implementation |
 |---------------------------------------------------------------------|------------------------------------------------|----------------|
-| [RISC-V v1](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) | 5-level pipeline  simulator                 | C++            |
+| [RISC-V v1](https://github.com/skyzh/RISCV-Simulator/tree/pipeline) | 5-stage pipeline  simulator                 | C++            |
 | [RISC-V v2](https://github.com/skyzh/RISCV-Simulator)               | dynamic scheduling simulator <br> Tomasulo + Speculation | C++            |
-| [MIPS](https://github.com/skyzh/mips-simulator)                     | 5-level pipeline  simulator                             | Haskell        |
-| [MIPS](https://github.com/skyzh/mips-cpu)                           | 5-level pipeline CPU (Not yet open-sourced)        | Verilog        |
+| [MIPS](https://github.com/skyzh/mips-simulator)                     | 5-stage pipeline  simulator                             | Haskell        |
+| [MIPS](https://github.com/skyzh/mips-cpu)                           | 5-stage pipeline CPU (Not yet open-sourced)        | Verilog        |
 
 The architecture is derived from **Tomasulo** and **Speculation** described in CA:AQA Chapter 3. While the method in the textbook is not detailed enough to carry out a CPU design (It illustrates the algorithm with only one float unit instead of a CPU), I came up with some ideas to complete the design for a fully-functional RISC-V CPU. It can be summarized as follows:
 
